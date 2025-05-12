@@ -1,0 +1,32 @@
+{
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "submit": "Se connecter"
+    }
+  },
+  "dashboard": {
+    "kpi": {
+      "users": "Utilisateurs actifs",
+      "invoices": "Factures en cours",
+      "notifications": "Notifications non lues"
+    },
+    "sections": {
+      "overview": "Aperçu",
+      "analytics": "Analytique",
+      "users": "Utilisateurs",
+      "settings": "Paramètres"
+    }
+  },
+  "users": {
+    "list": {
+      "title": "Gestion des utilisateurs",
+      "search": "Rechercher...",
+      "create": "Créer utilisateur",
+      "edit": "Éditer",
+      "block": "Bloquer"
+    }
+  }
+}

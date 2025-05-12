@@ -1,0 +1,32 @@
+{
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in"
+    }
+  },
+  "dashboard": {
+    "kpi": {
+      "users": "Active users",
+      "invoices": "Open invoices",
+      "notifications": "Unread notifications"
+    },
+    "sections": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "users": "Users",
+      "settings": "Settings"
+    }
+  },
+  "users": {
+    "list": {
+      "title": "User management",
+      "search": "Search...",
+      "create": "Create user",
+      "edit": "Edit",
+      "block": "Block"
+    }
+  }
+}
