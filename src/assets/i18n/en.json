@@ -28,5 +28,31 @@
       "edit": "Edit",
       "block": "Block"
     }
+  },
+  "notifications": {
+    "panel": {
+      "title": "Notifications",
+      "markAll": "Mark all as read",
+      "empty": "No notifications"
+    },
+    "details": {
+      "title": "Notification details",
+      "close": "Close"
+    }
+  },
+  "payments": {
+    "proofs": {
+      "upload": "Upload proof",
+      "view": "View proof",
+      "download": "Download receipt"
+    }
+  },
+  "monitoring": {
+    "thresholds": {
+      "title": "Thresholds",
+      "responseTime": "Response time (ms)",
+      "errorRate": "Error rate (%)",
+      "save": "Save"
+    }
   }
 }

@@ -28,5 +28,31 @@
       "edit": "Éditer",
       "block": "Bloquer"
     }
+  },
+  "notifications": {
+    "panel": {
+      "title": "Notifications",
+      "markAll": "Tout marquer comme lu",
+      "empty": "Aucune notification"
+    },
+    "details": {
+      "title": "Détails de la notification",
+      "close": "Fermer"
+    }
+  },
+  "payments": {
+    "proofs": {
+      "upload": "Téléverser une preuve",
+      "view": "Voir la preuve",
+      "download": "Télécharger le reçu"
+    }
+  },
+  "monitoring": {
+    "thresholds": {
+      "title": "Seuils",
+      "responseTime": "Temps de réponse (ms)",
+      "errorRate": "Taux d'erreur (%)",
+      "save": "Enregistrer"
+    }
   }
 }
