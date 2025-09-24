@@ -1,0 +1,28 @@
+<div class="notification-settings-container" [class.loading]="loading">
+  <h2>Préférences de notification</h2>
+  <form (ngSubmit)="savePreference()">
+    <label>
+      <input type="checkbox" [(ngModel)]="preference.emailEnabled" name="emailEnabled" />
+      Recevoir des notifications par email
+    </label>
+    <label>
+      <input type="checkbox" [(ngModel)]="preference.smsEnabled" name="smsEnabled" />
+      Recevoir des notifications par SMS
+    </label>
+    <label>
+      Nombre de jours avant échéance pour rappel :
+      <input type="number" [(ngModel)]="preference.daysBeforeDueDate" name="daysBeforeDueDate" min="1" max="30" />
+    </label>
+    <button type="button" *ngIf="!isPushSubscribed" (click)="enablePushNotifications()">Activer les notifications push</button>
+    <button type="button" *ngIf="isPushSubscribed" (click)="disablePushNotifications()">Désactiver les notifications push</button>
+    <div *ngIf="pushStatus" class="push-status">{{ pushStatus }}</div>
+    <div class="channel-status">
+      <span>Email : <b>{{ preference.emailEnabled ? 'Activé' : 'Désactivé' }}</b></span>
+      <span>SMS : <b>{{ preference.smsEnabled ? 'Activé' : 'Désactivé' }}</b></span>
+      <span>WhatsApp : <b>{{ preference.whatsappEnabled ? 'Activé' : 'Désactivé' }}</b></span>
+      <span>Push : <b>{{ isPushSubscribed ? 'Activé' : 'Désactivé' }}</b></span>
+    </div>
+    <button type="submit" [disabled]="loading">Enregistrer</button>
+  </form>
+  <div *ngIf="message" class="message">{{ message }}</div>
+</div>

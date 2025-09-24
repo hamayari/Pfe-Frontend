@@ -1,0 +1,2147 @@
+<!-- Dashboard Admin Simple et Fonctionnel -->
+<div class="admin-dashboard-container">
+  <!-- Header Professionnel -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1 class="page-title">Dashboard Administrateur</h1>
+    </div>
+    
+    <div class="header-center">
+      <!-- Barre de recherche globale -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="material-icons search-icon">search</i>
+          <input type="text" 
+                 class="search-input" 
+                 placeholder="Rechercher utilisateurs, conventions, factures..."
+                 [(ngModel)]="searchQuery"
+                 (keyup.enter)="performSearch()">
+          <button class="search-btn" (click)="performSearch()">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <!-- Notifications -->
+      <div class="notification-container">
+        <button class="header-icon-btn" (click)="toggleNotifications()" [class.has-notifications]="hasNotifications" title="Notifications">
+          <i class="material-icons">notifications</i>
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Messages -->
+      <div class="messages-container">
+        <button class="header-icon-btn" (click)="toggleMessages()" [class.has-messages]="hasMessages" title="Messages">
+          <i class="material-icons">mail</i>
+          <span class="message-badge" *ngIf="messageCount > 0">{{ messageCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Paramètres -->
+      <button class="header-icon-btn" (click)="toggleSettings()" title="Paramètres">
+        <i class="material-icons">settings</i>
+      </button>
+      
+      <!-- Mode sombre/clair -->
+      <button class="header-icon-btn" (click)="toggleDarkMode()" [title]="darkMode ? 'Mode clair' : 'Mode sombre'">
+        <i class="material-icons">{{ darkMode ? 'light_mode' : 'dark_mode' }}</i>
+      </button>
+      
+      
+      <!-- Profil utilisateur -->
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <img [src]="currentUser?.avatar || getDefaultAvatar('User')" 
+               [alt]="currentUser?.username || 'User'"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+        </div>
+        <div class="user-details">
+          <div class="username">{{ currentUser?.username || 'Utilisateur' }}</div>
+          <div class="role">{{ getCurrentUserRole() }}</div>
+        </div>
+        <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
+      </div>
+
+      <!-- Menu dropdown utilisateur -->
+      <div class="user-menu" [class.open]="userMenuOpen">
+        <div class="menu-item" (click)="goToProfile()">
+          <i class="material-icons">person</i>
+          <span>Mon Profil</span>
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item logout" (click)="logout()">
+          <i class="material-icons">logout</i>
+          <span>Se Déconnecter</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout principal -->
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <div class="logo-icon">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#4F8DF9;stop-opacity:1" />
+                  <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#2ECC71;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#27AE60;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect width="40" height="40" rx="12" fill="url(#logoGradient)"/>
+              <rect x="8" y="12" width="24" height="2" rx="1" fill="white"/>
+              <rect x="8" y="18" width="20" height="2" rx="1" fill="white"/>
+              <rect x="8" y="24" width="16" height="2" rx="1" fill="white"/>
+              <circle cx="26" cy="26" r="4" fill="url(#accentGradient)"/>
+              <circle cx="26" cy="26" r="2" fill="white"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h2 class="brand-name">GestionPro</h2>
+            <span class="brand-tagline">Administration</span>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <h3 class="section-title">PRINCIPAL</h3>
+          <div class="nav-item" [class.active]="currentSection === 'dashboard'" (click)="navigateToSection('dashboard')">
+            <i class="material-icons">dashboard</i>
+            <span>Dashboard</span>
+          </div>
+          <div class="nav-item" [class.active]="currentSection === 'users'" (click)="navigateToSection('users')">
+            <i class="material-icons">people</i>
+            <span>Utilisateurs</span>
+          </div>
+          <div class="nav-item nav-parent" [class.active]="isNomenclatureSectionActive()" [class.expanded]="nomenclatureMenuExpanded" (click)="toggleNomenclatureMenu()">
+            <i class="material-icons">apps</i>
+            <span>Nomenclatures</span>
+            <i class="material-icons expand-icon">{{ nomenclatureMenuExpanded ? 'expand_less' : 'expand_more' }}</i>
+          </div>
+          
+          <!-- Sous-menu Nomenclatures -->
+          <div class="nav-submenu" [class.expanded]="nomenclatureMenuExpanded">
+            <div class="nav-item nav-child" [class.active]="currentSection === 'applications'" (click)="navigateToSection('applications')">
+              <i class="material-icons">apps</i>
+              <span>Applications</span>
+            </div>
+            <div class="nav-item nav-child" [class.active]="currentSection === 'zones'" (click)="navigateToSection('zones')">
+              <i class="material-icons">map</i>
+              <span>Zones Géographiques</span>
+            </div>
+            <div class="nav-item nav-child" [class.active]="currentSection === 'structures-nomenclatures'" (click)="navigateToSection('structures-nomenclatures')">
+            <i class="material-icons">business</i>
+            <span>Structures</span>
+          </div>
+          </div>
+        </div>
+        
+        <!-- Section Administration -->
+        <div class="nav-section">
+          <h3 class="section-title">ADMINISTRATION</h3>
+          <div class="nav-item" [class.active]="currentSection === 'settings'" (click)="navigateToSection('settings')">
+            <i class="material-icons">settings</i>
+            <span>Paramètres</span>
+          </div>
+          <div class="nav-item" [class.active]="currentSection === 'notification-history'" (click)="navigateToSection('notification-history')">
+            <i class="material-icons">history</i>
+            <span>Historique</span>
+          </div>
+          <div class="nav-item" [class.active]="currentSection === 'notifications-settings'" (click)="navigateToSection('notifications-settings')">
+            <i class="material-icons">notifications_active</i>
+            <span>Paramètres</span>
+          </div>
+        </div>
+        
+        <!-- Section Profil -->
+        <div class="nav-section">
+          <h3 class="section-title">PROFIL</h3>
+          <div class="nav-item" [class.active]="currentSection === 'profile'" (click)="navigateToSection('profile')">
+            <i class="material-icons">person</i>
+            <span>Mon Profil</span>
+          </div>
+        </div>
+        
+      </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+      <!-- Section Dashboard -->
+      <div class="content-section" [class.active]="currentSection === 'dashboard'">
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" 
+               [class.users-card]="card.title === 'Utilisateurs'"
+               [class.structures-card]="card.title === 'Structures Configurées'"
+               [class.taxonomies-card]="card.title === 'Taxonomies'"
+               [class.alerts-card]="card.title === 'Alertes'"
+               *ngFor="let card of kpiCards">
+            <div class="kpi-header">
+              <h3 class="kpi-title">{{ card.title }}</h3>
+              <div class="kpi-icon">
+                <i class="material-icons">{{ card.icon }}</i>
+              </div>
+            </div>
+            <div class="kpi-value">{{ card.value }}</div>
+            <div class="kpi-unit">{{ card.unit }}</div>
+            <div class="kpi-trend">
+              <i class="material-icons trend-icon" [class]="card.trend">{{ getTrendIcon(card.trend) }}</i>
+              <span class="trend-value">{{ card.trendValue }}</span>
+            </div>
+            <div class="kpi-breakdown" *ngIf="card.breakdown">
+              <div class="breakdown-item" *ngFor="let item of card.breakdown">
+                <div class="breakdown-color" [style.background-color]="item.color"></div>
+                <span class="breakdown-label">{{ item.label }}</span>
+                <span class="breakdown-value">{{ item.value }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Graphiques -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Utilisateurs par Rôle</h3>
+            </div>
+            <div class="chart-container">
+              <canvas #usersChart></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Applications par Statut</h3>
+            </div>
+            <div class="chart-container">
+              <canvas #evolutionChart></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Zones par Gouvernement</h3>
+            </div>
+            <div class="chart-container">
+              <canvas #structuresChart></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Structures par Type</h3>
+            </div>
+            <div class="chart-container">
+              <canvas #alertsChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Utilisateurs -->
+      <div class="content-section" [class.active]="currentSection === 'users'">
+        <div class="users-section">
+          <div class="section-header">
+            <h2 class="section-title">Gestion des Utilisateurs</h2>
+            <button class="btn" (click)="openAddUserDialog()">
+              <i class="material-icons">person_add</i>
+              Ajouter Utilisateur
+            </button>
+          </div>
+
+          <!-- Filtres -->
+          <div class="users-filters">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>Rôle</label>
+                <select [(ngModel)]="globalFilters.role">
+                  <option value="all">Tous les rôles</option>
+                  <option value="ROLE_ADMIN">Admin</option>
+                  <option value="ROLE_SUPER_ADMIN">Super Admin</option>
+                  <option value="ROLE_COMMERCIAL">Commercial</option>
+                  <option value="ROLE_CHEF_PROJET">Chef de Projet</option>
+                  <option value="ROLE_DECIDEUR">Décideur</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Statut</label>
+                <select [(ngModel)]="globalFilters.status">
+                  <option value="all">Tous les statuts</option>
+                  <option value="active">Actif</option>
+                  <option value="pending">En attente</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistiques -->
+          <div class="users-stats">
+            <div class="stat-card active-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">person_check</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ getActiveUsersCount() }}</div>
+              <div class="stat-label">Utilisateurs Actifs</div>
+            </div>
+            </div>
+            <div class="stat-card pending-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">schedule</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ getPendingUsersCount() }}</div>
+              <div class="stat-label">En Attente</div>
+            </div>
+            </div>
+            <div class="stat-card inactive-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">person_off</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ getInactiveUsersCount() }}</div>
+              <div class="stat-label">Inactifs</div>
+            </div>
+            </div>
+            <div class="stat-card total-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">people</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ recentUsers.length }}</div>
+              <div class="stat-label">Total</div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Actions groupées -->
+          <div class="bulk-actions" *ngIf="getSelectedUsers().length > 0">
+            <div class="bulk-actions-info">
+              <span>{{ getSelectedUsers().length }} utilisateur(s) sélectionné(s)</span>
+            </div>
+            <div class="bulk-actions-buttons">
+              <button class="btn btn-warning" (click)="bulkDeactivateUsers()" title="Désactiver les utilisateurs sélectionnés">
+                <i class="material-icons">person_off</i>
+                Désactiver
+              </button>
+              <button class="btn btn-danger" (click)="bulkDeleteUsers()" title="Supprimer les utilisateurs sélectionnés">
+                <i class="material-icons">delete</i>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <!-- Tableau des utilisateurs -->
+          <div class="users-table-container">
+            <table class="users-table" *ngIf="getPaginatedUsers().length > 0">
+              <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" 
+                           [checked]="isAllSelected()" 
+                           (change)="toggleSelectAll()"
+                           title="Sélectionner tous les utilisateurs">
+                  </th>
+                  <th class="sortable" (click)="sortBy('name')" title="Trier par nom">
+                    Utilisateur
+                    <i class="material-icons sort-icon" [class.active]="sortField === 'name'">
+                      {{ getSortIcon('name') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortBy('email')" title="Trier par email">
+                    Email
+                    <i class="material-icons sort-icon" [class.active]="sortField === 'email'">
+                      {{ getSortIcon('email') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortBy('role')" title="Trier par rôle">
+                    Rôle
+                    <i class="material-icons sort-icon" [class.active]="sortField === 'role'">
+                      {{ getSortIcon('role') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortBy('status')" title="Trier par statut">
+                    Statut
+                    <i class="material-icons sort-icon" [class.active]="sortField === 'status'">
+                      {{ getSortIcon('status') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortBy('lastLogin')" title="Trier par dernière connexion">
+                    Dernière Connexion
+                    <i class="material-icons sort-icon" [class.active]="sortField === 'lastLogin'">
+                      {{ getSortIcon('lastLogin') }}
+                    </i>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of getPaginatedUsers()">
+                  <td>
+                    <input type="checkbox" 
+                           [checked]="isUserSelected(user.id)" 
+                           (change)="toggleUserSelection(user.id)"
+                           title="Sélectionner cet utilisateur">
+                  </td>
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">
+                        <img [src]="user.avatar || getDefaultAvatar(user.name)" 
+                             [alt]="user.name"
+                             class="avatar-image"
+                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+                      </div>
+                      <div class="user-details">
+                        <div class="user-name">{{ user.name }}</div>
+                        <div class="user-email">{{ user.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="role-badge" [class]="getRoleClass(getUserRole(user))">
+                      <i class="material-icons role-icon">{{ getRoleIcon(getUserRole(user)) }}</i>
+                      {{ getUserRole(user) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="user.status">
+                      <i class="material-icons">{{ getStatusIcon(user.status) }}</i>
+                      {{ getStatusLabel(user.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="last-login">
+                      <i class="material-icons">access_time</i>
+                      <span>{{ user.lastLogin ? formatDate(user.lastLogin) : 'Jamais' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="user-actions">
+                      <button class="action-btn edit" (click)="editUser(user)" title="Modifier l'utilisateur">
+                        <i class="material-icons">edit</i>
+                      </button>
+                      <button class="action-btn delete" (click)="deleteUser(user)" title="Supprimer l'utilisateur">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination-container" *ngIf="getFilteredAndSortedUsers().length > itemsPerPage">
+              <div class="pagination-info">
+                <span>
+                  Affichage de {{ getStartItemIndex() }} à 
+                  {{ getDisplayedItemsCount() }} 
+                  sur {{ getFilteredAndSortedUsers().length }} utilisateurs
+                </span>
+              </div>
+              
+              <div class="pagination-controls">
+                <!-- Bouton Précédent -->
+                <button class="pagination-btn" 
+                        [disabled]="currentPage === 1" 
+                        (click)="previousPage()"
+                        title="Page précédente">
+                  <i class="material-icons">chevron_left</i>
+                </button>
+
+                <!-- Numéros de pages -->
+                <div class="pagination-numbers">
+                  <!-- Première page si nécessaire -->
+                  <button *ngIf="getPageNumbers()[0] > 1" 
+                          class="pagination-number" 
+                          (click)="goToPage(1)">1</button>
+                  <span *ngIf="getPageNumbers()[0] > 2" class="pagination-ellipsis">...</span>
+
+                  <!-- Pages visibles -->
+                  <button *ngFor="let page of getPageNumbers()" 
+                          class="pagination-number" 
+                          [class.active]="page === currentPage"
+                          (click)="goToPage(page)">{{ page }}</button>
+
+                  <!-- Dernière page si nécessaire -->
+                  <span *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1" 
+                        class="pagination-ellipsis">...</span>
+                  <button *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages" 
+                          class="pagination-number" 
+                          (click)="goToPage(totalPages)">{{ totalPages }}</button>
+                </div>
+
+                <!-- Bouton Suivant -->
+                <button class="pagination-btn" 
+                        [disabled]="currentPage === totalPages" 
+                        (click)="nextPage()"
+                        title="Page suivante">
+                  <i class="material-icons">chevron_right</i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Message si aucun utilisateur -->
+            <div class="no-users" *ngIf="getFilteredAndSortedUsers().length === 0">
+              <i class="material-icons">people_outline</i>
+              <div class="no-users-title">Aucun utilisateur trouvé</div>
+              <div class="no-users-message">
+                {{ searchTerm ? 'Aucun utilisateur ne correspond à votre recherche.' : 'Commencez par ajouter votre premier utilisateur.' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Structures -->
+      <div class="content-section" [class.active]="currentSection === 'structures'" style="display: none;">
+        <div class="users-section">
+          <div class="section-header">
+            <h2 class="section-title">Gestion des Structures</h2>
+            <button class="btn" (click)="openAddStructureDialog()">
+              <i class="material-icons">business</i>
+              Ajouter Structure
+            </button>
+          </div>
+
+          <!-- Filtres -->
+          <div class="users-filters">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>Type</label>
+                <select [(ngModel)]="structureFilters.type">
+                  <option value="all">Tous les types</option>
+                  <option value="ENTREPRISE">Entreprise</option>
+                  <option value="ORGANISATION">Organisation</option>
+                  <option value="MINISTERE">Ministère</option>
+                  <option value="ASSOCIATION">Association</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Statut</label>
+                <select [(ngModel)]="structureFilters.status">
+                  <option value="all">Tous les statuts</option>
+                  <option value="active">Actif</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              </div>
+        </div>
+      </div>
+
+          <!-- Statistiques -->
+          <div class="users-stats">
+            <div class="stat-card active-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">business</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.actives }}</div>
+              <div class="stat-label">Structures Actives</div>
+            </div>
+            </div>
+            <div class="stat-card pending-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">schedule</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.enAttente }}</div>
+              <div class="stat-label">En Attente</div>
+            </div>
+            </div>
+            <div class="stat-card inactive-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">business_center</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.inactives }}</div>
+              <div class="stat-label">Inactives</div>
+            </div>
+            </div>
+            <div class="stat-card total-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">domain</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.total }}</div>
+              <div class="stat-label">Total</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions groupées -->
+          <div class="bulk-actions" *ngIf="getSelectedStructures().length > 0">
+            <div class="bulk-actions-info">
+              <span>{{ getSelectedStructures().length }} structure(s) sélectionnée(s)</span>
+            </div>
+            <div class="bulk-actions-buttons">
+              <button class="btn btn-warning" (click)="bulkDeactivateStructures()" title="Désactiver les structures sélectionnées">
+                <i class="material-icons">business_center</i>
+                Désactiver
+              </button>
+              <button class="btn btn-danger" (click)="bulkDeleteStructures()" title="Supprimer les structures sélectionnées">
+                <i class="material-icons">delete</i>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <!-- Tableau des structures -->
+          <div class="users-table-container">
+            <table class="users-table" *ngIf="getPaginatedStructures().length > 0">
+              <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" 
+                           [checked]="isAllStructuresSelected()" 
+                           (change)="toggleSelectAllStructures()"
+                           title="Sélectionner toutes les structures">
+                  </th>
+                  <th class="sortable" (click)="sortStructures('libelle')" title="Trier par nom">
+                    Structure
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'libelle'">
+                      {{ getStructureSortIcon('libelle') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortStructures('code')" title="Trier par code">
+                    Code
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'code'">
+                      {{ getStructureSortIcon('code') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortStructures('typeStructure')" title="Trier par type">
+                    Type
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'typeStructure'">
+                      {{ getStructureSortIcon('typeStructure') }}
+                    </i>
+                  </th>
+                  <th>Adresse</th>
+                  <th>Gouvernorat</th>
+                  <th class="sortable" (click)="sortStructures('actif')" title="Trier par statut">
+                    Statut
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'actif'">
+                      {{ getStructureSortIcon('actif') }}
+                    </i>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let structure of getPaginatedStructures(); trackBy: trackByStructureId">
+                  <td>
+                    <input type="checkbox" 
+                           [checked]="isStructureSelected(structure.id)" 
+                           (change)="toggleStructureSelection(structure.id)"
+                           title="Sélectionner cette structure">
+                  </td>
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">
+                        <div class="avatar-circle" [style.background-color]="getStructureAvatarColor(structure)">
+                          {{ getStructureInitials(structure) }}
+                        </div>
+                      </div>
+                      <div class="user-details">
+                        <div class="user-name">{{ structure.libelle }}</div>
+                        <div class="user-email">{{ structure.code }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ structure.code }}</td>
+                  <td>
+                    <span class="role-badge" [class]="getStructureTypeClass(structure.typeStructure)">
+                      <i class="material-icons role-icon">business</i>
+                      {{ structureService.getStructureTypeLabel(structure.typeStructure) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="structure-address">
+                      <i class="material-icons">location_on</i>
+                      <span>{{ structure.adresse || 'Non renseignée' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="structure-governorate">
+                      <i class="material-icons">map</i>
+                      <span>{{ getGovernorateName(structure.zoneGeographiqueId) || 'Non renseigné' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="structure.actif ? 'active' : 'inactive'">
+                      <i class="material-icons">{{ structure.actif ? 'check_circle' : 'cancel' }}</i>
+                      {{ structure.actif ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="user-actions">
+                      <button class="action-btn edit" (click)="editStructure(structure)" title="Modifier la structure">
+                        <i class="material-icons">edit</i>
+                      </button>
+                      <button class="action-btn delete" (click)="deleteStructure(structure)" title="Supprimer la structure">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Message quand aucune structure -->
+            <div class="no-data-message" *ngIf="getPaginatedStructures().length === 0">
+              <div class="no-data-content">
+                <i class="material-icons">business_center</i>
+                <h3>Aucune structure trouvée</h3>
+                <p>Il n'y a actuellement aucune structure dans le système.</p>
+                <button class="btn btn-primary" (click)="openAddStructureDialog()">
+                  <i class="material-icons">add</i>
+                  Ajouter la première structure
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-container" *ngIf="getFilteredStructures().length > 5">
+            <div class="pagination-info">
+              <span>
+                Affichage de {{ (currentPageStructures - 1) * itemsPerPageStructures + 1 }} à 
+                {{ getEndIndexStructures() }} 
+                sur {{ getFilteredStructures().length }} structures
+              </span>
+            </div>
+            
+            <div class="pagination-controls">
+              <!-- Bouton Précédent -->
+              <button class="pagination-btn" 
+                      [disabled]="currentPageStructures === 1" 
+                      (click)="changePageStructures(currentPageStructures - 1)"
+                      title="Page précédente">
+                <i class="material-icons">chevron_left</i>
+              </button>
+
+              <!-- Numéros de pages -->
+              <div class="pagination-numbers">
+                <!-- Première page si nécessaire -->
+                <button *ngIf="getStructurePageNumbers()[0] > 1" 
+                        class="pagination-number" 
+                        (click)="changePageStructures(1)">1</button>
+                <span *ngIf="getStructurePageNumbers()[0] > 2" class="pagination-ellipsis">...</span>
+
+                <!-- Pages visibles -->
+                <button *ngFor="let page of getStructurePageNumbers()" 
+                        class="pagination-number" 
+                        [class.active]="page === currentPageStructures"
+                        (click)="changePageStructures(page)">{{ page }}</button>
+
+                <!-- Dernière page si nécessaire -->
+                <span *ngIf="getStructurePageNumbers()[getStructurePageNumbers().length - 1] < getTotalPagesStructures() - 1" 
+                      class="pagination-ellipsis">...</span>
+                <button *ngIf="getStructurePageNumbers()[getStructurePageNumbers().length - 1] < getTotalPagesStructures()" 
+                        class="pagination-number" 
+                        (click)="changePageStructures(getTotalPagesStructures())">{{ getTotalPagesStructures() }}</button>
+              </div>
+
+              <!-- Bouton Suivant -->
+              <button class="pagination-btn" 
+                      [disabled]="currentPageStructures === getTotalPagesStructures()" 
+                      (click)="changePageStructures(currentPageStructures + 1)"
+                      title="Page suivante">
+                <i class="material-icons">chevron_right</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Section Applications -->
+      <div class="content-section" [class.active]="currentSection === 'applications'">
+        <div class="users-section">
+          <!-- En-tête avec statistiques -->
+          <div class="section-header">
+            <h2 class="section-title">Gestion des Applications</h2>
+            <div class="header-actions">
+              <button class="btn btn-primary" (click)="showAddApplicationModal = true">
+                <i class="material-icons">add</i>
+                Ajouter Application
+            </button>
+          </div>
+        </div>
+
+          <!-- Cartes de statistiques -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="material-icons">apps</i>
+      </div>
+              <div class="stat-content">
+                <div class="stat-number">{{ getTotalApplicationsCount() }}</div>
+                <div class="stat-label">Total Applications</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon active">
+                <i class="material-icons">check_circle</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">{{ getActiveApplicationsCount() }}</div>
+                <div class="stat-label">Applications Actives</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon inactive">
+                <i class="material-icons">cancel</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">{{ getInactiveApplicationsCount() }}</div>
+                <div class="stat-label">Applications Inactives</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtres -->
+          <div class="users-filters">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>Statut</label>
+                <select [(ngModel)]="applicationFilters.status">
+                  <option value="all">Tous les statuts</option>
+                  <option value="active">Actif</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Recherche</label>
+                <input 
+                  type="text" 
+                  placeholder="Rechercher une application..." 
+                  [(ngModel)]="searchTermApplications"
+                  (keyup)="searchApplications()"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions groupées -->
+          <div class="bulk-actions" *ngIf="selectedApplicationIds.length > 0">
+            <div class="bulk-actions-info">
+              <span>{{ selectedApplicationIds.length }} application(s) sélectionnée(s)</span>
+            </div>
+            <div class="bulk-actions-buttons">
+              <button class="btn btn-warning" (click)="bulkDeactivateApplications()" title="Désactiver les applications sélectionnées">
+                <i class="material-icons">block</i>
+                Désactiver
+              </button>
+              <button class="btn btn-danger" (click)="bulkDeleteApplications()" title="Supprimer les applications sélectionnées">
+                <i class="material-icons">delete</i>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <!-- Tableau des Applications -->
+          <div class="users-table-container">
+            <table class="users-table">
+              <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" 
+                           [checked]="isAllApplicationsSelected()" 
+                           (change)="toggleSelectAllApplications()"
+                           title="Sélectionner toutes les applications">
+                  </th>
+                  <th class="sortable" (click)="sortApplications('libelle')" title="Trier par nom">
+                    Application
+                    <i class="material-icons sort-icon" [class.active]="sortFieldApplications === 'libelle'">
+                      {{ getApplicationSortIcon('libelle') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortApplications('code')" title="Trier par code">
+                    Code
+                    <i class="material-icons sort-icon" [class.active]="sortFieldApplications === 'code'">
+                      {{ getApplicationSortIcon('code') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortApplications('description')" title="Trier par description">
+                    Description
+                    <i class="material-icons sort-icon" [class.active]="sortFieldApplications === 'description'">
+                      {{ getApplicationSortIcon('description') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortApplications('actif')" title="Trier par statut">
+                    Statut
+                    <i class="material-icons sort-icon" [class.active]="sortFieldApplications === 'actif'">
+                      {{ getApplicationSortIcon('actif') }}
+                    </i>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let app of getPaginatedApplications(); trackBy: trackByApplicationId">
+                  <td>
+                    <input type="checkbox" 
+                           [checked]="isApplicationSelected(app.id)" 
+                           (change)="toggleApplicationSelection(app.id)"
+                           title="Sélectionner cette application">
+                  </td>
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">
+                        <div class="avatar-circle" [style.background-color]="getApplicationAvatarColor(app)">
+                          {{ getApplicationInitials(app) }}
+                        </div>
+                      </div>
+                      <div class="user-details">
+                        <div class="user-name">{{ app.libelle }}</div>
+                        <div class="user-email">{{ app.code }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="application-code">{{ app.code }}</span>
+                  </td>
+                  <td>
+                    <div class="description-cell">
+                      {{ app.description || 'Aucune description' }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="app.actif ? 'active' : 'inactive'">
+                      <i class="material-icons">{{ app.actif ? 'check_circle' : 'cancel' }}</i>
+                      {{ app.actif ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="user-actions">
+                      <button class="action-btn edit" (click)="editApplication(app)" title="Modifier l'application">
+                        <i class="material-icons">edit</i>
+                      </button>
+                      <button class="action-btn delete" (click)="deleteApplication(app)" title="Supprimer l'application">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Message quand aucune application -->
+            <div class="no-data-message" *ngIf="getFilteredApplications().length === 0">
+              <div class="no-data-content">
+                <i class="material-icons">apps</i>
+                <h3>Aucune application trouvée</h3>
+                <p *ngIf="searchTermApplications">Aucune application ne correspond à votre recherche "{{ searchTermApplications }}".</p>
+                <p *ngIf="!searchTermApplications">Il n'y a actuellement aucune application dans le système.</p>
+                <button class="btn btn-primary" (click)="showAddApplicationModal = true">
+                  <i class="material-icons">add</i>
+                  Ajouter la première application
+                </button>
+              </div>
+            </div>
+          </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" *ngIf="getFilteredApplications().length > 5">
+              <div class="pagination-info">
+                <span>
+                  Affichage de {{ (currentPageApplications - 1) * itemsPerPageApplications + 1 }} à 
+                  {{ getEndIndexApplications() }} 
+                  sur {{ getFilteredApplications().length }} applications
+                </span>
+              </div>
+              
+              <div class="pagination-controls">
+                <!-- Bouton Précédent -->
+                <button class="pagination-btn" 
+                        [disabled]="currentPageApplications === 1" 
+                        (click)="changePageApplications(currentPageApplications - 1)"
+                        title="Page précédente">
+                  <i class="material-icons">chevron_left</i>
+                </button>
+
+                <!-- Numéros de pages -->
+                <div class="pagination-numbers">
+                  <!-- Première page si nécessaire -->
+                  <button *ngIf="getPageNumbersApplications()[0] > 1" 
+                          class="pagination-number" 
+                          (click)="changePageApplications(1)">1</button>
+                  <span *ngIf="getPageNumbersApplications()[0] > 2" class="pagination-ellipsis">...</span>
+
+                  <!-- Pages visibles -->
+                  <button *ngFor="let page of getPageNumbersApplications()" 
+                          class="pagination-number" 
+                          [class.active]="page === currentPageApplications"
+                          (click)="changePageApplications(page)">{{ page }}</button>
+
+                  <!-- Dernière page si nécessaire -->
+                  <span *ngIf="getPageNumbersApplications()[getPageNumbersApplications().length - 1] < getTotalPagesApplications() - 1" 
+                        class="pagination-ellipsis">...</span>
+                  <button *ngIf="getPageNumbersApplications()[getPageNumbersApplications().length - 1] < getTotalPagesApplications()" 
+                          class="pagination-number" 
+                          (click)="changePageApplications(getTotalPagesApplications())">{{ getTotalPagesApplications() }}</button>
+                </div>
+
+                <!-- Bouton Suivant -->
+                <button class="pagination-btn" 
+                        [disabled]="currentPageApplications === getTotalPagesApplications()" 
+                        (click)="changePageApplications(currentPageApplications + 1)"
+                        title="Page suivante">
+                  <i class="material-icons">chevron_right</i>
+                </button>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <!-- Section Zones Géographiques -->
+      <div class="content-section" [class.active]="currentSection === 'zones'">
+        <div class="users-section">
+          <div class="section-header">
+            <h2 class="section-title">Gestion des Zones Géographiques</h2>
+            <div class="header-actions">
+              <button class="btn btn-primary" (click)="openAddZoneModal()">
+                <i class="material-icons">add</i>
+                Ajouter Zone
+              </button>
+            </div>
+          </div>
+
+          <!-- Cartes de statistiques -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="material-icons">map</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">{{ getTotalZonesCount() }}</div>
+                <div class="stat-label">Total Zones</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon active">
+                <i class="material-icons">check_circle</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">{{ getActiveZonesCount() }}</div>
+                <div class="stat-label">Zones Actives</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon inactive">
+                <i class="material-icons">cancel</i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">{{ getInactiveZonesCount() }}</div>
+                <div class="stat-label">Zones Inactives</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtres -->
+          <div class="users-filters">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>Statut</label>
+                <select [(ngModel)]="zoneFilters.status">
+                  <option value="all">Tous les statuts</option>
+                  <option value="active">Actif</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Gouvernement</label>
+                <select [(ngModel)]="zoneFilters.government">
+                  <option value="all">Tous les gouvernements</option>
+                  <option *ngFor="let gov of gouvernorats" [value]="gov.name">{{ gov.name }}</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Recherche</label>
+                <input 
+                  type="text" 
+                  placeholder="Rechercher une zone..." 
+                  [(ngModel)]="searchTermZones"
+                  (keyup)="searchZones()"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions groupées -->
+          <div class="bulk-actions" *ngIf="selectedZoneIds.length > 0">
+            <div class="bulk-actions-info">
+              <span>{{ selectedZoneIds.length }} zone(s) sélectionnée(s)</span>
+            </div>
+            <div class="bulk-actions-buttons">
+              <button class="btn btn-warning" (click)="bulkDeactivateZones()" title="Désactiver les zones sélectionnées">
+                <i class="material-icons">block</i>
+                Désactiver
+              </button>
+              <button class="btn btn-danger" (click)="bulkDeleteZones()" title="Supprimer les zones sélectionnées">
+                <i class="material-icons">delete</i>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <!-- Tableau des Zones Géographiques -->
+          <div class="users-table-container">
+            <table class="users-table" *ngIf="getPaginatedZones().length > 0">
+              <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" 
+                           [checked]="isAllZonesSelected()" 
+                           (change)="toggleSelectAllZones()"
+                           title="Sélectionner toutes les zones">
+                  </th>
+                  <th class="sortable" (click)="sortZones('libelle')" title="Trier par nom">
+                    Zone
+                    <i class="material-icons sort-icon" [class.active]="sortFieldZones === 'libelle'">
+                      {{ getZoneSortIcon('libelle') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortZones('code')" title="Trier par code">
+                    Code
+                    <i class="material-icons sort-icon" [class.active]="sortFieldZones === 'code'">
+                      {{ getZoneSortIcon('code') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortZones('gouvernement')" title="Trier par gouvernement">
+                    Gouvernement
+                    <i class="material-icons sort-icon" [class.active]="sortFieldZones === 'gouvernement'">
+                      {{ getZoneSortIcon('gouvernement') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortZones('actif')" title="Trier par statut">
+                    Statut
+                    <i class="material-icons sort-icon" [class.active]="sortFieldZones === 'actif'">
+                      {{ getZoneSortIcon('actif') }}
+                    </i>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let zone of getPaginatedZones(); trackBy: trackByZoneId">
+                  <td>
+                    <input type="checkbox" 
+                           [checked]="isZoneSelected(zone.id)" 
+                           (change)="toggleZoneSelection(zone.id)"
+                           title="Sélectionner cette zone">
+                  </td>
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">
+                        <div class="avatar-circle" [style.background-color]="getZoneAvatarColor(zone)">
+                          {{ getZoneInitials(zone) }}
+                        </div>
+                      </div>
+                      <div class="user-details">
+                        <div class="user-name">{{ zone.libelle }}</div>
+                        <div class="user-email">{{ zone.code }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="zone-code">{{ zone.code }}</span>
+                  </td>
+                  <td>
+                    <div class="government-cell">
+                      {{ zone.gouvernement || 'Non renseigné' }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="zone.actif ? 'active' : 'inactive'">
+                      <i class="material-icons">{{ zone.actif ? 'check_circle' : 'cancel' }}</i>
+                      {{ zone.actif ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="user-actions">
+                      <button class="action-btn edit" (click)="editZone(zone)" title="Modifier la zone">
+                        <i class="material-icons">edit</i>
+                      </button>
+                      <button class="action-btn delete" (click)="deleteZone(zone)" title="Supprimer la zone">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Message quand aucune zone -->
+            <div class="no-data-message" *ngIf="getPaginatedZones().length === 0 && zonesGeographiques.length === 0">
+              <div class="no-data-content">
+                <i class="material-icons">map</i>
+                <h3>Aucune zone géographique trouvée</h3>
+                <p>Il n'y a actuellement aucune zone géographique dans le système.</p>
+                <button class="btn btn-primary" (click)="openAddZoneModal()">
+                  <i class="material-icons">add</i>
+                  Ajouter la première zone
+                </button>
+              </div>
+            </div>
+
+            <!-- Message quand aucun résultat de recherche -->
+            <div class="no-data-message" *ngIf="getPaginatedZones().length === 0 && zonesGeographiques.length > 0">
+              <div class="no-data-content">
+                <i class="material-icons">search_off</i>
+                <h3>Aucun résultat trouvé</h3>
+                <p>Aucune zone ne correspond aux critères de recherche.</p>
+                <button class="btn btn-secondary" (click)="clearZoneFilters()">
+                  <i class="material-icons">clear</i>
+                  Effacer les filtres
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-container" *ngIf="getFilteredZones().length > 5">
+            <div class="pagination-info">
+              <span>
+                Affichage de {{ getZonePaginationStart() }} à 
+                {{ getZonePaginationEnd() }} 
+                sur {{ getFilteredZones().length }} zones
+              </span>
+            </div>
+            
+            <div class="pagination-controls">
+              <!-- Bouton Précédent -->
+              <button class="pagination-btn" 
+                      [disabled]="currentZonePage === 0" 
+                      (click)="previousZonePage()"
+                      title="Page précédente">
+                <i class="material-icons">chevron_left</i>
+              </button>
+
+              <!-- Numéros de pages -->
+              <div class="pagination-numbers">
+                <!-- Première page si nécessaire -->
+                <button *ngIf="getZonePageNumbers()[0] > 0" 
+                        class="pagination-number" 
+                        (click)="goToZonePage(0)">1</button>
+                <span *ngIf="getZonePageNumbers()[0] > 1" class="pagination-ellipsis">...</span>
+
+                <!-- Pages visibles -->
+                <button *ngFor="let page of getZonePageNumbers()" 
+                        class="pagination-number" 
+                        [class.active]="page === currentZonePage"
+                        (click)="goToZonePage(page)">{{ page + 1 }}</button>
+
+                <!-- Dernière page si nécessaire -->
+                <span *ngIf="getZonePageNumbers()[getZonePageNumbers().length - 1] < getTotalZonePages() - 2" 
+                      class="pagination-ellipsis">...</span>
+                <button *ngIf="getZonePageNumbers()[getZonePageNumbers().length - 1] < getTotalZonePages() - 1" 
+                        class="pagination-number" 
+                        (click)="goToZonePage(getTotalZonePages() - 1)">{{ getTotalZonePages() }}</button>
+              </div>
+
+              <!-- Bouton Suivant -->
+              <button class="pagination-btn" 
+                      [disabled]="currentZonePage >= getTotalZonePages() - 1" 
+                      (click)="nextZonePage()"
+                      title="Page suivante">
+                <i class="material-icons">chevron_right</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Structures dans Nomenclatures -->
+      <div class="content-section" [class.active]="currentSection === 'structures-nomenclatures'">
+        <div class="users-section">
+          <div class="section-header">
+            <h2 class="section-title">Gestion des Structures</h2>
+            <div class="header-actions">
+              <button class="btn btn-secondary" (click)="navigateToSection('nomenclatures')">
+                <i class="material-icons">arrow_back</i>
+                Retour
+              </button>
+              <button class="btn btn-primary" (click)="openAddStructureDialog()">
+                <i class="material-icons">add</i>
+                Ajouter Structure
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtres -->
+          <div class="users-filters">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>Type</label>
+                <select [(ngModel)]="structureFilters.type">
+                  <option value="all">Tous les types</option>
+                  <option value="ENTREPRISE">Entreprise</option>
+                  <option value="ORGANISATION">Organisation</option>
+                  <option value="MINISTERE">Ministère</option>
+                  <option value="ASSOCIATION">Association</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Statut</label>
+                <select [(ngModel)]="structureFilters.status">
+                  <option value="all">Tous les statuts</option>
+                  <option value="active">Actif</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistiques -->
+          <div class="users-stats">
+            <div class="stat-card active-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">business</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.actives }}</div>
+              <div class="stat-label">Structures Actives</div>
+            </div>
+            </div>
+            <div class="stat-card pending-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">schedule</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.enAttente }}</div>
+              <div class="stat-label">En Attente</div>
+            </div>
+            </div>
+            <div class="stat-card inactive-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">business_center</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.inactives }}</div>
+              <div class="stat-label">Inactives</div>
+            </div>
+            </div>
+            <div class="stat-card total-users-card">
+              <div class="stat-icon">
+                <i class="material-icons">domain</i>
+              </div>
+              <div class="stat-content">
+              <div class="stat-value">{{ structureStats.total }}</div>
+              <div class="stat-label">Total</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions groupées -->
+          <div class="bulk-actions" *ngIf="getSelectedStructures().length > 0">
+            <div class="bulk-actions-info">
+              <span>{{ getSelectedStructures().length }} structure(s) sélectionnée(s)</span>
+            </div>
+            <div class="bulk-actions-buttons">
+              <button class="btn btn-warning" (click)="bulkDeactivateStructures()" title="Désactiver les structures sélectionnées">
+                <i class="material-icons">business_center</i>
+                Désactiver
+              </button>
+              <button class="btn btn-danger" (click)="bulkDeleteStructures()" title="Supprimer les structures sélectionnées">
+                <i class="material-icons">delete</i>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <!-- Tableau des structures -->
+          <div class="users-table-container">
+            <table class="users-table" *ngIf="getPaginatedStructures().length > 0">
+              <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" 
+                           [checked]="isAllStructuresSelected()" 
+                           (change)="toggleSelectAllStructures()"
+                           title="Sélectionner toutes les structures">
+                  </th>
+                  <th class="sortable" (click)="sortStructures('libelle')" title="Trier par nom">
+                    Structure
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'libelle'">
+                      {{ getStructureSortIcon('libelle') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortStructures('code')" title="Trier par code">
+                    Code
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'code'">
+                      {{ getStructureSortIcon('code') }}
+                    </i>
+                  </th>
+                  <th class="sortable" (click)="sortStructures('typeStructure')" title="Trier par type">
+                    Type
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'typeStructure'">
+                      {{ getStructureSortIcon('typeStructure') }}
+                    </i>
+                  </th>
+                  <th>Adresse</th>
+                  <th>Gouvernorat</th>
+                  <th class="sortable" (click)="sortStructures('actif')" title="Trier par statut">
+                    Statut
+                    <i class="material-icons sort-icon" [class.active]="sortFieldStructures === 'actif'">
+                      {{ getStructureSortIcon('actif') }}
+                    </i>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let structure of getPaginatedStructures(); trackBy: trackByStructureId">
+                  <td>
+                    <input type="checkbox" 
+                           [checked]="isStructureSelected(structure.id)" 
+                           (change)="toggleStructureSelection(structure.id)"
+                           title="Sélectionner cette structure">
+                  </td>
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">
+                        <div class="avatar-circle" [style.background-color]="getStructureAvatarColor(structure)">
+                          {{ getStructureInitials(structure) }}
+                        </div>
+                      </div>
+                      <div class="user-details">
+                        <div class="user-name">{{ structure.libelle }}</div>
+                        <div class="user-email">{{ structure.code }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ structure.code }}</td>
+                  <td>
+                    <span class="role-badge" [class]="getStructureTypeClass(structure.typeStructure)">
+                      <i class="material-icons role-icon">business</i>
+                      {{ structureService.getStructureTypeLabel(structure.typeStructure) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="structure-address">
+                      <i class="material-icons">location_on</i>
+                      <span>{{ structure.adresse || 'Non renseignée' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="structure-governorate">
+                      <i class="material-icons">map</i>
+                      <span>{{ getGovernorateName(structure.zoneGeographiqueId) || 'Non renseigné' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="structure.actif ? 'active' : 'inactive'">
+                      <i class="material-icons">{{ structure.actif ? 'check_circle' : 'cancel' }}</i>
+                      {{ structure.actif ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="user-actions">
+                      <button class="action-btn edit" (click)="editStructure(structure)" title="Modifier la structure">
+                        <i class="material-icons">edit</i>
+                      </button>
+                      <button class="action-btn delete" (click)="deleteStructure(structure)" title="Supprimer la structure">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Message quand aucune structure -->
+            <div class="no-data-message" *ngIf="getPaginatedStructures().length === 0">
+              <div class="no-data-content">
+                <i class="material-icons">business_center</i>
+                <h3>Aucune structure trouvée</h3>
+                <p>Il n'y a actuellement aucune structure dans le système.</p>
+                <button class="btn btn-primary" (click)="openAddStructureDialog()">
+                  <i class="material-icons">add</i>
+                  Ajouter la première structure
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-container" *ngIf="getFilteredStructures().length > 5">
+            <div class="pagination-info">
+              <span>
+                Affichage de {{ (currentPageStructures - 1) * itemsPerPageStructures + 1 }} à 
+                {{ getEndIndexStructures() }} 
+                sur {{ getFilteredStructures().length }} structures
+              </span>
+            </div>
+            
+            <div class="pagination-controls">
+              <!-- Bouton Précédent -->
+              <button class="pagination-btn" 
+                      [disabled]="currentPageStructures === 1" 
+                      (click)="changePageStructures(currentPageStructures - 1)"
+                      title="Page précédente">
+                <i class="material-icons">chevron_left</i>
+              </button>
+
+              <!-- Numéros de pages -->
+              <div class="pagination-numbers">
+                <!-- Première page si nécessaire -->
+                <button *ngIf="getStructurePageNumbers()[0] > 1" 
+                        class="pagination-number" 
+                        (click)="changePageStructures(1)">1</button>
+                <span *ngIf="getStructurePageNumbers()[0] > 2" class="pagination-ellipsis">...</span>
+
+                <!-- Pages visibles -->
+                <button *ngFor="let page of getStructurePageNumbers()" 
+                        class="pagination-number" 
+                        [class.active]="page === currentPageStructures"
+                        (click)="changePageStructures(page)">{{ page }}</button>
+
+                <!-- Dernière page si nécessaire -->
+                <span *ngIf="getStructurePageNumbers()[getStructurePageNumbers().length - 1] < getTotalPagesStructures() - 1" 
+                      class="pagination-ellipsis">...</span>
+                <button *ngIf="getStructurePageNumbers()[getStructurePageNumbers().length - 1] < getTotalPagesStructures()" 
+                        class="pagination-number" 
+                        (click)="changePageStructures(getTotalPagesStructures())">{{ getTotalPagesStructures() }}</button>
+              </div>
+
+              <!-- Bouton Suivant -->
+              <button class="pagination-btn" 
+                      [disabled]="currentPageStructures === getTotalPagesStructures()" 
+                      (click)="changePageStructures(currentPageStructures + 1)"
+                      title="Page suivante">
+                <i class="material-icons">chevron_right</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Historique des Notifications -->
+      <div class="content-section" [class.active]="currentSection === 'notification-history'">
+        <app-notification-history></app-notification-history>
+      </div>
+
+      <!-- Section Paramètres de Notifications -->
+      <div class="content-section" [class.active]="currentSection === 'notifications-settings'">
+        <div class="notifications-settings-page">
+          <div class="page-header">
+            <h2 class="page-title">Paramétrage des Notifications</h2>
+            <p class="page-subtitle">Configurez les notifications automatiques pour les échéances et alertes</p>
+          </div>
+
+          <div class="settings-content">
+            <!-- Onglets de configuration -->
+            <div class="settings-tabs">
+              <div class="tab-nav">
+                <button class="tab-button" [class.active]="activeNotificationTab === 'email'" (click)="setActiveNotificationTab('email')">
+                  <i class="material-icons">email</i>
+                  Email
+                </button>
+                <button class="tab-button" [class.active]="activeNotificationTab === 'sms'" (click)="setActiveNotificationTab('sms')">
+                  <i class="material-icons">sms</i>
+                  SMS
+                </button>
+                <button class="tab-button" [class.active]="activeNotificationTab === 'push'" (click)="setActiveNotificationTab('push')">
+                  <i class="material-icons">notifications</i>
+                  Push
+                </button>
+                <button class="tab-button" [class.active]="activeNotificationTab === 'thresholds'" (click)="setActiveNotificationTab('thresholds')">
+                  <i class="material-icons">schedule</i>
+                  Seuils
+                </button>
+                <button class="tab-button" [class.active]="activeNotificationTab === 'quiet-hours'" (click)="setActiveNotificationTab('quiet-hours')">
+                  <i class="material-icons">bedtime</i>
+                  Heures Silencieuses
+                </button>
+              </div>
+
+              <!-- Contenu des onglets -->
+              <div class="tab-content">
+                <!-- Onglet Email -->
+                <div class="tab-panel" [class.active]="activeNotificationTab === 'email'">
+                  <div class="settings-card">
+                    <h3 class="card-title">Configuration Email</h3>
+                    <div class="settings-group">
+                      <div class="setting-item">
+                        <label class="setting-label">
+                          <input type="checkbox" [(ngModel)]="notificationSettings.email.enabled">
+                          Activer les notifications par email
+                        </label>
+                      </div>
+                      <div class="setting-item">
+                        <label class="setting-label">Fréquence d'envoi</label>
+                        <select [(ngModel)]="notificationSettings.email.frequency">
+                          <option value="immediate">Immédiat</option>
+                          <option value="hourly">Toutes les heures</option>
+                          <option value="daily">Quotidien</option>
+                          <option value="weekly">Hebdomadaire</option>
+                        </select>
+                      </div>
+                      <div class="setting-item">
+                        <h4>Types de notifications</h4>
+                        <div class="checkbox-group">
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.email.types.conventions">
+                            Conventions
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.email.types.invoices">
+                            Factures
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.email.types.payments">
+                            Paiements
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.email.types.system">
+                            Système
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.email.types.security">
+                            Sécurité
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Onglet SMS -->
+                <div class="tab-panel" [class.active]="activeNotificationTab === 'sms'">
+                  <div class="settings-card">
+                    <h3 class="card-title">Configuration SMS</h3>
+                    <div class="settings-group">
+                      <div class="setting-item">
+                        <label class="setting-label">
+                          <input type="checkbox" [(ngModel)]="notificationSettings.sms.enabled">
+                          Activer les notifications par SMS
+                        </label>
+                      </div>
+                      <div class="setting-item">
+                        <h4>Types de notifications SMS</h4>
+                        <div class="checkbox-group">
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.sms.types.urgent">
+                            Urgentes uniquement
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.sms.types.overdue">
+                            Factures en retard
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.sms.types.system">
+                            Alertes système
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Onglet Push -->
+                <div class="tab-panel" [class.active]="activeNotificationTab === 'push'">
+                  <div class="settings-card">
+                    <h3 class="card-title">Configuration Push</h3>
+                    <div class="settings-group">
+                      <div class="setting-item">
+                        <label class="setting-label">
+                          <input type="checkbox" [(ngModel)]="notificationSettings.push.enabled">
+                          Activer les notifications push
+                        </label>
+                      </div>
+                      <div class="setting-item">
+                        <h4>Types de notifications Push</h4>
+                        <div class="checkbox-group">
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.push.types.conventions">
+                            Conventions
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.push.types.invoices">
+                            Factures
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.push.types.payments">
+                            Paiements
+                          </label>
+                          <label class="checkbox-label">
+                            <input type="checkbox" [(ngModel)]="notificationSettings.push.types.system">
+                            Système
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Onglet Seuils -->
+                <div class="tab-panel" [class.active]="activeNotificationTab === 'thresholds'">
+                  <div class="settings-card">
+                    <h3 class="card-title">Configuration des Seuils</h3>
+                    <div class="settings-group">
+                      <div class="setting-item">
+                        <label class="setting-label">Rappel factures (jours avant échéance)</label>
+                        <div class="slider-container">
+                          <input type="range" 
+                                 min="1" 
+                                 max="30" 
+                                 [(ngModel)]="notificationSettings.thresholds.overdueInvoices"
+                                 class="slider">
+                          <span class="slider-value">{{ notificationSettings.thresholds.overdueInvoices }} jours</span>
+                        </div>
+                      </div>
+                      <div class="setting-item">
+                        <label class="setting-label">Seuil de solde faible (€)</label>
+                        <div class="slider-container">
+                          <input type="range" 
+                                 min="100" 
+                                 max="10000" 
+                                 step="100"
+                                 [(ngModel)]="notificationSettings.thresholds.lowBalance"
+                                 class="slider">
+                          <span class="slider-value">{{ notificationSettings.thresholds.lowBalance }}€</span>
+                        </div>
+                      </div>
+                      <div class="setting-item">
+                        <label class="setting-label">Nombre d'erreurs système</label>
+                        <div class="slider-container">
+                          <input type="range" 
+                                 min="1" 
+                                 max="50" 
+                                 [(ngModel)]="notificationSettings.thresholds.systemErrors"
+                                 class="slider">
+                          <span class="slider-value">{{ notificationSettings.thresholds.systemErrors }} erreurs</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Onglet Heures Silencieuses -->
+                <div class="tab-panel" [class.active]="activeNotificationTab === 'quiet-hours'">
+                  <div class="settings-card">
+                    <h3 class="card-title">Heures Silencieuses</h3>
+                    <div class="settings-group">
+                      <div class="setting-item">
+                        <label class="setting-label">
+                          <input type="checkbox" [(ngModel)]="notificationSettings.quietHours.enabled">
+                          Activer les heures silencieuses
+                        </label>
+                      </div>
+                      <div class="setting-item" *ngIf="notificationSettings.quietHours.enabled">
+                        <label class="setting-label">Début des heures silencieuses</label>
+                        <input type="time" [(ngModel)]="notificationSettings.quietHours.start">
+                      </div>
+                      <div class="setting-item" *ngIf="notificationSettings.quietHours.enabled">
+                        <label class="setting-label">Fin des heures silencieuses</label>
+                        <input type="time" [(ngModel)]="notificationSettings.quietHours.end">
+                      </div>
+                      <div class="setting-item" *ngIf="notificationSettings.quietHours.enabled">
+                        <h4>Jours d'application</h4>
+                        <div class="checkbox-group">
+                          <label class="checkbox-label" *ngFor="let day of weekDays">
+                            <input type="checkbox" 
+                                   [checked]="notificationSettings.quietHours.days.includes(day.value)"
+                                   (change)="toggleQuietHoursDay(day.value)">
+                            {{ day.label }}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="settings-actions">
+              <button class="btn btn-secondary" (click)="resetNotificationSettings()">
+                <i class="material-icons">refresh</i>
+                Réinitialiser
+              </button>
+              <button class="btn btn-primary" (click)="saveNotificationSettings()">
+                <i class="material-icons">save</i>
+                Sauvegarder
+              </button>
+              <button class="btn btn-success" (click)="testEmailNotification()">
+                <i class="material-icons">email</i>
+                Tester Email
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Profil -->
+      <div class="content-section" [class.active]="currentSection === 'profile'">
+        <div class="profile-page">
+          <div class="profile-header">
+            <h2 class="page-title">Mon Profil</h2>
+            <div class="profile-actions">
+              <button class="btn btn-primary" (click)="editProfile()">
+                <i class="material-icons">edit</i>
+                Modifier le profil
+              </button>
+            </div>
+          </div>
+
+          <div class="profile-content">
+            <!-- Carte Profil Simple -->
+            <div class="profile-card-simple">
+              <div class="card-header">
+                <h3 class="user-name">{{ getCurrentUserName() }}</h3>
+              </div>
+              <div class="card-content">
+                <div class="info-item">
+                  <div class="info-icon">
+                    <i class="material-icons">email</i>
+                  </div>
+                  <div class="info-content">
+                    <label>E-Mail :</label>
+                    <span class="info-value email-link">{{ getCurrentUserEmail() }}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-icon">
+                    <i class="material-icons">person</i>
+                  </div>
+                  <div class="info-content">
+                    <label>Rôle :</label>
+                    <span class="info-value role-badge">{{ getCurrentUserRole() }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modale Ajout Utilisateur -->
+  <div class="modal-overlay" *ngIf="showUserModal" (click)="closeUserModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ isEditMode ? 'Modifier l\'Utilisateur' : 'Ajouter un Utilisateur' }}</h3>
+        <button class="modal-close" (click)="closeUserModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitUserForm()">
+          <div class="form-group">
+            <label for="userName">Nom complet</label>
+            <input type="text" id="userName" [(ngModel)]="userForm.name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="userEmail">Email</label>
+            <input type="email" id="userEmail" [(ngModel)]="userForm.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="userPhoneNumber">Numéro de téléphone</label>
+            <input type="tel" id="userPhoneNumber" [(ngModel)]="userForm.phoneNumber" name="phoneNumber" 
+                   placeholder="+216 XX XXX XXX" pattern="^\+[1-9]\d{1,14}$">
+            <small class="form-text">Format international requis (ex: +216 XX XXX XXX)</small>
+          </div>
+          <div class="form-group">
+            <label for="userCountry">Pays</label>
+            <select id="userCountry" [(ngModel)]="userForm.country" name="country" (change)="onCountryChange($event)">
+              <option value="">Sélectionner un pays</option>
+              <option *ngFor="let country of countries" [value]="country.cca2">
+                {{ country.flag }} {{ country.name.common }} ({{ country.cca2 }})
+              </option>
+            </select>
+            <small class="form-text">Sélectionnez le pays pour le format de numéro</small>
+          </div>
+          <div class="form-group">
+            <label for="userRole">Rôle</label>
+            <select id="userRole" [(ngModel)]="userForm.role" name="role" required>
+              <option value="">Sélectionner un rôle</option>
+              <option value="ROLE_SUPER_ADMIN">Super Administrateur</option>
+              <option value="ROLE_ADMIN">Administrateur</option>
+              <option value="ROLE_COMMERCIAL">Commercial</option>
+              <option value="ROLE_CHEF_PROJET">Chef de Projet</option>
+              <option value="ROLE_DECIDEUR">Décideur</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="userPassword">Mot de passe {{ isEditMode ? '(optionnel)' : '' }}</label>
+            <input type="password" id="userPassword" [(ngModel)]="userForm.password" name="password" [required]="!isEditMode">
+            <small *ngIf="isEditMode" class="form-text">Laissez vide pour conserver le mot de passe actuel</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeUserModal()">Annuler</button>
+            <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Modifier' : 'Ajouter' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Ajout Structure -->
+  <div class="modal-overlay" *ngIf="showStructureModal" (click)="closeStructureModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Ajouter une Structure</h3>
+        <button class="modal-close" (click)="closeStructureModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitStructureForm()">
+          <div class="form-group">
+            <label for="structureCode">Code de la structure *</label>
+            <input type="text" id="structureCode" [(ngModel)]="structureForm.code" name="code" required placeholder="Ex: ENT001">
+          </div>
+          <div class="form-group">
+            <label for="structureLibelle">Libellé de la structure *</label>
+            <input type="text" id="structureLibelle" [(ngModel)]="structureForm.libelle" name="libelle" required placeholder="Nom de la structure">
+          </div>
+          <div class="form-group">
+            <label for="structureDescription">Description</label>
+            <textarea id="structureDescription" [(ngModel)]="structureForm.description" name="description" rows="3" placeholder="Description de la structure"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="structureType">Type de structure *</label>
+            <select id="structureType" [(ngModel)]="structureForm.typeStructure" name="typeStructure" required>
+              <option value="">Sélectionner un type</option>
+              <option *ngFor="let type of structureTypes" [value]="type">
+                {{ structureService.getStructureTypeLabel(type) }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="structureAddress">Adresse</label>
+            <input type="text" id="structureAddress" [(ngModel)]="structureForm.adresse" name="adresse" placeholder="Adresse complète">
+          </div>
+          <div class="form-group">
+            <label for="structureGovernorate">Gouvernement</label>
+            <select id="structureGovernorate" [(ngModel)]="structureForm.gouvernement" name="gouvernement">
+              <option value="">Sélectionner un gouvernement</option>
+              <option *ngFor="let governorate of gouvernorats" [value]="governorate.name">
+                {{ governorate.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="structureForm.actif" name="actif">
+              Structure active
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeStructureModal()">Annuler</button>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Édition Structure -->
+  <div class="modal-overlay" *ngIf="showEditStructureModal" (click)="closeEditStructureModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Modifier la Structure</h3>
+        <button class="modal-close" (click)="closeEditStructureModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitEditStructureForm()">
+          <div class="form-group">
+            <label for="editStructureCode">Code de la structure *</label>
+            <input type="text" id="editStructureCode" [(ngModel)]="structureForm.code" name="code" required placeholder="Ex: ENT001">
+          </div>
+          <div class="form-group">
+            <label for="editStructureLibelle">Libellé de la structure *</label>
+            <input type="text" id="editStructureLibelle" [(ngModel)]="structureForm.libelle" name="libelle" required placeholder="Nom de la structure">
+          </div>
+          <div class="form-group">
+            <label for="editStructureDescription">Description</label>
+            <textarea id="editStructureDescription" [(ngModel)]="structureForm.description" name="description" rows="3" placeholder="Description de la structure"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="editStructureType">Type de structure *</label>
+            <select id="editStructureType" [(ngModel)]="structureForm.typeStructure" name="typeStructure" required>
+              <option value="">Sélectionner un type</option>
+              <option *ngFor="let type of structureTypes" [value]="type">
+                {{ structureService.getStructureTypeLabel(type) }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editStructureAddress">Adresse</label>
+            <input type="text" id="editStructureAddress" [(ngModel)]="structureForm.adresse" name="adresse" placeholder="Adresse complète">
+          </div>
+          <div class="form-group">
+            <label for="editStructureGovernorate">Gouvernement</label>
+            <select id="editStructureGovernorate" [(ngModel)]="structureForm.gouvernement" name="gouvernement">
+              <option value="">Sélectionner un gouvernement</option>
+              <option *ngFor="let governorate of gouvernorats" [value]="governorate.name">
+                {{ governorate.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="structureForm.actif" name="actif">
+              Structure active
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeEditStructureModal()">Annuler</button>
+            <button type="submit" class="btn btn-primary">Modifier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Ajout Nomenclature -->
+  <div class="modal-overlay" *ngIf="showNomenclatureModal" (click)="closeNomenclatureModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Ajouter une Nomenclature</h3>
+        <button class="modal-close" (click)="closeNomenclatureModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitNomenclatureForm()">
+          <div class="form-group">
+            <label for="nomenclatureName">Nom</label>
+            <input type="text" id="nomenclatureName" [(ngModel)]="nomenclatureForm.name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="nomenclatureCategory">Catégorie</label>
+            <select id="nomenclatureCategory" [(ngModel)]="nomenclatureForm.category" name="category" required>
+              <option value="">Sélectionner une catégorie</option>
+              <option value="application">Application</option>
+              <option value="zone">Zone</option>
+              <option value="structure">Structure</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="nomenclatureDescription">Description</label>
+            <textarea id="nomenclatureDescription" [(ngModel)]="nomenclatureForm.description" name="description" rows="3"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeNomenclatureModal()">Annuler</button>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Ajout Application -->
+  <div class="modal-overlay" *ngIf="showAddApplicationModal" (click)="closeAddApplicationModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Ajouter une Application</h3>
+        <button class="modal-close" (click)="closeAddApplicationModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitApplicationForm()">
+          <div class="form-group">
+            <label for="applicationCode">Code *</label>
+            <input type="text" id="applicationCode" [(ngModel)]="applicationForm.code" name="code" required>
+          </div>
+          <div class="form-group">
+            <label for="applicationLibelle">Libellé *</label>
+            <input type="text" id="applicationLibelle" [(ngModel)]="applicationForm.libelle" name="libelle" required>
+          </div>
+          <div class="form-group">
+            <label for="applicationDescription">Description</label>
+            <textarea id="applicationDescription" [(ngModel)]="applicationForm.description" name="description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="applicationForm.actif" name="actif">
+              Application active
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeAddApplicationModal()">Annuler</button>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Ajout Zone Géographique -->
+  <div class="modal-overlay" *ngIf="showAddZoneModal" (click)="closeAddZoneModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          {{ zoneModalMode === 'add' ? 'Ajouter une Zone Géographique' : 'Modifier la Zone Géographique' }}
+        </h3>
+        <button class="modal-close" (click)="closeAddZoneModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitZoneForm()">
+          <div class="form-group">
+            <label for="zoneCode">Code *</label>
+            <input type="text" id="zoneCode" [(ngModel)]="zoneForm.code" name="code" required>
+          </div>
+          <div class="form-group">
+            <label for="zoneLibelle">Libellé *</label>
+            <input type="text" id="zoneLibelle" [(ngModel)]="zoneForm.libelle" name="libelle" required>
+          </div>
+          <div class="form-group">
+            <label for="zoneDescription">Description</label>
+            <textarea id="zoneDescription" [(ngModel)]="zoneForm.description" name="description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="zoneGouvernement">Gouvernement *</label>
+            <select id="zoneGouvernement" [(ngModel)]="zoneForm.gouvernement" name="gouvernement" required>
+              <option value="">Sélectionnez un gouvernement</option>
+              <option *ngFor="let gouvernement of gouvernorats" [value]="gouvernement.name">
+                {{ gouvernement.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="zoneForm.actif" name="actif">
+              Zone active
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeAddZoneModal()">Annuler</button>
+            <button type="submit" class="btn btn-primary">
+              {{ zoneModalMode === 'add' ? 'Ajouter' : 'Modifier' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer Professionnel -->
+  <!-- <app-footer></app-footer> -->

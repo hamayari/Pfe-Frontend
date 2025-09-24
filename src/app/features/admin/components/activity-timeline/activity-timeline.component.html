@@ -1,0 +1,64 @@
+<div class="activity-timeline">
+  <ng-container *ngIf="displayedActivities.length > 0; else noActivities">
+    <div 
+      *ngFor="let activity of displayedActivities; trackBy: trackByActivity"
+      class="timeline-item"
+      [class.unread]="!activity.read"
+    >
+      <!-- Timeline dot/line -->
+      <div class="timeline-badge">
+        <div class="timeline-dot"></div>
+      </div>
+      
+      <!-- Timeline content -->
+      <div class="timeline-content">
+        <!-- User avatar -->
+        <div 
+          class="user-avatar"
+          [style.background]="getRandomColor(activity.user)"
+          [style.backgroundImage]="activity.avatar ? 'url(' + activity.avatar + ')' : 'none'"
+        >
+          <span *ngIf="!activity.avatar">{{ getInitials(activity.user) }}</span>
+        </div>
+        
+        <!-- Activity details -->
+        <div class="activity-details">
+          <div class="activity-message">
+            <span class="user-name">{{ activity.user }}</span>
+            <span class="action">{{ activity.action }}</span>
+            <span class="target">{{ activity.target }}</span>
+          </div>
+          <div class="activity-time">
+            <mat-icon class="time-icon">schedule</mat-icon>
+            <span>{{ getTimeAgo(activity.timestamp) }}</span>
+          </div>
+        </div>
+        
+        <!-- Action button -->
+        <button 
+          *ngIf="activity.link" 
+          mat-icon-button 
+          class="action-button"
+          [routerLink]="activity.link"
+          matTooltip="Voir les détails"
+        >
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </div>
+    
+    <!-- View all button -->
+    <div class="view-all-container" *ngIf="activities.length > (maxItems || 0)">
+      <button mat-button color="primary" routerLink="/admin/activity">
+        Voir toutes les activités
+      </button>
+    </div>
+  </ng-container>
+  
+  <ng-template #noActivities>
+    <div class="no-activities">
+      <mat-icon>notifications_none</mat-icon>
+      <p>Aucune activité récente</p>
+    </div>
+  </ng-template>
+</div>

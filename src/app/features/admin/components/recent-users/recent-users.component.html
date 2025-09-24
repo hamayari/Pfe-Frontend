@@ -1,0 +1,68 @@
+<div class="recent-users">
+  <ng-container *ngIf="displayedUsers.length > 0; else noUsers">
+    <mat-list class="user-list">
+      <mat-list-item 
+        *ngFor="let user of displayedUsers; trackBy: trackByUserId"
+        class="user-list-item"
+        [routerLink]="['/admin/users', user.id]"
+      >
+        <!-- User Avatar -->
+        <div 
+          class="user-avatar" 
+          [style.background]="getRandomColor(user.username)"
+          [style.backgroundImage]="user.avatar ? 'url(' + user.avatar + ')' : 'none'"
+          mat-list-avatar
+        >
+          <span *ngIf="!user.avatar">{{ getInitials(user.fullName || user.username) }}</span>
+        </div>
+        
+        <!-- User Info -->
+        <div class="user-info" mat-line>
+          <div class="user-name">
+            {{ user.fullName || user.username }}
+            <span class="user-role" [class]="'role-' + user.role.toLowerCase()">
+              {{ getRoleLabel(user.role) }}
+            </span>
+          </div>
+          <div class="user-email" mat-line>{{ user.email }}</div>
+        </div>
+        
+        <!-- User Status -->
+        <div class="user-status" [class.active]="user.isActive">
+          <mat-icon *ngIf="user.isActive" class="status-icon">fiber_manual_record</mat-icon>
+          {{ user.isActive ? 'Actif' : 'Inactif' }}
+        </div>
+        
+        <!-- View Button -->
+        <button 
+          mat-icon-button 
+          class="view-button"
+          (click)="$event.stopPropagation(); $event.preventDefault();"
+          [routerLink]="['/admin/users', user.id]"
+          matTooltip="Voir le profil"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+    
+    <!-- View All Button -->
+    <div class="view-all-container" *ngIf="users.length > maxItems">
+      <button 
+        mat-button 
+        color="primary" 
+        class="view-all-button"
+        routerLink="/admin/users"
+      >
+        Voir tous les utilisateurs
+      </button>
+    </div>
+  </ng-container>
+  
+  <ng-template #noUsers>
+    <div class="no-users">
+      <mat-icon>people_outline</mat-icon>
+      <p>Aucun utilisateur récent</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,132 @@
+<h2 mat-dialog-title>
+  {{ data.mode === 'create' ? 'Add New User' : 'Edit User' }}
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" placeholder="Enter first name">
+        <mat-error *ngIf="f['firstName'].errors">
+          {{ getErrorMessage('firstName') }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" placeholder="Enter last name">
+        <mat-error *ngIf="f['lastName'].errors">
+          {{ getErrorMessage('lastName') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="Enter email address">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="f['email'].errors">
+          {{ getErrorMessage('email') }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Phone</mat-label>
+        <input matInput type="tel" formControlName="phone" placeholder="Enter phone number">
+        <mat-icon matSuffix>phone</mat-icon>
+        <mat-error *ngIf="f['phone'].errors">
+          {{ getErrorMessage('phone') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="role" placeholder="Select role">
+          <mat-option *ngFor="let role of roles" [value]="role.value">
+            {{ role.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="f['role'].errors">
+          {{ getErrorMessage('role') }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status" placeholder="Select status">
+          <mat-option *ngFor="let status of statuses" [value]="status.value">
+            {{ status.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="f['status'].errors">
+          {{ getErrorMessage('status') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row" *ngIf="data.mode === 'create' || f['password'].value">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="passwordHidden ? 'password' : 'text'" 
+               formControlName="password" 
+               placeholder="Enter password">
+        <button type="button" mat-icon-button matSuffix 
+                (click)="togglePasswordVisibility()" 
+                [attr.aria-label]="'Hide password'" 
+                [attr.aria-pressed]="!passwordHidden">
+          <mat-icon>{{ passwordHidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-hint>
+          <div class="password-hint" 
+               (mouseenter)="showPasswordRequirements()" 
+               (mouseleave)="hidePasswordRequirements()">
+            <mat-icon>info</mat-icon>
+            <span>Password requirements</span>
+            <div class="password-tooltip" *ngIf="showPasswordHint">
+              <ul>
+                <li>At least 8 characters</li>
+                <li>At least one uppercase letter</li>
+                <li>At least one lowercase letter</li>
+                <li>At least one number</li>
+                <li>At least one special character</li>
+              </ul>
+            </div>
+          </div>
+        </mat-hint>
+        <mat-error *ngIf="f['password'].errors">
+          {{ getErrorMessage('password') }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field" *ngIf="data.mode === 'create' || f['password'].value">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput [type]="passwordHidden ? 'password' : 'text'" 
+               formControlName="confirmPassword" 
+               placeholder="Confirm password">
+        <mat-error *ngIf="f['confirmPassword'].errors">
+          {{ getErrorMessage('confirmPassword') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()" [disabled]="isSubmitting">
+    Cancel
+  </button>
+  <button mat-raised-button 
+          color="primary" 
+          (click)="onSubmit()" 
+          [disabled]="userForm.invalid || isSubmitting"
+          [class.spinner]="isSubmitting">
+    <span *ngIf="!isSubmitting">
+      {{ data.mode === 'create' ? 'Create User' : 'Save Changes' }}
+    </span>
+    <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+  </button>
+</mat-dialog-actions>

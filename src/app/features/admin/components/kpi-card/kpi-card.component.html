@@ -1,0 +1,36 @@
+<mat-card class="kpi-card" [ngClass]="color">
+  <mat-card-content>
+    <!-- Loading State -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+    
+    <div class="kpi-content">
+      <!-- Icon -->
+      <div class="kpi-icon">
+        <mat-icon [color]="color">{{ icon }}</mat-icon>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="kpi-details">
+        <div class="kpi-title">{{ title }}</div>
+        <div class="kpi-value">
+          <span *ngIf="!isLoading">{{ value }}</span>
+          <span *ngIf="isLoading" class="skeleton-text">Loading...</span>
+        </div>
+      </div>
+      
+      <!-- Change Indicator -->
+      <div class="kpi-change" *ngIf="!isLoading && change !== 0" [ngClass]="{
+        'positive': isPositiveChange,
+        'negative': isNegativeChange
+      }">
+        <mat-icon class="change-icon">{{ changeIcon }}</mat-icon>
+        <span class="change-value">{{ formattedChange }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+  
+  <!-- Optional Link Overlay -->
+  <a *ngIf="!isLoading" [routerLink]="link" class="card-link"></a>
+</mat-card>

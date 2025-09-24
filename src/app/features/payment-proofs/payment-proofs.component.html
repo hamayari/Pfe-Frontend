@@ -1,0 +1,123 @@
+<div class="payment-proofs-container">
+  <div class="header">
+    <h1>Gestion des Preuves de Paiement</h1>
+    <p>Validez ou rejetez les preuves de paiement téléversées par les clients</p>
+  </div>
+
+  <div *ngIf="showMessage" class="message" [class]="messageType">
+    {{ message }}
+  </div>
+
+  <div class="content">
+    <div class="proofs-section">
+      <h2>Preuves en Attente de Validation</h2>
+      
+      <div *ngIf="isLoading" class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Chargement en cours...</p>
+      </div>
+
+      <div *ngIf="!isLoading && pendingProofs.length === 0" class="no-proofs">
+        <mat-icon>check_circle</mat-icon>
+        <p>Aucune preuve en attente de validation</p>
+      </div>
+
+      <div *ngIf="!isLoading && pendingProofs.length > 0" class="proofs-grid">
+        <mat-card *ngFor="let proof of pendingProofs" 
+                  class="proof-card"
+                  [class.selected]="selectedProof?.id === proof.id">
+          <mat-card-header>
+            <mat-card-title>{{ proof.fileName }}</mat-card-title>
+            <mat-card-subtitle>
+              Téléversé le {{ proof.uploadedAt | date:'dd/MM/yyyy HH:mm' }}
+            </mat-card-subtitle>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="proof-details">
+              <div class="file-info">
+                <p><strong>Type:</strong> {{ proof.fileType.toUpperCase() }}</p>
+                <p><strong>Taille:</strong> {{ formatFileSize(proof.fileSize) }}</p>
+                <p><strong>Client:</strong> {{ proof.clientId }}</p>
+                <p><strong>Facture:</strong> {{ proof.invoiceId }}</p>
+              </div>
+              
+              <div class="status">
+                <span class="status-chip" [ngClass]="'status-' + getStatusColor(proof.status)">
+                  {{ getStatusLabel(proof.status) }}
+                </span>
+              </div>
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="downloadProof(proof)">
+              <mat-icon>download</mat-icon>
+              Télécharger
+            </button>
+            <button mat-raised-button color="primary" (click)="openValidationDialog(proof)">
+              <mat-icon>check</mat-icon>
+              Valider
+            </button>
+            <button mat-raised-button color="warn" (click)="openValidationDialog(proof)">
+              <mat-icon>close</mat-icon>
+              Rejeter
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog de validation -->
+  <div *ngIf="showValidationDialog" class="validation-dialog-overlay" (click)="showValidationDialog = false">
+    <div class="validation-dialog" (click)="$event.stopPropagation()">
+      <h2>Validation de Preuve de Paiement</h2>
+      
+      <div class="proof-info" *ngIf="selectedProof">
+        <h3>{{ selectedProof.fileName }}</h3>
+        <p><strong>Client:</strong> {{ selectedProof.clientId }}</p>
+        <p><strong>Facture:</strong> {{ selectedProof.invoiceId }}</p>
+        <p><strong>Téléversé le:</strong> {{ selectedProof.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+
+      <div class="validation-form">
+        <div class="form-group">
+          <label>Notes de validation (optionnel):</label>
+          <textarea matInput 
+                    [(ngModel)]="validationNotes"
+                    placeholder="Ajoutez des notes sur la validation..."
+                    rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Raison du rejet (si applicable):</label>
+          <textarea matInput 
+                    [(ngModel)]="rejectionReason"
+                    placeholder="Expliquez pourquoi la preuve est rejetée..."
+                    rows="3"></textarea>
+        </div>
+
+        <div class="dialog-actions">
+          <button mat-button (click)="showValidationDialog = false">
+            Annuler
+          </button>
+          <button mat-raised-button 
+                  color="primary"
+                  [disabled]="isLoading"
+                  (click)="validateProof('VALIDATE')">
+            <mat-icon>check</mat-icon>
+            Valider
+          </button>
+          <button mat-raised-button 
+                  color="warn"
+                  [disabled]="isLoading"
+                  (click)="validateProof('REJECT')">
+            <mat-icon>close</mat-icon>
+            Rejeter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

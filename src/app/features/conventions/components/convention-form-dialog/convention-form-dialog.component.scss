@@ -1,0 +1,387 @@
+// Variables and mixins are now imported globally in styles.scss
+
+// Dialog container
+:host {
+  display: block;
+  max-width: 100%;
+  width: 900px;
+}
+
+// Dialog title
+.mat-dialog-title {
+  display: flex;
+  align-items: center;
+  margin: -24px -24px 16px -24px;
+  padding: 16px 24px;
+  background-color: #4F8DF9;
+  color: white;
+  
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    flex: 1;
+  }
+  
+  button {
+    color: white;
+  }
+}
+
+// Dialog content
+.mat-dialog-content {
+  margin: 0 -24px;
+  padding: 0 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+  
+  /* Scrollbar styles removed - using default */
+  
+  @media (max-height: 800px) {
+    max-height: 65vh;
+  }
+  
+  @media (max-height: 600px) {
+    max-height: 55vh;
+  }
+}
+
+// Form container
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 0;
+}
+
+// Form sections
+.form-section {
+  margin: 0;
+  overflow: visible;
+  
+  .mat-mdc-card-header {
+    padding: 16px 16px 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    
+    .mat-mdc-card-title {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: #4F8DF9;
+      margin: 0;
+      
+      mat-icon {
+        margin-right: 8px;
+        font-size: 20px;
+        height: 20px;
+        width: 20px;
+      }
+    }
+  }
+  
+  .mat-mdc-card-content {
+    padding: 8px 16px 16px;
+  }
+}
+
+// Form rows and fields
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  @media (max-width: 959px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+// Field styles
+.mat-mdc-form-field {
+  flex: 1;
+  
+  &.full-width {
+    width: 100%;
+  }
+  
+  // Specific field widths
+  &.reference-field {
+    flex: 0 0 250px;
+    
+    @media (max-width: 959px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+  
+  &.status-field {
+    flex: 0 0 200px;
+    
+    @media (max-width: 959px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+  
+  &.date-field {
+    flex: 0 1 200px;
+    
+    @media (max-width: 959px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+  
+  &.amount-field {
+    flex: 0 1 200px;
+    
+    @media (max-width: 959px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+  
+  &.currency-field {
+    flex: 0 0 150px;
+    
+    @media (max-width: 959px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+  
+  &.payment-terms-field {
+    flex: 0 1 300px;
+    
+    @media (max-width: 959px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+  
+  &.custom-days-field {
+    flex: 0 1 150px;
+    
+    @media (max-width: 959px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+}
+
+// Date validation error
+.date-validation-error {
+  display: flex;
+  align-items: center;
+  color: #F39C12;
+  font-size: 12px;
+  margin-top: -12px;
+  margin-bottom: 8px;
+  
+  mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    margin-right: 4px;
+  }
+}
+
+// Documents section
+.document-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  position: relative;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.document-preview {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+  
+  .file-name {
+    flex: 1;
+    margin: 0 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  mat-icon {
+    color: #4F8DF9;
+  }
+}
+
+.document-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  
+  .file-hint {
+    color: #A4B0BE;
+    font-size: 14px;
+  }
+}
+
+.document-description {
+  margin-top: 8px;
+}
+
+.add-document {
+  margin-top: 8px;
+  
+  button {
+    font-weight: 500;
+  }
+}
+
+.no-documents {
+  text-align: center;
+  padding: 16px;
+  color: #A4B0BE;
+  font-style: italic;
+}
+
+.documents-list {
+  .document-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .document-info {
+      flex: 1;
+      margin: 0 12px;
+      overflow: hidden;
+      
+      .document-name {
+        font-weight: 500;
+        display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+      }
+      
+      .document-description {
+        font-size: 12px;
+        color: #A4B0BE;
+        display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+      }
+    }
+    
+    mat-icon {
+      color: #4F8DF9;
+    }
+  }
+}
+
+// Dialog actions
+.mat-dialog-actions {
+  margin: 16px -24px -24px -24px;
+  padding: 8px 24px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  
+  button {
+    margin-left: 8px;
+    
+    &[color="primary"] {
+      mat-icon {
+        margin-right: 8px;
+      }
+      
+      mat-spinner {
+        display: inline-block;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 959px) {
+  .mat-dialog-content {
+    padding: 0 16px;
+  }
+  
+  .form-section {
+    .mat-mdc-card-header {
+      padding: 12px 12px 8px;
+    }
+    
+    .mat-mdc-card-content {
+      padding: 8px 12px 12px;
+    }
+  }
+  
+  .mat-dialog-actions {
+    padding: 8px 16px;
+    
+    button {
+      margin: 0 0 0 8px;
+    }
+  }
+}
+
+// Dark theme overrides
+:host-context(.dark-theme) {
+  .mat-dialog-title {
+    background-color: #2F3542;
+    color: white;
+    
+    button {
+      color: white;
+    }
+  }
+  
+  .form-section {
+    background-color: #2F3542;
+    color: white;
+    
+    .mat-mdc-card-header {
+      border-bottom-color: rgba(255, 255, 255, 0.1);
+      
+      .mat-mdc-card-title {
+        color: white;
+      }
+    }
+  }
+  
+  .document-row {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .document-preview {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .mat-dialog-actions {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+}

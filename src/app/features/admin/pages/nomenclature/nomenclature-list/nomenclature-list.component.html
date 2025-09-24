@@ -1,0 +1,200 @@
+<div class="nomenclature-list-container">
+  <!-- Header with title and actions -->
+  <div class="list-header">
+    <div class="header-content">
+      <h1>Gestion des Nomenclatures</h1>
+      <button mat-flat-button color="primary" (click)="createNomenclature()">
+        <mat-icon>add</mat-icon>
+        Nouvelle Nomenclature
+      </button>
+    </div>
+    <p class="subtitle">Gérez les différentes nomenclatures du système</p>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <div class="filters-container">
+      <!-- Search input -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher</mat-label>
+        <input 
+          matInput 
+          placeholder="Rechercher par code ou libellé" 
+          [formControl]="searchControl"
+          #searchInput>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Type filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Type</mat-label>
+        <mat-select [formControl]="typeFilter">
+          <mat-option value="all">Tous les types</mat-option>
+          <mat-option *ngFor="let type of nomenclatureTypes" [value]="type.code">
+            {{ type.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Status filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Statut</mat-label>
+        <mat-select [formControl]="statusFilter">
+          <mat-option value="all">Tous les statuts</mat-option>
+          <mat-option value="active">Actif</mat-option>
+          <mat-option value="inactive">Inactif</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Reset filters button -->
+      <button 
+        mat-button 
+        color="warn" 
+        (click)="resetFilters()"
+        class="reset-filters-btn"
+        [disabled]="!searchControl.value && typeFilter.value === 'all' && statusFilter.value === 'all'">
+        <mat-icon>refresh</mat-icon>
+        Réinitialiser
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Chargement des nomenclatures...</p>
+  </div>
+
+  <!-- No results message -->
+  <div 
+    *ngIf="!loading && dataSource.data.length === 0"
+    class="no-results">
+    <mat-icon>search_off</mat-icon>
+    <h3>Aucune nomenclature trouvée</h3>
+    <p>Essayez de modifier vos critères de recherche</p>
+    <button 
+      mat-stroked-button 
+      color="primary" 
+      (click)="resetFilters()"
+      class="reset-search-btn">
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- Nomenclatures table -->
+  <div *ngIf="!loading && dataSource.data.length > 0" class="table-container">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="dataSource" matSort class="nomenclature-table">
+        <!-- Code Column -->
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Code</th>
+          <td mat-cell *matCellDef="let element" class="code-cell">
+            <div class="code-wrapper">
+              <span class="code">{{ element.code }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Label Column -->
+        <ng-container matColumnDef="label">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Libellé</th>
+          <td mat-cell *matCellDef="let element" class="label-cell">
+            <div class="label-wrapper">
+              <span class="label">{{ element.label }}</span>
+              <span *ngIf="element.description" class="description">{{ element.description }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let element" class="type-cell">
+            <span class="type-badge" [ngClass]="'type-' + element.type.toLowerCase()">
+              {{ element.type | nomenclatureType }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="isActive">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+          <td mat-cell *matCellDef="let element" class="status-cell">
+            <mat-slide-toggle 
+              [checked]="element.isActive"
+              (change)="toggleStatus(element, $event)"
+              color="primary"
+              [disableRipple]="true">
+              <span class="status-label">
+                {{ element.isActive ? 'Actif' : 'Inactif' }}
+              </span>
+            </mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <!-- Created At Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Créé le</th>
+          <td mat-cell *matCellDef="let element" class="date-cell">
+            {{ element.createdAt | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+          <td mat-cell *matCellDef="let element" class="actions-cell">
+            <div class="actions-container">
+              <!-- View button -->
+              <button 
+                mat-icon-button 
+                matTooltip="Voir les détails"
+                (click)="viewNomenclature(element)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              
+              <!-- Edit button -->
+              <button 
+                mat-icon-button 
+                color="primary"
+                matTooltip="Modifier"
+                (click)="editNomenclature(element)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              
+              <!-- Delete button -->
+              <button 
+                mat-icon-button 
+                color="warn"
+                matTooltip="Supprimer"
+                (click)="$event.stopPropagation(); deleteNomenclature(element, $event)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Header and row definitions -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr 
+          mat-row 
+          *matRowDef="let row; columns: displayedColumns;"
+          [class.row-inactive]="!row.isActive"
+          (click)="viewNomenclature(row)"
+          class="nomenclature-row">
+        </tr>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      [length]="totalItems"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="0"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      aria-label="Sélectionner la page">
+    </mat-paginator>
+  </div>
+</div>

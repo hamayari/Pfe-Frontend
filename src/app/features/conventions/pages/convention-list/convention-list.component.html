@@ -1,0 +1,266 @@
+<div class="convention-list-container">
+  <!-- Header with title and actions -->
+  <div class="header">
+    <h1>Gestion des Conventions</h1>
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="openCreateDialog()" [disabled]="isLoading">
+        <mat-icon>add</mat-icon>
+        Nouvelle Convention
+      </button>
+      <button mat-stroked-button color="primary" (click)="exportToExcel()" [disabled]="isLoading || dataSource.data.length === 0">
+        <mat-icon>file_download</mat-icon>
+        Exporter
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>filter_list</mat-icon>
+        Filtres
+      </mat-card-title>
+      <button mat-button color="primary" (click)="clearFilters()" [disabled]="isLoading">
+        Réinitialiser
+      </button>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filter-form">
+        <div class="filter-row">
+          <!-- Search input -->
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Rechercher</mat-label>
+            <input matInput formControlName="search" placeholder="Référence, libellé...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Status filter -->
+          <mat-form-field appearance="outline" class="status-field">
+            <mat-label>Statut</mat-label>
+            <mat-select formControlName="status">
+              <mat-option [value]="">Tous les statuts</mat-option>
+              <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                {{ status.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filter-row">
+          <!-- Date range filters -->
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Date de début (du)</mat-label>
+            <input matInput [matDatepicker]="startDateFromPicker" formControlName="startDateFrom">
+            <mat-datepicker-toggle matSuffix [for]="startDateFromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startDateFromPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>au</mat-label>
+            <input matInput [matDatepicker]="startDateToPicker" formControlName="startDateTo">
+            <mat-datepicker-toggle matSuffix [for]="startDateToPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startDateToPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="filter-row">
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Date de fin (du)</mat-label>
+            <input matInput [matDatepicker]="endDateFromPicker" formControlName="endDateFrom">
+            <mat-datepicker-toggle matSuffix [for]="endDateFromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endDateFromPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>au</mat-label>
+            <input matInput [matDatepicker]="endDateToPicker" formControlName="endDateTo">
+            <mat-datepicker-toggle matSuffix [for]="endDateToPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endDateToPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Bulk actions -->
+  <div class="bulk-actions" *ngIf="selection.hasValue()">
+    <div class="selected-count">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ selection.selected.length }} élément(s) sélectionné(s)</span>
+    </div>
+    <div class="action-buttons">
+      <button mat-button color="warn" (click)="deleteSelectedConventions()" [disabled]="isLoading">
+        <mat-icon>delete</mat-icon>
+        Supprimer
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="loading-shade" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Data table -->
+  <div class="table-container" [class.loading]="isLoading">
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="loadConventions()" class="mat-elevation-z1">
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Reference Column -->
+      <ng-container matColumnDef="reference">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Référence</th>
+        <td mat-cell *matCellDef="let element" class="reference-cell">
+          <div class="reference">{{ element.reference }}</div>
+          <div class="subdued">Créée le {{ element.createdAt | date:'dd/MM/yyyy' }}</div>
+        </td>
+      </ng-container>
+
+      <!-- Label Column -->
+      <ng-container matColumnDef="label">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Libellé</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="label">{{ element.label }}</div>
+          <div class="subdued" *ngIf="element.description">{{ element.description | truncate:50 }}</div>
+        </td>
+      </ng-container>
+
+      <!-- Application Column -->
+      <ng-container matColumnDef="application">
+        <th mat-header-cell *matHeaderCellDef>Application</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.application?.label || 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- Zone Column -->
+      <ng-container matColumnDef="zone">
+        <th mat-header-cell *matHeaderCellDef>Zone</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.zone?.label || 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- Structure Column -->
+      <ng-container matColumnDef="structure">
+        <th mat-header-cell *matHeaderCellDef>Structure</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.structure?.label || 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- Start Date Column -->
+      <ng-container matColumnDef="startDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Début</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.startDate | date:'dd/MM/yyyy' }}
+        </td>
+      </ng-container>
+
+      <!-- End Date Column -->
+      <ng-container matColumnDef="endDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fin</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.endDate | date:'dd/MM/yyyy' }}
+          <div class="subdued" [ngClass]="getStatusClass(element.status)">
+            {{ getStatusLabel(element.status) }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-chip [ngClass]="getStatusClass(element.status)">
+            {{ getStatusLabel(element.status) }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <!-- Total Amount Column -->
+      <ng-container matColumnDef="totalAmount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.totalAmount | number:'1.2-2' }} {{ element.currency || 'MAD' }}
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let element" class="actions-cell">
+          <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isLoading">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="openViewDialog(element)">
+              <mat-icon>visibility</mat-icon>
+              <span>Voir les détails</span>
+            </button>
+            <button mat-menu-item (click)="openEditDialog(element)">
+              <mat-icon>edit</mat-icon>
+              <span>Modifier</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="deleteConvention(element)" class="delete-action">
+              <mat-icon>delete</mat-icon>
+              <span>Supprimer</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <!-- Header and row definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row 
+          *matRowDef="let row; columns: displayedColumns;"
+          [class.selected]="selection.isSelected(row)"
+          (click)="openViewDialog(row)"
+          class="clickable-row">
+      </tr>
+    </table>
+  </div>
+
+  <!-- No data message -->
+  <div class="no-data" *ngIf="!isLoading && dataSource.data.length === 0">
+    <mat-icon>inbox</mat-icon>
+    <h3>Aucune convention trouvée</h3>
+    <p *ngIf="filterForm.dirty">Aucune convention ne correspond à vos critères de recherche.</p>
+    <p *ngIf="!filterForm.dirty">Aucune convention n'a été créée pour le moment.</p>
+    <button mat-raised-button color="primary" (click)="openCreateDialog()" *ngIf="!filterForm.dirty">
+      <mat-icon>add</mat-icon>
+      Créer une convention
+    </button>
+    <button mat-button (click)="clearFilters()" *ngIf="filterForm.dirty">
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator [length]="totalItems"
+                 [pageSize]="pageSize"
+                 [pageSizeOptions]="pageSizeOptions"
+                 [pageIndex]="paginator.pageIndex || 0"
+                 (page)="onPageChange($event)"
+                 showFirstLastButtons
+                 aria-label="Select page of conventions">
+  </mat-paginator>
+</div>

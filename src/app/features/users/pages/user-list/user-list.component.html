@@ -1,0 +1,163 @@
+<div class="user-list-container">
+  <!-- Header with title and actions -->
+  <div class="list-header">
+    <h2>User Management</h2>
+    <button mat-raised-button color="primary" (click)="openCreateDialog()">
+      <mat-icon>person_add</mat-icon>
+      Add New User
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <form [formGroup]="filterForm" class="filters-form">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search Users</mat-label>
+        <input matInput formControlName="search" placeholder="Search by name or email">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="role">
+          <mat-option [value]="">All Roles</mat-option>
+          <mat-option *ngFor="let role of roles" [value]="role.value">
+            {{ role.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option [value]="">All Statuses</mat-option>
+          <mat-option *ngFor="let status of statuses" [value]="status.value">
+            {{ status.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button type="button" (click)="resetFilters()" class="reset-btn">
+        <mat-icon>refresh</mat-icon>
+        Reset
+      </button>
+    </form>
+  </mat-card>
+
+  <!-- Users Table -->
+  <mat-card class="table-card">
+    <div class="table-container" [class.loading]="isLoading">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let user" class="user-cell">
+            <div class="user-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="user-info">
+              <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+              <div class="user-email" matTooltip="{{ user.email }}">{{ user.email }}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Contact</th>
+          <td mat-cell *matCellDef="let user">
+            <div class="contact-info">
+              <div class="email">
+                <mat-icon>email</mat-icon>
+                <span matTooltip="{{ user.email }}">{{ user.email | truncate: 20 }}</span>
+              </div>
+              <div class="phone" *ngIf="user.phone">
+                <mat-icon>phone</mat-icon>
+                <span>{{ user.phone }}</span>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Role Column -->
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Role</th>
+          <td mat-cell *matCellDef="let user">
+            <span class="role-badge" [ngClass]="user.role.toLowerCase()">
+              {{ getRoleDisplay(user.role) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let user">
+            <mat-chip-set>
+              <mat-chip>
+                {{ user.status | titlecase }}
+              </mat-chip>
+            </mat-chip-set>
+          </td>
+        </ng-container>
+
+        <!-- Last Login Column -->
+        <ng-container matColumnDef="lastLogin">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Login</th>
+          <td mat-cell *matCellDef="let user">
+            <div class="last-login">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ formatDate(user.lastLogin) }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+          <td mat-cell *matCellDef="let user" class="actions-cell">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="openEditDialog(user)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="openDeleteDialog(user)" class="delete-action">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <!-- Header and Row Definitions -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <!-- Loading Spinner -->
+      <div class="loading-overlay" *ngIf="isLoading">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <!-- No Data Message -->
+      <div class="no-data" *ngIf="!isLoading && dataSource.data.length === 0">
+        <mat-icon>people_outline</mat-icon>
+        <h3>No users found</h3>
+        <p>Try adjusting your search or filter criteria</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator [length]="totalItems"
+                  [pageSize]="pageSize"
+                  [pageIndex]="pageIndex"
+                  [pageSizeOptions]="pageSizeOptions"
+                  [showFirstLastButtons]="true"
+                  (page)="onPageChange($event)"
+                  aria-label="Select page">
+    </mat-paginator>
+  </mat-card>
+</div>

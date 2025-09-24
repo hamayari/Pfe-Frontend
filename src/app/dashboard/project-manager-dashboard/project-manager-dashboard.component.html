@@ -1,0 +1,185 @@
+<div class="dashboard-container">
+  <!-- Header Professionnel (même que admin) -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1 class="page-title">Dashboard Chef de Projet</h1>
+    </div>
+    
+    <div class="header-center">
+      <!-- Barre de recherche globale -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="material-icons search-icon">search</i>
+          <input type="text" 
+                 class="search-input" 
+                 placeholder="Rechercher projets, équipes..."
+                 [(ngModel)]="searchQuery"
+                 (keyup.enter)="performSearch()">
+          <button class="search-btn" (click)="performSearch()">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <!-- Notifications -->
+      <div class="notification-container">
+        <button class="header-icon-btn" (click)="toggleNotifications()" [class.has-notifications]="hasNotifications" title="Notifications">
+          <i class="material-icons">notifications</i>
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Messages -->
+      <div class="messages-container">
+        <button class="header-icon-btn" (click)="toggleMessages()" [class.has-messages]="hasMessages" title="Messages">
+          <i class="material-icons">mail</i>
+          <span class="message-badge" *ngIf="messageCount > 0">{{ messageCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Paramètres -->
+      <button class="header-icon-btn" (click)="toggleSettings()" title="Paramètres">
+        <i class="material-icons">settings</i>
+      </button>
+      
+      <!-- Mode sombre/clair -->
+      <button class="header-icon-btn" (click)="toggleDarkMode()" [title]="darkMode ? 'Mode clair' : 'Mode sombre'">
+        <i class="material-icons">{{ darkMode ? 'light_mode' : 'dark_mode' }}</i>
+      </button>
+      
+      <!-- Profil utilisateur -->
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <img [src]="currentUser?.avatar || getDefaultAvatar()" 
+               [alt]="currentUser?.username || 'Chef de Projet'"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+        </div>
+        <div class="user-details">
+          <div class="username">{{ currentUser?.username || 'Chef de Projet' }}</div>
+          <div class="role">Chef de Projet</div>
+        </div>
+        <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
+      </div>
+
+      <!-- Menu dropdown utilisateur -->
+      <div class="user-menu" [class.open]="userMenuOpen">
+        <div class="menu-item" (click)="goToProfile()">
+          <i class="material-icons">person</i>
+          <span>Mon Profil</span>
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item logout" (click)="logout()">
+          <i class="material-icons">logout</i>
+          <span>Se Déconnecter</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- KPI Cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card kpi-ok">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>check_circle_outline</mat-icon></div>
+        <mat-card-title>15</mat-card-title>
+        <mat-card-subtitle>Conventions OK</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="stat-card kpi-vigilance">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>warning_amber</mat-icon></div>
+        <mat-card-title>{{ stats.conventionsAtRisk }}</mat-card-title>
+        <mat-card-subtitle>Conventions à Risque</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="stat-card kpi-problem">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>highlight_off</mat-icon></div>
+        <mat-card-title>{{ stats.detectedDelays }}</mat-card-title>
+        <mat-card-subtitle>Retards Détectés</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+  </div>
+
+  <!-- Timeline de sprint -->
+  <mat-card class="timeline-card">
+    <mat-card-header>
+      <mat-card-title>Suivi du Sprint</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li *ngFor="let step of timeline">
+          <span [ngClass]="step.status">{{ step.label }} ({{ step.date }})</span>
+        </li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Logs d'activité -->
+  <mat-card class="logs-card">
+    <mat-card-header>
+      <mat-card-title>Logs d'activité</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li *ngFor="let log of logs">{{ log }}</li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Messagerie interne -->
+  <mat-card class="messages-card">
+    <mat-card-header>
+      <mat-card-title>Messagerie Interne</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="messages-list">
+        <div *ngFor="let msg of messages">
+          <b>{{ msg.from }}</b> : {{ msg.content }} <small>({{ msg.date | date:'short' }})</small>
+        </div>
+      </div>
+      <div class="message-input">
+        <input [(ngModel)]="newMessage" placeholder="Votre message..." />
+        <button mat-raised-button color="primary" (click)="sendMessage()">Envoyer</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Alerts Section -->
+  <div class="alerts-section">
+    <h3>Alertes</h3>
+    <ul>
+      <li *ngFor="let alert of alerts" [ngClass]="alert.type">
+        {{ alert.message }} ({{ alert.timestamp | date:'short' }})
+      </li>
+    </ul>
+  </div>
+
+  <!-- Reminder Section -->
+  <div class="reminder-section">
+    <h3>Envoyer un rappel à un commercial</h3>
+    <form (ngSubmit)="sendReminder()">
+      <label>À :
+        <select [(ngModel)]="reminderForm.to" name="to" required>
+          <option *ngFor="let team of teams" [value]="team">{{ team }}</option>
+        </select>
+      </label>
+      <label>Message :
+        <input [(ngModel)]="reminderForm.message" name="message" required />
+      </label>
+      <button type="submit">Envoyer</button>
+    </form>
+    <div *ngIf="reminderMessage" class="reminder-message">{{ reminderMessage }}</div>
+    <h4>Rappels envoyés</h4>
+    <ul>
+      <li *ngFor="let r of reminders">
+        {{ r.date | date:'short' }} - {{ r.to }} : {{ r.message }}
+      </li>
+    </ul>
+  </div>
+
+  <!-- existing content -->
+  <p>project-manager-dashboard works!</p>
+</div>

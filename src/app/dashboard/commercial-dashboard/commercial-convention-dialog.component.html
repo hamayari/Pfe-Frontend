@@ -1,0 +1,137 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>
+    {{ data.mode === 'add' ? 'Ajouter une Convention' : 'Modifier la Convention' }}
+  </h2>
+
+  <div mat-dialog-content>
+    <form [formGroup]="form" class="convention-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Référence</mat-label>
+        <input matInput formControlName="reference" placeholder="REF-2024-001">
+        <mat-error *ngIf="form.get('reference')?.hasError('required')">
+          La référence est obligatoire
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Libellé</mat-label>
+        <input matInput formControlName="title" placeholder="Titre de la convention">
+        <mat-error *ngIf="form.get('title')?.hasError('required')">
+          Le libellé est obligatoire
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Date de début</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Date de fin</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Structure</mat-label>
+        <mat-select formControlName="structure">
+          <mat-option *ngFor="let structure of structures" [value]="structure.value">
+            {{ structure.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Gouvernorat</mat-label>
+        <mat-select formControlName="governorate">
+          <mat-option *ngFor="let gov of governorates" [value]="gov">
+            {{ gov }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Modalité de paiement</mat-label>
+        <mat-select formControlName="paymentMethod">
+          <mat-option *ngFor="let method of paymentMethods" [value]="method">
+            {{ method }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Montant</mat-label>
+          <input matInput type="number" formControlName="amount" placeholder="0.00">
+          <span matSuffix>€</span>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Devise</mat-label>
+          <mat-select formControlName="currency">
+            <mat-option *ngFor="let currency of currencies" [value]="currency">
+              {{ currency }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3" placeholder="Description détaillée..."></textarea>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Annuler</button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">
+      {{ data.mode === 'add' ? 'Créer' : 'Modifier' }}
+    </button>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

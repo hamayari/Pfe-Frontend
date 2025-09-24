@@ -1,0 +1,159 @@
+:host {
+  display: block;
+  padding: 2rem;
+  background-color: #f4f7fa;
+}
+
+.users-container {
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.users-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  button {
+    font-weight: 500;
+    border-radius: 6px;
+  }
+}
+
+.filters-bar {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  .filter-field {
+    flex: 1;
+    max-width: 300px;
+  }
+  .search-field {
+    flex: 1;
+    max-width: 400px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+  
+  p {
+    color: #666;
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+
+  .mat-column-username {
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  .mat-column-actions {
+    width: 120px;
+  }
+  
+  .mat-mdc-header-cell {
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+/* Custom chip styles */
+.roles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.role-chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  background-color: #757575;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  background-color: #757575;
+}
+
+/* Styles pour les puces de statut */
+.chip-active {
+  background-color: #4CAF50 !important; /* Vert */
+}
+
+.chip-inactive {
+  background-color: #757575 !important; /* Gris */
+}
+
+/* Styles pour les badges de rôle */
+.chip-role-admin { background-color: #2196F3 !important; } /* Bleu */
+.chip-role-super_admin, .chip-role-superadmin { background-color: #f44336 !important; } /* Rouge */
+.chip-role-commercial { background-color: #FF9800 !important; } /* Orange */
+.chip-role-project_manager { background-color: #9C27B0 !important; } /* Violet */
+.chip-role-decision_maker { background-color: #009688 !important; } /* Teal */
+
+.mat-mdc-paginator {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 1rem;
+  }
+  .users-container {
+    padding: 1rem;
+  }
+  .users-header, .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+} 

@@ -1,0 +1,33 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Conventions par Gouvernorat</h3>
+    <div class="chart-actions">
+      <button mat-icon-button [matMenuTriggerFor]="chartMenu" class="chart-menu-btn">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #chartMenu="matMenu">
+        <button mat-menu-item (click)="exportChart()">
+          <mat-icon>download</mat-icon>
+          <span>Exporter</span>
+        </button>
+        <button mat-menu-item (click)="refreshChart()">
+          <mat-icon>refresh</mat-icon>
+          <span>Actualiser</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+  
+  <div class="chart-wrapper">
+    <canvas #chartCanvas></canvas>
+  </div>
+  
+  <div class="chart-legend">
+    <div class="legend-item" *ngFor="let item of legendItems">
+      <div class="legend-color" [style.background-color]="item.color"></div>
+      <span class="legend-label">{{ item.label }}</span>
+      <span class="legend-value">{{ item.value }}</span>
+    </div>
+  </div>
+</div>
+

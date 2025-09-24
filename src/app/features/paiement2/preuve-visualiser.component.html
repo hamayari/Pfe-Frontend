@@ -1,0 +1,13 @@
+<div *ngIf="erreur" class="preuve-erreur">
+  <mat-icon color="warn">error_outline</mat-icon>
+  {{ erreur }}
+</div>
+<div *ngIf="preuveUrl && !erreur">
+  <object [data]="preuveUrl" type="application/pdf" width="100%" height="600px">
+    <img [src]="preuveUrl" alt="Preuve de paiement" *ngIf="preuveUrl">
+    <p>Impossible d'afficher la preuve. <a [href]="preuveUrl" download>Télécharger</a></p>
+  </object>
+</div>
+<div *ngIf="!preuveUrl && !erreur">
+  <p>Chargement de la preuve...</p>
+</div> 

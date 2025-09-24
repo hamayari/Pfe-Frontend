@@ -1,0 +1,355 @@
+<div class="users-management-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <mat-icon class="header-icon">people</mat-icon>
+        <h1>Gestion des Utilisateurs</h1>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="onAddUser()">
+          <mat-icon>person_add</mat-icon>
+          Nouvel Utilisateur
+        </button>
+        <button mat-raised-button color="accent" (click)="onAddRole()">
+          <mat-icon>security</mat-icon>
+          Nouveau Rôle
+        </button>
+        <button mat-raised-button color="warn" (click)="exportData('users')">
+          <mat-icon>download</mat-icon>
+          Exporter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Bar -->
+  <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="primary"></mat-progress-bar>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <mat-tab-group [(selectedIndex)]="selectedTab" class="management-tabs">
+      
+      <!-- Users Tab -->
+      <mat-tab label="Tous les Utilisateurs">
+        <div class="tab-content">
+          <!-- Filters Section -->
+          <mat-card class="filters-card">
+            <mat-card-content>
+              <div class="filters-row">
+                <mat-form-field class="search-field" appearance="outline">
+                  <mat-icon matPrefix>search</mat-icon>
+                  <input matInput 
+                         [(ngModel)]="searchTerm"
+                         placeholder="Rechercher utilisateurs..."
+                         (input)="applyFilter()">
+                </mat-form-field>
+
+                <mat-form-field class="filter-field" appearance="outline">
+                  <mat-label>Rôle</mat-label>
+                  <mat-select [(ngModel)]="selectedRole" (selectionChange)="applyFilter()">
+                    <mat-option value="all">Tous les rôles</mat-option>
+                    <mat-option value="ROLE_ADMIN">Administrateur</mat-option>
+                    <mat-option value="ROLE_COMMERCIAL">Commercial</mat-option>
+                    <mat-option value="ROLE_PROJECT_MANAGER">Chef de Projet</mat-option>
+                    <mat-option value="ROLE_DECISION_MAKER">Preneur de Décision</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="filter-field" appearance="outline">
+                  <mat-label>Statut</mat-label>
+                  <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()">
+                    <mat-option value="all">Tous les statuts</mat-option>
+                    <mat-option value="active">Actif</mat-option>
+                    <mat-option value="inactive">Inactif</mat-option>
+                    <mat-option value="pending">En attente</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Users Table -->
+          <mat-card class="table-card">
+            <mat-card-content>
+              <table mat-table [dataSource]="usersDataSource" matSort class="users-table">
+                
+                <!-- Avatar Column -->
+                <ng-container matColumnDef="avatar">
+                  <th mat-header-cell *matHeaderCellDef>Avatar</th>
+                  <td mat-cell *matCellDef="let user">
+                    <div class="user-avatar">
+                      <mat-icon *ngIf="!user.avatar">account_circle</mat-icon>
+                      <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.name">
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Username Column -->
+                <ng-container matColumnDef="username">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom d'utilisateur</th>
+                  <td mat-cell *matCellDef="let user">
+                    <div class="user-info">
+                      <span class="username">{{ user.username }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Email Column -->
+                <ng-container matColumnDef="email">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+                  <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+                </ng-container>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom complet</th>
+                  <td mat-cell *matCellDef="let user">{{ user.name }}</td>
+                </ng-container>
+
+                <!-- Role Column -->
+                <ng-container matColumnDef="role">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Rôle</th>
+                  <td mat-cell *matCellDef="let user">
+                    <mat-chip [color]="getRoleColor(user.role)" selected>
+                      {{ user.role.replace('ROLE_', '') }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+                  <td mat-cell *matCellDef="let user">
+                    <div class="status-indicator" [ngClass]="getStatusColor(user.status)">
+                      <mat-icon>{{ getStatusIcon(user.status) }}</mat-icon>
+                      <span>{{ user.status | titlecase }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Created At Column -->
+                <ng-container matColumnDef="createdAt">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Créé le</th>
+                  <td mat-cell *matCellDef="let user">{{ user.createdAt | date:'short' }}</td>
+                </ng-container>
+
+                <!-- Last Login Column -->
+                <ng-container matColumnDef="lastLogin">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Dernière connexion</th>
+                  <td mat-cell *matCellDef="let user">
+                    {{ user.lastLogin ? (user.lastLogin | date:'short') : 'Jamais' }}
+                  </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let user">
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button mat-menu-item (click)="onEditUser(user)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Modifier</span>
+                      </button>
+                      <button mat-menu-item (click)="onResetPassword(user)">
+                        <mat-icon>lock_reset</mat-icon>
+                        <span>Réinitialiser mot de passe</span>
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="onDeleteUser(user)" class="danger-action">
+                        <mat-icon>delete</mat-icon>
+                        <span>Supprimer</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons></mat-paginator>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Roles Tab -->
+      <mat-tab label="Rôles & Permissions">
+        <div class="tab-content">
+          <mat-card class="table-card">
+            <mat-card-content>
+              <table mat-table [dataSource]="rolesDataSource" class="roles-table">
+                
+                <!-- Role Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef>Nom du Rôle</th>
+                  <td mat-cell *matCellDef="let role">
+                    <div class="role-info">
+                      <span class="role-name">{{ role.name.replace('ROLE_', '') }}</span>
+                      <span class="role-code">{{ role.name }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Description Column -->
+                <ng-container matColumnDef="description">
+                  <th mat-header-cell *matHeaderCellDef>Description</th>
+                  <td mat-cell *matCellDef="let role">{{ role.description }}</td>
+                </ng-container>
+
+                <!-- Permissions Column -->
+                <ng-container matColumnDef="permissions">
+                  <th mat-header-cell *matHeaderCellDef>Permissions</th>
+                  <td mat-cell *matCellDef="let role">
+                    <div class="permissions-list">
+                      <mat-chip *ngFor="let permission of role.permissions" color="primary" selected>
+                        {{ permission }}
+                      </mat-chip>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- User Count Column -->
+                <ng-container matColumnDef="userCount">
+                  <th mat-header-cell *matHeaderCellDef>Utilisateurs</th>
+                  <td mat-cell *matCellDef="let role">
+                    <div class="user-count">
+                      <mat-icon>people</mat-icon>
+                      <span>{{ role.userCount }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let role">
+                    <button mat-icon-button [matMenuTriggerFor]="roleMenu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #roleMenu="matMenu">
+                      <button mat-menu-item (click)="onEditRole(role)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Modifier</span>
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="onDeleteRole(role)" class="danger-action">
+                        <mat-icon>delete</mat-icon>
+                        <span>Supprimer</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['name', 'description', 'permissions', 'userCount', 'actions']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['name', 'description', 'permissions', 'userCount', 'actions'];"></tr>
+              </table>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Audit Logs Tab -->
+      <mat-tab label="Journal d'Audit">
+        <div class="tab-content">
+          <mat-card class="table-card">
+            <mat-card-content>
+              <table mat-table [dataSource]="auditDataSource" class="audit-table">
+                
+                <!-- Username Column -->
+                <ng-container matColumnDef="username">
+                  <th mat-header-cell *matHeaderCellDef>Utilisateur</th>
+                  <td mat-cell *matCellDef="let log">
+                    <div class="user-info">
+                      <span class="username">{{ log.username }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Action Column -->
+                <ng-container matColumnDef="action">
+                  <th mat-header-cell *matHeaderCellDef>Action</th>
+                  <td mat-cell *matCellDef="let log">
+                    <div class="action-info">
+                      <mat-icon class="action-icon">{{ getActionIcon(log.action) }}</mat-icon>
+                      <span>{{ log.action }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Details Column -->
+                <ng-container matColumnDef="details">
+                  <th mat-header-cell *matHeaderCellDef>Détails</th>
+                  <td mat-cell *matCellDef="let log">{{ log.details }}</td>
+                </ng-container>
+
+                <!-- Timestamp Column -->
+                <ng-container matColumnDef="timestamp">
+                  <th mat-header-cell *matHeaderCellDef>Date/Heure</th>
+                  <td mat-cell *matCellDef="let log">{{ log.timestamp | date:'short' }}</td>
+                </ng-container>
+
+                <!-- IP Address Column -->
+                <ng-container matColumnDef="ipAddress">
+                  <th mat-header-cell *matHeaderCellDef>Adresse IP</th>
+                  <td mat-cell *matCellDef="let log">{{ log.ipAddress }}</td>
+                </ng-container>
+
+                <!-- Result Column -->
+                <ng-container matColumnDef="result">
+                  <th mat-header-cell *matHeaderCellDef>Résultat</th>
+                  <td mat-cell *matCellDef="let log">
+                    <div class="result-indicator" [ngClass]="log.result">
+                      <mat-icon>{{ log.result === 'success' ? 'check_circle' : 'error' }}</mat-icon>
+                      <span>{{ log.result | titlecase }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['username', 'action', 'details', 'timestamp', 'ipAddress', 'result']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['username', 'action', 'details', 'timestamp', 'ipAddress', 'result'];"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

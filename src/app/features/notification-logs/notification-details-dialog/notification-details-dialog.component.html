@@ -1,0 +1,31 @@
+<div class="notification-details-dialog">
+  <h2 mat-dialog-title>Détails de la notification</h2>
+  
+  <mat-dialog-content>
+    <div class="notification-details">
+      <div class="detail-row">
+        <strong>Type:</strong> {{ data.notification.type }}
+      </div>
+      <div class="detail-row">
+        <strong>Sujet:</strong> {{ data.notification.subject }}
+      </div>
+      <div class="detail-row">
+        <strong>Destinataire:</strong> {{ data.notification.recipient }}
+      </div>
+      <div class="detail-row">
+        <strong>Statut:</strong> {{ data.notification.status }}
+      </div>
+      <div class="detail-row">
+        <strong>Date:</strong> {{ data.notification.createdAt | date:'medium' }}
+      </div>
+      <div class="detail-row" *ngIf="data.notification.content">
+        <strong>Contenu:</strong>
+        <div class="content">{{ data.notification.content }}</div>
+      </div>
+    </div>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()">Fermer</button>
+  </mat-dialog-actions>
+</div>

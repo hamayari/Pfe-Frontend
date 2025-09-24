@@ -1,0 +1,702 @@
+// Design moderne du Footer - Améliorations UX/UI
+// Basé sur Material Design 3 et les meilleures pratiques modernes
+
+// Variables pour le footer moderne
+$footer-height: 80px;
+$footer-padding: 0 32px;
+$footer-bg: #ffffff;
+$footer-bg-dark: #1a1a1a;
+$footer-border: rgba(0, 0, 0, 0.08);
+$footer-border-dark: rgba(255, 255, 255, 0.08);
+$footer-text: #64748b;
+$footer-text-dark: rgba(255, 255, 255, 0.7);
+$footer-link: #3f51b5;
+$footer-link-dark: #90caf9;
+
+// Footer Container Principal
+.modern-footer {
+  height: $footer-height;
+  background: $footer-bg;
+  border-top: 1px solid $footer-border;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  // Thème sombre
+  &.dark-theme {
+    background: $footer-bg-dark;
+    border-top-color: $footer-border-dark;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+    
+    .footer-content {
+      .footer-left {
+        .copyright {
+          color: $footer-text-dark;
+        }
+        
+        .version {
+          color: rgba(255, 255, 255, 0.5);
+        }
+      }
+      
+      .footer-center {
+        .footer-links {
+          .footer-link {
+            color: $footer-text-dark;
+            
+            &:hover {
+              color: $footer-link-dark;
+            }
+          }
+        }
+      }
+      
+      .footer-right {
+        .footer-actions {
+          .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: $footer-text-dark;
+            border-color: rgba(255, 255, 255, 0.2);
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.15);
+              border-color: rgba(255, 255, 255, 0.3);
+              color: #ffffff;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Contenu du footer
+.footer-content {
+  height: 100%;
+  padding: $footer-padding;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  
+  // Section gauche : Copyright et version
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    
+    .copyright {
+      font-size: 14px;
+      font-weight: 500;
+      color: $footer-text;
+      margin: 0;
+      white-space: nowrap;
+      
+      .company-name {
+        font-weight: 600;
+        color: #3f51b5;
+      }
+      
+      .year {
+        font-weight: 400;
+      }
+    }
+    
+    .version {
+      font-size: 12px;
+      color: #94a3b8;
+      margin: 0;
+      font-weight: 400;
+      
+      .version-number {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #64748b;
+        font-size: 11px;
+        margin-left: 4px;
+      }
+    }
+  }
+  
+  // Section centrale : Liens utiles
+  .footer-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      
+      .footer-link {
+        font-size: 13px;
+        color: $footer-text;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        cursor: pointer;
+        
+        &:hover {
+          color: $footer-link;
+          background: rgba(99, 102, 241, 0.1);
+          transform: translateY(-1px);
+        }
+        
+        &:active {
+          transform: translateY(0);
+        }
+        
+        // Indicateur de page active
+        &.active {
+          color: $footer-link;
+          background: rgba(99, 102, 241, 0.1);
+          font-weight: 600;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: $footer-link;
+            border-radius: 1px;
+          }
+        }
+        
+        // Icône pour certains liens
+        .link-icon {
+          margin-right: 6px;
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+          vertical-align: middle;
+        }
+      }
+      
+      // Séparateur entre liens
+      .link-separator {
+        width: 1px;
+        height: 20px;
+        background: #e2e8f0;
+        margin: 0 8px;
+      }
+    }
+  }
+  
+  // Section droite : Actions et informations
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    
+    .footer-actions {
+      display: flex;
+      gap: 8px;
+      
+      .action-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #ffffff;
+        color: $footer-text;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          color: #1a202c;
+          transform: translateY(-1px);
+        }
+        
+        &:active {
+          transform: translateY(0);
+        }
+        
+        mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+        }
+        
+        // Variantes de couleur
+        &.primary {
+          background: #3f51b5;
+          color: #ffffff;
+          border-color: #3f51b5;
+          
+          &:hover {
+            background: #5c6bc0;
+            border-color: #5c6bc0;
+          }
+        }
+        
+        &.success {
+          background: #4caf50;
+          color: #ffffff;
+          border-color: #4caf50;
+          
+          &:hover {
+            background: #66bb6a;
+            border-color: #66bb6a;
+          }
+        }
+        
+        &.info {
+          background: #2196f3;
+          color: #ffffff;
+          border-color: #2196f3;
+          
+          &:hover {
+            background: #42a5f5;
+            border-color: #42a5f5;
+          }
+        }
+      }
+    }
+    
+    // Informations système
+    .system-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 11px;
+      color: #94a3b8;
+      
+      .info-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        
+        .info-icon {
+          font-size: 12px;
+          width: 12px;
+          height: 12px;
+          color: #cbd5e1;
+        }
+        
+        .info-value {
+          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+          font-weight: 500;
+        }
+      }
+      
+      // Séparateur
+      .info-separator {
+        width: 1px;
+        height: 16px;
+        background: #e2e8f0;
+      }
+    }
+  }
+}
+
+// Footer responsive (mode mobile)
+.footer-mobile {
+  height: auto;
+  padding: 20px 16px;
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    
+    .footer-left {
+      order: 1;
+      
+      .copyright {
+        font-size: 13px;
+      }
+      
+      .version {
+        font-size: 11px;
+      }
+    }
+    
+    .footer-center {
+      order: 2;
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 16px;
+        
+        .footer-link {
+          padding: 10px 16px;
+          font-size: 14px;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          background: #f8fafc;
+          
+          &:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+          }
+        }
+        
+        .link-separator {
+          display: none;
+        }
+      }
+    }
+    
+    .footer-right {
+      order: 3;
+      flex-direction: column;
+      gap: 12px;
+      
+      .footer-actions {
+        justify-content: center;
+        
+        .action-btn {
+          width: 40px;
+          height: 40px;
+          
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+      
+      .system-info {
+        justify-content: center;
+        font-size: 12px;
+        
+        .info-separator {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+// Footer compact (mode réduit)
+.footer-compact {
+  height: 60px;
+  
+  .footer-content {
+    .footer-left {
+      .version {
+        display: none;
+      }
+    }
+    
+    .footer-center {
+      .footer-links {
+        gap: 24px;
+        
+        .footer-link {
+          font-size: 12px;
+          padding: 6px 10px;
+        }
+      }
+    }
+    
+    .footer-right {
+      .system-info {
+        display: none;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Classes d'animation
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.6s ease-out;
+}
+
+// Responsive
+@media (max-width: 1200px) {
+  .footer-content {
+    .footer-center {
+      .footer-links {
+        gap: 24px;
+      }
+    }
+    
+    .footer-right {
+      .system-info {
+        .info-item {
+          &:nth-child(3),
+          &:nth-child(4) {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .modern-footer {
+    height: auto;
+    padding: 20px 0;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    
+    .footer-left {
+      order: 1;
+    }
+    
+    .footer-center {
+      order: 2;
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 16px;
+        
+        .footer-link {
+          padding: 10px 16px;
+          font-size: 14px;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          background: #f8fafc;
+          
+          &:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+          }
+        }
+        
+        .link-separator {
+          display: none;
+        }
+      }
+    }
+    
+    .footer-right {
+      order: 3;
+      flex-direction: column;
+      gap: 12px;
+      
+      .footer-actions {
+        justify-content: center;
+        
+        .action-btn {
+          width: 40px;
+          height: 40px;
+          
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+      
+      .system-info {
+        justify-content: center;
+        font-size: 12px;
+        
+        .info-separator {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-footer {
+    padding: 16px 0;
+  }
+  
+  .footer-content {
+    padding: 0 16px;
+    gap: 16px;
+    
+    .footer-left {
+      .copyright {
+        font-size: 12px;
+      }
+      
+      .version {
+        font-size: 10px;
+      }
+    }
+    
+    .footer-center {
+      .footer-links {
+        gap: 12px;
+        
+        .footer-link {
+          font-size: 13px;
+          padding: 8px 12px;
+        }
+      }
+    }
+    
+    .footer-right {
+      .footer-actions {
+        gap: 6px;
+        
+        .action-btn {
+          width: 36px;
+          height: 36px;
+          
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+      
+      .system-info {
+        font-size: 11px;
+        gap: 12px;
+      }
+    }
+  }
+}
+
+// Transitions fluides
+.modern-footer * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// États de focus pour l'accessibilité
+.footer-link:focus-visible,
+.action-btn:focus-visible {
+  outline: 2px solid #3f51b5;
+  outline-offset: 2px;
+}
+
+// Support des lecteurs d'écran
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Effets de survol avancés
+.footer-link {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+// Indicateur de statut en ligne
+.online-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #4caf50;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

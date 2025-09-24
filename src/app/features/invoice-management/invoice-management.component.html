@@ -1,0 +1,393 @@
+<div class="invoice-management-container">
+  <!-- Header avec statistiques -->
+  <div class="stats-header">
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon total">
+            <mat-icon>receipt</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ totalInvoices }}</h3>
+            <p>Total Factures</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon paid">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ paidInvoices }}</h3>
+            <p>Payées</p>
+            <small>{{ paidAmount | currency:'EUR':'symbol':'1.2-2' }}</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon pending">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ pendingInvoices }}</h3>
+            <p>En attente</p>
+            <small>{{ pendingAmount | currency:'EUR':'symbol':'1.2-2' }}</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon overdue">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ overdueInvoices }}</h3>
+            <p>En retard</p>
+            <small>{{ overdueAmount | currency:'EUR':'symbol':'1.2-2' }}</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="notifications-section" *ngIf="notifications.overdueInvoices > 0 || notifications.upcomingDueDates > 0">
+    <mat-card class="notification-card">
+      <mat-card-content>
+        <div class="notification-item" *ngIf="notifications.overdueInvoices > 0">
+          <mat-icon class="warning-icon">warning</mat-icon>
+          <span>{{ notifications.overdueInvoices }} facture(s) en retard</span>
+          <button mat-button color="warn" (click)="filterForm.patchValue({overdueOnly: true})">
+            Voir
+          </button>
+        </div>
+        <div class="notification-item" *ngIf="notifications.upcomingDueDates > 0">
+          <mat-icon class="info-icon">info</mat-icon>
+          <span>{{ notifications.upcomingDueDates }} échéance(s) dans les 7 jours</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Barre d'actions -->
+  <div class="action-bar">
+    <div class="left-actions">
+      <button mat-raised-button color="primary" (click)="createInvoice()">
+        <mat-icon>add</mat-icon>
+        Nouvelle Facture
+      </button>
+      
+      <button mat-raised-button color="accent" 
+              [disabled]="selectedInvoices.length === 0"
+              (click)="openBulkPaymentDialog()">
+        <mat-icon>payment</mat-icon>
+        Paiement Groupé ({{ selectedInvoices.length }})
+      </button>
+
+      <button mat-raised-button color="warn" 
+              [disabled]="selectedInvoices.length === 0"
+              (click)="executeBulkAction('sendReminders')">
+        <mat-icon>notifications</mat-icon>
+        Rappels ({{ selectedInvoices.length }})
+      </button>
+    </div>
+
+    <div class="right-actions">
+      <button mat-icon-button [matMenuTriggerFor]="exportMenu">
+        <mat-icon>download</mat-icon>
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportInvoices('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Export PDF
+        </button>
+        <button mat-menu-item (click)="exportInvoices('excel')">
+          <mat-icon>table_chart</mat-icon>
+          Export Excel
+        </button>
+        <button mat-menu-item (click)="exportInvoices('csv')">
+          <mat-icon>description</mat-icon>
+          Export CSV
+        </button>
+        <button mat-menu-item (click)="exportInvoices('json')">
+          <mat-icon>code</mat-icon>
+          Export JSON
+        </button>
+      </mat-menu>
+
+      <button mat-icon-button [matMenuTriggerFor]="bulkMenu" 
+              [disabled]="selectedInvoices.length === 0">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #bulkMenu="matMenu">
+        <button mat-menu-item *ngFor="let action of bulkActions" 
+                (click)="executeBulkAction(action.action)">
+          <mat-icon>{{ action.icon }}</mat-icon>
+          {{ action.label }}
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filters-form">
+        <div class="filters-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Statut</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="">Tous</mat-option>
+              <mat-option *ngFor="let status of workflowStates" [value]="status.value">
+                {{ status.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Client</mat-label>
+            <input matInput formControlName="client" placeholder="Rechercher par client...">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Convention</mat-label>
+            <input matInput formControlName="convention" placeholder="Rechercher par convention...">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Méthode de paiement</mat-label>
+            <mat-select formControlName="paymentMethod">
+              <mat-option value="">Toutes</mat-option>
+              <mat-option *ngFor="let method of paymentMethods" [value]="method.value">
+                {{ method.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filters-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Montant minimum</mat-label>
+            <input matInput type="number" formControlName="amountMin" placeholder="0">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Montant maximum</mat-label>
+            <input matInput type="number" formControlName="amountMax" placeholder="1000000">
+          </mat-form-field>
+
+          <mat-slide-toggle formControlName="overdueOnly" color="warn">
+            Factures en retard uniquement
+          </mat-slide-toggle>
+
+          <button mat-stroked-button type="button" (click)="clearFilters()">
+            <mat-icon>clear</mat-icon>
+            Effacer
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Table des factures -->
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="filteredInvoices" matSort class="invoice-table">
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (change)="onSelectAll($event.checked)"
+                           [checked]="selectedInvoices.length === filteredInvoices.length && filteredInvoices.length > 0"
+                           [indeterminate]="selectedInvoices.length > 0 && selectedInvoices.length < filteredInvoices.length">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let invoice">
+              <mat-checkbox (change)="onInvoiceSelection(invoice, $event.checked)"
+                           [checked]="isInvoiceSelected(invoice)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <!-- Reference Column -->
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Référence </th>
+            <td mat-cell *matCellDef="let invoice">
+              <div class="invoice-reference">
+                <strong>{{ invoice.reference }}</strong>
+                <span class="invoice-number" *ngIf="invoice.invoiceNumber">
+                  #{{ invoice.invoiceNumber }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Client Column -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Client </th>
+            <td mat-cell *matCellDef="let invoice">
+              <div class="client-info">
+                <div class="client-name">{{ invoice.clientName || 'N/A' }}</div>
+                <div class="client-email" *ngIf="invoice.clientId">
+                  {{ invoice.clientId }}
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Convention Column -->
+          <ng-container matColumnDef="convention">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Convention </th>
+            <td mat-cell *matCellDef="let invoice">
+              <div class="convention-info" *ngIf="invoice.conventionId">
+                <div class="convention-ref">{{ invoice.conventionId }}</div>
+                <div class="convention-title">{{ invoice.conventionName || 'N/A' }}</div>
+              </div>
+              <span *ngIf="!invoice.conventionId">-</span>
+            </td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant </th>
+            <td mat-cell *matCellDef="let invoice">
+              <div class="amount-info">
+                <span class="amount">{{ invoice.amount | currency:'EUR':'symbol':'1.2-2' }}</span>
+                <span class="currency">{{ invoice.currency || 'EUR' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Issue Date Column -->
+          <ng-container matColumnDef="issueDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Date d'émission </th>
+            <td mat-cell *matCellDef="let invoice">
+              {{ invoice.issueDate | date:'dd/MM/yyyy' }}
+            </td>
+          </ng-container>
+
+          <!-- Due Date Column -->
+          <ng-container matColumnDef="dueDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Échéance </th>
+            <td mat-cell *matCellDef="let invoice">
+              <div class="due-date" [class.overdue]="isOverdue(invoice)" [class.expiring-soon]="isExpiringSoon(invoice)">
+                {{ invoice.dueDate | date:'dd/MM/yyyy' }}
+                <mat-icon *ngIf="isOverdue(invoice)" class="overdue-icon">warning</mat-icon>
+                <mat-icon *ngIf="isExpiringSoon(invoice)" class="expiring-icon">schedule</mat-icon>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Statut </th>
+            <td mat-cell *matCellDef="let invoice">
+              <span class="status-chip" [class]="'status-' + getStatusColor(invoice.status)">
+                {{ getStatusLabel(invoice.status) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Payment Method Column -->
+          <ng-container matColumnDef="paymentMethod">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Méthode de paiement </th>
+            <td mat-cell *matCellDef="let invoice">
+              <span class="payment-method">
+                {{ getPaymentMethodLabel(invoice.paymentMethod) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let invoice">
+              <div class="action-buttons">
+                <button mat-icon-button [matMenuTriggerFor]="actionMenu" 
+                        (click)="$event.stopPropagation()">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #actionMenu="matMenu">
+                  <button mat-menu-item (click)="editInvoice(invoice)">
+                    <mat-icon>edit</mat-icon>
+                    Modifier
+                  </button>
+                  <button mat-menu-item (click)="openPaymentDialog(invoice)" 
+                          *ngIf="invoice.status !== 'PAID'">
+                    <mat-icon>payment</mat-icon>
+                    Enregistrer paiement
+                  </button>
+                  <button mat-menu-item (click)="openPaymentProofDialog(invoice)"
+                          *ngIf="invoice.status === 'PAID'">
+                    <mat-icon>receipt_long</mat-icon>
+                    Preuve de paiement
+                  </button>
+                  <button mat-menu-item (click)="openWorkflowDialog(invoice)">
+                    <mat-icon>workflow</mat-icon>
+                    Workflow
+                  </button>
+                  <button mat-menu-item (click)="openHistoryDialog(invoice)">
+                    <mat-icon>history</mat-icon>
+                    Historique
+                  </button>
+                  <button mat-menu-item (click)="generateInvoicePDF(invoice)">
+                    <mat-icon>picture_as_pdf</mat-icon>
+                    Générer PDF
+                  </button>
+                  <button mat-menu-item (click)="sendPaymentReminder(invoice)"
+                          *ngIf="invoice.status !== 'PAID'">
+                    <mat-icon>notifications</mat-icon>
+                    Envoyer rappel
+                  </button>
+                  <mat-divider></mat-divider>
+                  <button mat-menu-item (click)="deleteInvoice(invoice)" color="warn">
+                    <mat-icon>delete</mat-icon>
+                    Supprimer
+                  </button>
+                </mat-menu>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              [class.selected-row]="isRowSelected(row)"
+              [class.overdue-row]="isOverdue(row)"
+              [class.expiring-row]="isExpiringSoon(row)"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" 
+                       showFirstLastButtons
+                       aria-label="Sélectionner la page des factures">
+        </mat-paginator>
+
+        <!-- Loading spinner -->
+        <div class="loading-container" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Chargement des factures...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" *ngIf="!isLoading && filteredInvoices.length === 0">
+          <mat-icon>receipt</mat-icon>
+          <h3>Aucune facture trouvée</h3>
+          <p *ngIf="invoices.length === 0">
+            Commencez par créer votre première facture.
+          </p>
+          <p *ngIf="invoices.length > 0">
+            Aucune facture ne correspond aux critères de recherche.
+          </p>
+          <button mat-raised-button color="primary" (click)="createInvoice()" 
+                  *ngIf="invoices.length === 0">
+            Créer une facture
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

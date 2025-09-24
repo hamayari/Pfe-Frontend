@@ -1,0 +1,209 @@
+<div class="nomenclature-form-container">
+  <!-- Header with title and actions -->
+  <div class="form-header">
+    <div class="header-content">
+      <h1>{{ isEditMode ? 'Modifier la nomenclature' : 'Nouvelle nomenclature' }}</h1>
+      <div class="form-actions">
+        <button 
+          mat-stroked-button 
+          type="button" 
+          (click)="goBack()"
+          [disabled]="loading">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </button>
+        <button 
+          mat-flat-button 
+          color="primary" 
+          type="submit" 
+          (click)="onSubmit()"
+          [disabled]="nomenclatureForm.invalid || loading">
+          <mat-icon>save</mat-icon>
+          {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+          <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+        </button>
+      </div>
+    </div>
+    <p class="subtitle" *ngIf="isEditMode">
+      Code: <strong>{{ nomenclatureForm.get('code')?.value }}</strong>
+    </p>
+  </div>
+
+  <!-- Main form -->
+  <form [formGroup]="nomenclatureForm" (ngSubmit)="onSubmit()" class="form-content">
+    <div class="form-section">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>Informations de base</mat-card-title>
+          <mat-card-subtitle>Définissez les propriétés principales de la nomenclature</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content class="form-fields">
+          <!-- Code -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Code *</mat-label>
+            <input 
+              matInput 
+              formControlName="code" 
+              placeholder="Entrez un code unique"
+              [readonly]="isEditMode"
+              [ngClass]="{ 'is-readonly': isEditMode }"
+              required>
+            <mat-hint>Doit être unique et ne contenir que des lettres, chiffres, tirets et underscores</mat-hint>
+            <mat-error *ngIf="f['code'].hasError('required')">Le code est obligatoire</mat-error>
+            <mat-error *ngIf="f['code'].hasError('minlength')">Le code doit contenir au moins 2 caractères</mat-error>
+            <mat-error *ngIf="f['code'].hasError('maxlength')">Le code ne peut pas dépasser 50 caractères</mat-error>
+            <mat-error *ngIf="f['code'].hasError('pattern')">Caractères non autorisés</mat-error>
+          </mat-form-field>
+
+          <!-- Label -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Libellé *</mat-label>
+            <input 
+              matInput 
+              formControlName="label" 
+              placeholder="Entrez un libellé"
+              required>
+            <mat-error *ngIf="f['label'].hasError('required')">Le libellé est obligatoire</mat-error>
+            <mat-error *ngIf="f['label'].hasError('minlength')">Le libellé doit contenir au moins 2 caractères</mat-error>
+            <mat-error *ngIf="f['label'].hasError('maxlength')">Le libellé ne peut pas dépasser 100 caractères</mat-error>
+          </mat-form-field>
+
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Description</mat-label>
+            <textarea 
+              matInput 
+              formControlName="description" 
+              placeholder="Entrez une description (optionnel)"
+              rows="3">
+            </textarea>
+            <mat-hint>Maximum 500 caractères</mat-hint>
+            <mat-error *ngIf="f['description'].hasError('maxlength')">La description ne peut pas dépasser 500 caractères</mat-error>
+          </mat-form-field>
+
+          <div class="form-row">
+            <!-- Type -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Type *</mat-label>
+              <mat-select 
+                formControlName="type"
+                [disabled]="isEditMode"
+                required>
+                <mat-option 
+                  *ngFor="let type of types" 
+                  [value]="type.code"
+                  [disabled]="isEditMode">
+                  {{ type.label }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="f['type'].hasError('required')">Le type est obligatoire</mat-error>
+            </mat-form-field>
+
+            <!-- Parent -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Parent</mat-label>
+              <mat-select 
+                formControlName="parentId"
+                [compareWith]="compareWithId">
+                <mat-option [value]="null">Aucun parent</mat-option>
+                <mat-option 
+                  *ngFor="let parent of parentOptions" 
+                  [value]="parent.id">
+                  {{ parent.label }}
+                  <span class="parent-code">({{ parent.code }})</span>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <!-- Order -->
+            <mat-form-field appearance="outline" class="form-field small">
+              <mat-label>Ordre</mat-label>
+              <input 
+                matInput 
+                type="number" 
+                formControlName="order"
+                min="0"
+                max="1000">
+              <mat-error *ngIf="f['order'].hasError('min') || f['order'].hasError('max')">
+                Doit être entre 0 et 1000
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Status -->
+            <div class="status-toggle">
+              <mat-slide-toggle 
+                formControlName="isActive"
+                color="primary">
+                {{ nomenclatureForm.get('isActive')?.value ? 'Actif' : 'Inactif' }}
+              </mat-slide-toggle>
+              <mat-hint>Désactivez pour masquer cette nomenclature</mat-hint>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Metadata Section -->
+    <div class="form-section" *ngIf="metadataFormGroup.controls">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>Métadonnées</mat-card-title>
+          <mat-card-subtitle>Informations supplémentaires (optionnel)</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content class="form-fields">
+          <div formGroupName="metadata" class="metadata-container">
+            <ng-container *ngFor="let control of metadataFormGroup.controls | keyvalue; trackBy: trackByFn">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>{{ control.key | titlecase }}</mat-label>
+                <input 
+                  matInput 
+                  [formControlName]="control.key"
+                  [placeholder]="'Valeur pour ' + control.key">
+              </mat-form-field>
+            </ng-container>
+            
+            <div class="no-metadata" *ngIf="metadataFormGroup.controls && Object.keys(metadataFormGroup.controls).length === 0">
+              <mat-icon>info</mat-icon>
+              <p>Aucune métadonnée disponible</p>
+              <p class="hint">Les métadonnées sont automatiquement ajoutées lors de l'utilisation de cette nomenclature</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </form>
+  
+  <!-- Form actions (sticky footer) -->
+  <div class="form-actions-footer">
+    <div class="form-actions">
+      <button 
+        mat-stroked-button 
+        type="button" 
+        (click)="goBack()"
+        [disabled]="loading">
+        <mat-icon>arrow_back</mat-icon>
+        Annuler
+      </button>
+      <button 
+        mat-flat-button 
+        color="primary" 
+        type="button" 
+        (click)="onSubmit()"
+        [disabled]="nomenclatureForm.invalid || loading">
+        <mat-icon>save</mat-icon>
+        {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+        <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>{{ isEditMode ? 'Mise à jour en cours...' : 'Création en cours...' }}</p>
+  </div>
+</div>

@@ -1,0 +1,141 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Rule files
+rule_files:
+  - "alert_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Application metrics endpoint
+  - job_name: 'conventions-app'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/prometheus'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    
+    # Relabeling for better metric organization
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*)'
+        replacement: 'conventions-app-${1}'
+      - source_labels: [__address__]
+        target_label: app
+        regex: '(.*)'
+        replacement: 'conventions-management'
+
+  # UX Metrics - Higher frequency for real-time user experience
+  - job_name: 'ux-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/ux'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: metric_type
+        regex: '(.*)'
+        replacement: 'ux'
+
+  # Business Metrics - Medium frequency for business intelligence
+  - job_name: 'business-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/business'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: metric_type
+        regex: '(.*)'
+        replacement: 'business'
+
+  # Technical Metrics - Standard frequency for system monitoring
+  - job_name: 'technical-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/technical'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: metric_type
+        regex: '(.*)'
+        replacement: 'technical'
+
+  # User Session Metrics - High frequency for real-time user tracking
+  - job_name: 'session-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/sessions'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: metric_type
+        regex: '(.*)'
+        replacement: 'session'
+
+  # Performance Metrics - High frequency for performance monitoring
+  - job_name: 'performance-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/performance'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: metric_type
+        regex: '(.*)'
+        replacement: 'performance'
+
+  # Business Events - Event-driven metrics
+  - job_name: 'business-events'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/events'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: metric_type
+        regex: '(.*)'
+        replacement: 'events'
+
+# Storage configuration for long-term retention
+storage:
+  tsdb:
+    path: /prometheus/data
+    retention.time: 30d
+    retention.size: 50GB
+
+# Remote write configuration for long-term storage (optional)
+remote_write:
+  - url: "http://thanos-receive:10908/api/v1/receive"
+    remote_timeout: 30s
+    write_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'app_.*'
+        action: keep
+
+# Remote read configuration (optional)
+remote_read:
+  - url: "http://thanos-query:10904/api/v1/read"
+    read_timeout: 30s
+

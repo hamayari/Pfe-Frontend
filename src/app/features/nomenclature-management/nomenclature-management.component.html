@@ -1,0 +1,5 @@
+<p>nomenclature-management works!</p>
+<mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="40" color="primary" style="margin:2em auto;display:block;"></mat-progress-spinner>
+<div *ngIf="!isLoading && nomenclatures.length === 0" style="text-align:center;color:#888;font-size:1.2em;margin-top:2em;">
+  Aucun résultat.
+</div>

@@ -1,0 +1,272 @@
+// Variables and mixins are now imported globally in styles.scss
+
+.nomenclature-tree-view {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 0.5rem 0;
+  
+  .nomenclature-tree {
+    background: transparent;
+    
+    // Remove default mat-tree padding
+    ul, li {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+  }
+  
+  .tree-node {
+    display: block;
+    min-height: 40px;
+    
+    .node-content {
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      margin: 0.125rem 0;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      
+      &:hover {
+        background-color: var(--background-hover);
+      }
+      
+      &.selectable {
+        cursor: pointer;
+        
+        &:hover {
+          background-color: var(--background-hover);
+          
+          .node-label {
+            color: var(--primary);
+          }
+        }
+      }
+      
+      // Add a subtle border to the left of the node when selected
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: transparent;
+        border-radius: 0 3px 3px 0;
+        transition: background-color 0.2s ease;
+      }
+      
+      // Selected state
+      .node-label.selected {
+        color: var(--primary);
+        font-weight: 500;
+      }
+      
+      // Checkbox for selection
+      .node-checkbox {
+        margin-right: 0.5rem;
+      }
+      
+      // Node icon
+      .node-icon {
+        margin-right: 0.75rem;
+        color: var(--text-secondary);
+        font-size: 1.25rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        padding: 0.25rem;
+        
+        // Type-specific icon colors
+        &.badge-application {
+          background-color: rgba(25, 118, 210, 0.1);
+          color: #1565c0;
+        }
+        
+        &.badge-zone {
+          background-color: rgba(46, 125, 50, 0.1);
+          color: #2e7d32;
+        }
+        
+        &.badge-structure {
+          background-color: rgba(239, 108, 0, 0.1);
+          color: #ef6c00;
+        }
+        
+        &.badge-convention-type {
+          background-color: rgba(123, 31, 162, 0.1);
+          color: #7b1fa2;
+        }
+        
+        &.badge-invoice-item {
+          background-color: rgba(48, 63, 159, 0.1);
+          color: #303f9f;
+        }
+        
+        &.badge-default {
+          background-color: rgba(0, 0, 0, 0.05);
+          color: var(--text-secondary);
+        }
+      }
+      
+      // Node label
+      .node-label {
+        flex: 1;
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        transition: color 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        
+        &.expandable {
+          cursor: pointer;
+          padding: 0.5rem 0;
+          
+          &:hover {
+            color: var(--primary);
+          }
+        }
+        
+        .node-count {
+          font-size: 0.8em;
+          color: var(--text-secondary);
+          margin-left: 0.25rem;
+          font-weight: normal;
+        }
+      }
+      
+      // Status badge
+      .node-status {
+        font-size: 0.6875rem;
+        font-weight: 500;
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
+        margin-left: 0.75rem;
+        white-space: nowrap;
+        
+        &.active {
+          background-color: rgba(46, 125, 50, 0.1);
+          color: #2e7d32;
+        }
+        
+        &:not(.active) {
+          background-color: rgba(244, 67, 54, 0.1);
+          color: #f44336;
+        }
+      }
+      
+      // Loading indicator
+      .node-loading {
+        margin-left: 0.75rem;
+        
+        ::ng-deep circle {
+          stroke: var(--primary);
+        }
+      }
+    }
+    
+    // Indent child nodes
+    .mat-tree-node {
+      padding-left: 2rem;
+    }
+  }
+  
+  // Empty state
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+    
+    mat-icon {
+      font-size: 3rem;
+      height: 3rem;
+      width: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+  }
+  
+  // Dark theme overrides
+  :host-context(.dark-theme) {
+    .node-icon {
+      &.badge-application {
+        background-color: rgba(25, 118, 210, 0.2) !important;
+        color: #90caf9 !important;
+      }
+      
+      &.badge-zone {
+        background-color: rgba(46, 125, 50, 0.2) !important;
+        color: #a5d6a7 !important;
+      }
+      
+      &.badge-structure {
+        background-color: rgba(239, 108, 0, 0.2) !important;
+        color: #ffb74d !important;
+      }
+      
+      &.badge-convention-type {
+        background-color: rgba(123, 31, 162, 0.2) !important;
+        color: #ce93d8 !important;
+      }
+      
+      &.badge-invoice-item {
+        background-color: rgba(48, 63, 159, 0.2) !important;
+        color: #9fa8da !important;
+      }
+      
+      &.badge-default {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: var(--text-secondary) !important;
+      }
+    }
+    
+    .node-status {
+      &.active {
+        background-color: rgba(46, 125, 50, 0.2) !important;
+        color: #a5d6a7 !important;
+      }
+      
+      &:not(.active) {
+        background-color: rgba(244, 67, 54, 0.2) !important;
+        color: #ef9a9a !important;
+      }
+    }
+  }
+}
+
+// Custom scrollbar
+.nomenclature-tree-view::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.nomenclature-tree-view::-webkit-scrollbar-track {
+  background: var(--background-hover);
+  border-radius: 4px;
+}
+
+.nomenclature-tree-view::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+  
+  &:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+}

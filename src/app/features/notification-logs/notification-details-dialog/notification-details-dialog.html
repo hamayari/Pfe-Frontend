@@ -1,0 +1,242 @@
+<div class="notification-dialog">
+  <!-- Dialog header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon [style.color]="statusColor">{{ typeIcon }}</mat-icon>
+      <span>Détails de la notification</span>
+    </h2>
+    
+    <button mat-icon-button (click)="closeDialog()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  
+  <mat-dialog-content class="dialog-content">
+    <!-- Status and priority banner -->
+    <div class="status-banner" [style.border-left-color]="statusColor">
+      <div class="status-info">
+        <span class="status-badge" [style.background-color]="statusColor + '1a" [style.color]="statusColor">
+          {{ getStatusText(notification.status) }}
+        </span>
+        
+        <div class="type-priority">
+          <span class="type">
+            <mat-icon>{{ typeIcon }}</mat-icon>
+            {{ getTypeText(notification.type) }}
+          </span>
+          
+          <span class="divider">•</span>
+          
+          <span class="priority" *ngIf="notification.priority !== 'NORMAL'">
+            <mat-icon [style.color]="notification.priority === 'HIGH' || notification.priority === 'URGENT' ? 'warn' : 'primary'">
+              {{ getPriorityIcon(notification.priority) }}
+            </mat-icon>
+            {{ getPriorityText(notification.priority) }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="timestamps">
+        <div class="timestamp" *ngIf="notification.createdAt">
+          <span class="label">Créée le :</span>
+          <span class="value">{{ notification.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        
+        <div class="timestamp" *ngIf="notification.sentAt">
+          <span class="label">Envoyée le :</span>
+          <span class="value">{{ notification.sentAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        
+        <div class="timestamp" *ngIf="notification.deliveredAt">
+          <span class="label">Livrée le :</span>
+          <span class="value">{{ notification.deliveredAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tabs -->
+    <mat-tab-group [(selectedIndex)]="activeTabIndex" animationDuration="0ms">
+      <!-- Content tab -->
+      <mat-tab label="Contenu">
+        <div class="tab-content">
+          <!-- Email headers -->
+          <div class="email-headers" *ngIf="notification.type === 'EMAIL'">
+            <h3>{{ notification.subject || 'Sans objet' }}</h3>
+            
+            <mat-list dense class="header-list">
+              <mat-list-item *ngFor="let header of getEmailHeaders()">
+                <span matListItemTitle class="header-key">{{ header.key }}</span>
+                <span matLine class="header-value">
+                  <span class="truncate">{{ header.value }}</span>
+                  <button 
+                    mat-icon-button 
+                    [cdkCopyToClipboard]="header.value"
+                    (click)="$event.stopPropagation()"
+                    matTooltip="Copier"
+                    class="copy-button">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                </span>
+              </mat-list-item>
+            </mat-list>
+          </div>
+          
+          <!-- SMS content -->
+          <div *ngIf="notification.type === 'SMS'" class="sms-content">
+            <div class="sms-preview">
+              <div class="sms-header">
+                <span class="from">De: {{ notification.from || 'Système' }}</span>
+                <span class="date" *ngIf="notification.sentAt">
+                  {{ notification.sentAt | date:'dd/MM/yy HH:mm' }}
+                </span>
+              </div>
+              <div class="sms-body">
+                {{ notification.content }}
+              </div>
+            </div>
+          </div>
+          
+          <!-- Message content -->
+          <div class="message-content" *ngIf="notification.type === 'IN_APP' || notification.type === 'SYSTEM'">
+            <h3>{{ notification.subject || 'Notification' }}</h3>
+            <div class="message-body" [innerHTML]="notification.content"></div>
+          </div>
+          
+          <!-- Raw content -->
+          <div class="raw-content" *ngIf="notification.content">
+            <div class="content-actions">
+              <button 
+                mat-stroked-button 
+                color="primary" 
+                [cdkCopyToClipboard]="notification.content"
+                matTooltip="Copier le contenu">
+                <mat-icon>content_copy</mat-icon>
+                <span>Copier</span>
+              </button>
+              
+              <button 
+                mat-stroked-button 
+                *ngIf="notification.type === 'EMAIL'"
+                (click)="activeTabIndex = 1"
+                matTooltip="Voir le code source">
+                <mat-icon>code</mat-icon>
+                <span>Code source</span>
+              </button>
+            </div>
+            
+            <div class="content-preview" [innerHTML]="notification.content"></div>
+          </div>
+        </div>
+      </mat-tab>
+      
+      <!-- HTML Source tab (only for emails) -->
+      <mat-tab *ngIf="notification.type === 'EMAIL'" label="Code source">
+        <div class="tab-content">
+          <div class="source-actions">
+            <button 
+              mat-stroked-button 
+              color="primary"
+              [cdkCopyToClipboard]="notification.content"
+              matTooltip="Copier le code source">
+              <mat-icon>content_copy</mat-icon>
+              <span>Copier</span>
+            </button>
+          </div>
+          
+          <pre class="html-source"><code>{{ notification.content }}</code></pre>
+        </div>
+      </mat-tab>
+      
+      <!-- Metadata tab -->
+      <mat-tab label="Métadonnées">
+        <div class="tab-content">
+          <mat-list dense class="metadata-list">
+            <!-- ID -->
+            <mat-list-item>
+              <span matListItemTitle>ID</span>
+              <span matLine class="metadata-value">
+                <span class="truncate">{{ notification.id }}</span>
+                <button 
+                  mat-icon-button 
+                  [cdkCopyToClipboard]="notification.id"
+                  (click)="$event.stopPropagation()"
+                  matTooltip="Copier l'ID">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </span>
+            </mat-list-item>
+            
+            <!-- Template -->
+            <mat-list-item *ngIf="notification.templateId">
+              <span matListItemTitle>Modèle</span>
+              <span matLine class="metadata-value">
+                {{ notification.template?.name || notification.templateId }}
+                <button 
+                  mat-icon-button 
+                  *ngIf="notification.templateId"
+                  [cdkCopyToClipboard]="notification.templateId"
+                  (click)="$event.stopPropagation()"
+                  matTooltip="Copier l'ID du modèle">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </span>
+            </mat-list-item>
+            
+            <!-- User IDs -->
+            <mat-list-item *ngIf="notification.userIds?.length">
+              <span matListItemTitle>Utilisateurs cibles</span>
+              <div matLine class="metadata-value">
+                <mat-chip-set>
+                  <mat-chip 
+                    *ngFor="let userId of notification.userIds"
+                    [cdkCopyToClipboard]="userId"
+                    matTooltip="Copier l'ID utilisateur">
+                    {{ userId }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+            </mat-list-item>
+            
+            <!-- Error -->
+            <mat-list-item *ngIf="notification.error">
+              <span matListItemTitle>Erreur</span>
+              <span matLine class="metadata-value error">
+                {{ notification.error }}
+              </span>
+            </mat-list-item>
+            
+            <!-- Custom metadata -->
+            <ng-container *ngIf="notification.metadata">
+              <mat-list-item *ngFor="let item of getMetadataItems()">
+                <span matListItemTitle>{{ item.key }}</span>
+                <span matLine class="metadata-value">
+                  {{ item.value }}
+                </span>
+              </mat-list-item>
+            </ng-container>
+          </mat-list>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="closeDialog()">Fermer</button>
+    <button 
+      mat-flat-button 
+      color="primary"
+      *ngIf="notification.status === 'FAILED'"
+      (click)="retryNotification()">
+      <mat-icon>refresh</mat-icon>
+      <span>Réessayer</span>
+    </button>
+    <button 
+      mat-flat-button 
+      color="warn"
+      *ngIf="notification.status === 'SCHEDULED' || notification.status === 'SENDING'"
+      (click)="cancelNotification()">
+      <mat-icon>cancel</mat-icon>
+      <span>Annuler</span>
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="adminGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3f51b5"/>
+      <stop offset="100%" style="stop-color:#5c6bc0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="url(#adminGradient)" filter="url(#glow)"/>
+  
+  <!-- User silhouette -->
+  <circle cx="32" cy="20" r="8" fill="white"/>
+  <path d="M 16 48 Q 16 36 32 36 Q 48 36 48 48" fill="white"/>
+  
+  <!-- Shield -->
+  <path d="M 32 12 L 44 18 L 44 30 Q 44 40 32 46 L 20 30 Q 20 20 32 12" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="2"/>
+  
+  <!-- Gear -->
+  <circle cx="32" cy="32" r="4" fill="white"/>
+  <circle cx="32" cy="32" r="6" fill="none" stroke="white" stroke-width="1.5"/>
+  <path d="M 32 26 L 32 22 M 32 42 L 32 38 M 26 32 L 22 32 M 42 32 L 38 32" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,265 @@
+/* Layout principal */
+.sidenav-container {
+  height: 100vh;
+  background: #f4f7fa;
+}
+
+/* Sidebar améliorée */
+.custom-sidebar {
+  width: 240px;
+  background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 2px 0 12px rgba(26,35,126,0.08);
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+  transition: width 0.2s;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 24px 16px 24px;
+  .sidebar-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(26,35,126,0.08);
+    object-fit: contain;
+  }
+  .sidebar-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 24px;
+}
+
+.sidebar-section-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #b3baf7;
+  opacity: 0.8;
+  padding: 16px 24px 4px 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Styles pour les éléments de navigation */
+.mat-nav-list {
+  padding: 0;
+}
+
+.mat-nav-list a {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  color: #e3e7fa;
+  text-decoration: none;
+  border-left: 4px solid transparent;
+  font-size: 1.08rem;
+  font-weight: 500;
+  border-radius: 0 24px 24px 0;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+  position: relative;
+  cursor: pointer;
+  margin: 2px 0;
+}
+
+.mat-nav-list a:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.mat-nav-list a.active-link {
+  background: rgba(255,255,255,0.16);
+  color: #fff;
+  border-left: 4px solid #ffb300;
+  font-weight: 700;
+}
+
+.mat-nav-list a mat-icon {
+  font-size: 1.5rem;
+  color: inherit;
+  min-width: 28px;
+  text-align: center;
+}
+
+.mat-nav-list a span {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.sidebar-separator {
+  height: 1px;
+  background: rgba(255,255,255,0.10);
+  margin: 8px 0 8px 24px;
+  border-radius: 2px;
+}
+
+.main-content {
+  background: #f4f7fa;
+  min-height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1;
+  padding: 24px;
+  background: #f4f7fa;
+  overflow-y: auto;
+}
+
+.main-toolbar {
+  background: #fff;
+  color: #1a237e;
+  box-shadow: 0 2px 8px rgba(26,35,126,0.04);
+  border-bottom: 1px solid #e3e7fa;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 0 1.5rem;
+  height: 70px;
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-brand {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a237e;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar-brand:hover {
+  color: #3949ab;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-menu-button {
+  border-radius: 24px;
+  padding: 0.5rem 1rem;
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1a237e;
+  font-weight: 500;
+}
+
+.user-menu-button:hover {
+  background: #e3e7fa;
+}
+
+.user-icon {
+  font-size: 1.6rem;
+  color: #3949ab;
+}
+
+.username {
+  font-weight: 600;
+  color: #1a237e;
+}
+
+.dropdown-icon {
+  font-size: 1.3rem;
+  color: #3949ab;
+}
+
+.user-dropdown-menu {
+  min-width: 160px;
+}
+
+.menu-item.logout-item {
+  color: #e53935;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  .custom-sidebar {
+    width: 64px;
+    min-width: 64px;
+    padding: 0;
+  }
+  .sidebar-label, .sidebar-title {
+    display: none;
+  }
+  .sidebar-header {
+    padding: 16px 8px 8px 8px;
+  }
+  .mat-nav-list a mat-icon {
+    font-size: 1.7rem;
+  }
+  .mat-nav-list a {
+    padding: 12px 12px;
+    justify-content: center;
+  }
+}
+
+/* Animations */
+.sidenav-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Améliorations pour les icônes */
+.mat-icon {
+  transition: transform 0.2s ease;
+}
+
+.mat-nav-list a:hover .mat-icon {
+  transform: scale(1.1);
+}
+
+/* Effet de focus amélioré */
+.mat-nav-list a:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Scrollbar personnalisée */
+.sidenav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidenav::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidenav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidenav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}

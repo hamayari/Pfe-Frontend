@@ -1,0 +1,102 @@
+<mat-toolbar class="simplified-topbar">
+  <div class="topbar-content">
+    <!-- Logo/Brand -->
+    <div class="brand-section">
+      <mat-icon class="brand-icon">dashboard</mat-icon>
+      <span class="brand-text">Gestion Pro</span>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section" *ngIf="showSearch">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher...</mat-label>
+        <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- User Section -->
+    <div class="user-section">
+      <!-- Messages -->
+      <button mat-icon-button (click)="openMessagingDialog()" class="message-btn" style="background: red; color: white; border: 2px solid yellow;">
+        <mat-icon [matBadge]="2" matBadgeColor="warn">mail</mat-icon>
+      </button>
+
+      <!-- Notifications -->
+      <button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="notification-btn">
+        <mat-icon [matBadge]="notificationCount" matBadgeColor="warn">notifications</mat-icon>
+      </button>
+
+      <!-- User Menu -->
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-btn">
+        <mat-icon>account_circle</mat-icon>
+        <span class="user-name">{{ userName }}</span>
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<!-- Notification Menu -->
+<mat-menu #notificationMenu="matMenu" class="notification-menu">
+  <div class="notification-header">
+    <h3>Notifications</h3>
+    <button mat-button (click)="markAllAsRead()">Tout marquer comme lu</button>
+  </div>
+  <mat-divider></mat-divider>
+  <div class="notification-list">
+    <div class="notification-item" *ngFor="let notification of notifications">
+      <div class="notification-content">
+        <mat-icon [class]="'notification-icon ' + notification.type">{{ getNotificationIcon(notification.type) }}</mat-icon>
+        <div class="notification-text">
+          <p>{{ notification.message }}</p>
+          <span class="notification-time">{{ notification.time }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <mat-divider></mat-divider>
+  <div class="notification-footer">
+    <button mat-button (click)="viewAllNotifications()">Voir toutes les notifications</button>
+  </div>
+</mat-menu>
+
+<!-- User Menu -->
+<mat-menu #userMenu="matMenu" class="user-menu">
+  <div class="user-info">
+    <div class="user-avatar">
+      <mat-icon>account_circle</mat-icon>
+    </div>
+    <div class="user-details">
+      <h4>{{ userName }}</h4>
+      <p>{{ userRole }}</p>
+    </div>
+  </div>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="onProfile()">
+    <mat-icon>person</mat-icon>
+    <span>Mon Profil</span>
+  </button>
+  <button mat-menu-item (click)="onSettings()">
+    <mat-icon>settings</mat-icon>
+    <span>Paramètres</span>
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="onLogout()">
+    <mat-icon>logout</mat-icon>
+    <span>Déconnexion</span>
+  </button>
+</mat-menu>
+
+
+
+
+
+
+
+
+
+
+
+
+

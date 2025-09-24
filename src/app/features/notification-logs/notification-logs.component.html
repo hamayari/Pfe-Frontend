@@ -1,0 +1,237 @@
+<div class="notification-logs-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Journal des notifications</h1>
+      <div class="actions">
+        <button mat-stroked-button (click)="refresh()" [disabled]="isLoading">
+          <mat-icon>refresh</mat-icon>
+          <span>Rafraîchir</span>
+        </button>
+      </div>
+    </div>
+    
+    <p class="subtitle">Consultez l'historique et le statut des notifications envoyées</p>
+  </div>
+  
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <form [formGroup]="filterForm" class="filters-form">
+      <div class="filters-row">
+        <!-- Search -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Rechercher</mat-label>
+          <input matInput formControlName="search" placeholder="Sujet, destinataire...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <!-- Type filter -->
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option [value]="">Tous les types</mat-option>
+            <mat-option *ngFor="let type of notificationTypes" [value]="type">
+              {{ type }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <!-- Status filter -->
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select formControlName="status">
+            <mat-option [value]="">Tous les statuts</mat-option>
+            <mat-option *ngFor="let status of notificationStatuses" [value]="status">
+              {{ getStatusText(status) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <!-- Priority filter -->
+        <mat-form-field appearance="outline">
+          <mat-label>Priorité</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option [value]="">Toutes les priorités</mat-option>
+            <mat-option *ngFor="let priority of notificationPriorities" [value]="priority">
+              {{ getPriorityText(priority) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <!-- Date range -->
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>Date de début</mat-label>
+          <input matInput [matDatepicker]="startDatePicker" formControlName="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #startDatePanel></mat-datepicker>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>Date de fin</mat-label>
+          <input matInput [matDatepicker]="endDatePicker" formControlName="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #endDatePanel></mat-datepicker>
+        </mat-form-field>
+        
+        <!-- Clear filters button -->
+        <button 
+          mat-button 
+          color="warn" 
+          (click)="clearFilters()" 
+          class="clear-filters"
+          [disabled]="!filterForm.dirty">
+          <mat-icon>clear_all</mat-icon>
+          <span>Réinitialiser</span>
+        </button>
+      </div>
+    </form>
+  </mat-card>
+  
+  <!-- Loading indicator -->
+  <div class="loading-indicator" *ngIf="isLoading && !isRefreshing">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Chargement des notifications...</span>
+  </div>
+  
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!isLoading && dataSource.data.length === 0">
+    <mat-icon class="empty-icon">notifications_off</mat-icon>
+    <h3>Aucune notification trouvée</h3>
+    <p>Aucune notification ne correspond à vos critères de recherche.</p>
+    <button mat-stroked-button (click)="clearFilters()" color="primary">
+      Réinitialiser les filtres
+    </button>
+  </div>
+  
+  <!-- Notifications table -->
+  <div class="table-container" *ngIf="!isLoading && dataSource.data.length > 0">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="dataSource" matSort class="notifications-table">
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let element">
+            <div class="type-cell">
+              <mat-icon [style.color]="element.statusColor">{{ element.typeIcon }}</mat-icon>
+              <span>{{ element.type }}</span>
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Subject Column -->
+        <ng-container matColumnDef="subject">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Sujet</th>
+          <td mat-cell *matCellDef="let element" class="subject-cell">
+            <div class="subject">{{ element.subject || 'Sans objet' }}</div>
+            <div class="preview" *ngIf="element.content">
+              {{ element.content | truncate:60 }}
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Recipient Column -->
+        <ng-container matColumnDef="recipient">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Destinataire</th>
+          <td mat-cell *matCellDef="let element" class="recipient-cell">
+            <div class="recipient">
+              <mat-icon class="recipient-icon" [ngClass]="element.type.toLowerCase()">
+                {{ element.type === 'EMAIL' ? 'email' : 'sms' }}
+              </mat-icon>
+              <span>{{ element.recipientDisplay }}</span>
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="status-badge" [style.background-color]="element.statusColor + '1a'" [style.color]="element.statusColor">
+              {{ getStatusText(element.status) }}
+            </span>
+          </td>
+        </ng-container>
+        
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+          <td mat-cell *matCellDef="let element" class="date-cell">
+            <div class="date">{{ element.dateDisplay }}</div>
+            <div class="priority" *ngIf="element.priority !== 'NORMAL'">
+              <mat-icon [style.color]="element.priority === 'HIGH' || element.priority === 'URGENT' ? 'warn' : 'primary'">
+                {{ element.priority === 'URGENT' ? 'error' : 
+                   element.priority === 'HIGH' ? 'warning' : 
+                   'arrow_downward' }}
+              </mat-icon>
+              <span>{{ getPriorityText(element.priority) }}</span>
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" class="actions-cell">
+            <button 
+              mat-icon-button 
+              [matMenuTriggerFor]="menu"
+              aria-label="Actions">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="viewDetails(element)">
+                <mat-icon>visibility</mat-icon>
+                <span>Détails</span>
+              </button>
+              
+              <button 
+                mat-menu-item 
+                *ngIf="canRetry(element)" 
+                (click)="retryNotification(element)"
+                [disabled]="isLoading">
+                <mat-icon>refresh</mat-icon>
+                <span>Réessayer</span>
+              </button>
+              
+              <button 
+                mat-menu-item 
+                *ngIf="canCancel(element)" 
+                (click)="cancelNotification(element)"
+                [disabled]="isLoading">
+                <mat-icon>cancel</mat-icon>
+                <span>Annuler</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+        
+        <!-- Header and row definitions -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr 
+          mat-row 
+          *matRowDef="let row; columns: displayedColumns;"
+          (click)="viewDetails(row)"
+          class="notification-row">
+        </tr>
+      </table>
+    </div>
+    
+    <!-- Pagination -->
+    <mat-paginator 
+      [length]="totalItems"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="filterForm.get('page')?.value"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      aria-label="Select page of notifications">
+    </mat-paginator>
+  </div>
+  
+  <!-- Refresh indicator (floating) -->
+  <div class="refresh-indicator" *ngIf="isRefreshing">
+    <mat-spinner diameter="24"></mat-spinner>
+    <span>Mise à jour des notifications...</span>
+  </div>
+</div>

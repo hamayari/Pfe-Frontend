@@ -1,0 +1,539 @@
+// Variables
+$primary-color: #1976d2;
+$accent-color: #ff4081;
+$warn-color: #f44336;
+$success-color: #4caf50;
+$border-radius: 8px;
+$shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+$transition: all 0.3s ease;
+
+// Main Container
+.nomenclatures-management-container {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+// Page Header
+.page-header {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  margin-bottom: 24px;
+  overflow: hidden;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    background: linear-gradient(135deg, $primary-color 0%, #1565c0 100%);
+    color: white;
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .header-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// Main Content
+.main-content {
+  .management-tabs {
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    overflow: hidden;
+
+    ::ng-deep .mat-mdc-tab-header {
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    ::ng-deep .mat-mdc-tab-label {
+      font-weight: 500;
+      color: #495057;
+    }
+
+    ::ng-deep .mat-mdc-tab-label-active {
+      color: $primary-color;
+    }
+  }
+
+  .tab-content {
+    padding: 24px;
+  }
+}
+
+// Search Card
+.search-card {
+  margin-bottom: 24px;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+
+  .search-row {
+    display: flex;
+    gap: 16px;
+    align-items: end;
+
+    .search-field {
+      flex: 1;
+    }
+
+    button {
+      white-space: nowrap;
+    }
+  }
+}
+
+// Table Cards
+.table-card {
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  overflow: hidden;
+
+  .mat-mdc-card-content {
+    padding: 0;
+  }
+}
+
+// Applications Table
+.applications-table {
+  width: 100%;
+
+  .app-info {
+    .app-name {
+      font-weight: 500;
+      color: #333;
+    }
+  }
+}
+
+// Zones Table
+.zones-table {
+  width: 100%;
+
+  .zone-info {
+    .zone-name {
+      font-weight: 500;
+      color: #333;
+    }
+  }
+
+  .zone-code {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: $primary-color;
+    background: rgba(25, 118, 210, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+}
+
+// Structures Table
+.structures-table {
+  width: 100%;
+
+  .structure-info {
+    .structure-name {
+      font-weight: 500;
+      color: #333;
+    }
+  }
+
+  .location-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: $primary-color;
+    }
+  }
+
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .contact-name {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .contact-phone {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+}
+
+// Status Indicators
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &.success {
+    background: rgba(76, 175, 80, 0.1);
+    color: $success-color;
+  }
+
+  &.warn {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Table Styles
+.mat-mdc-table {
+  .mat-mdc-header-cell {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .mat-mdc-row {
+    transition: $transition;
+
+    &:hover {
+      background: rgba(25, 118, 210, 0.04);
+    }
+  }
+
+  .mat-mdc-cell {
+    padding: 16px 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
+
+// Paginator
+.mat-mdc-paginator {
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+// Menu Styles
+.mat-mdc-menu-panel {
+  .danger-action {
+    color: $warn-color;
+
+    mat-icon {
+      color: $warn-color;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+
+    .header-actions {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
+  .search-row {
+    flex-direction: column;
+    gap: 12px;
+
+    .search-field {
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .nomenclatures-management-container {
+    padding: 16px;
+  }
+
+  .tab-content {
+    padding: 16px;
+  }
+
+  .header-content {
+    padding: 16px;
+
+    .header-title {
+      h1 {
+        font-size: 20px;
+      }
+    }
+
+    .header-actions {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  // Hide some columns on mobile
+  .applications-table {
+    .mat-mdc-header-cell:nth-child(3),
+    .mat-mdc-cell:nth-child(3) {
+      display: none;
+    }
+  }
+
+  .zones-table {
+    .mat-mdc-header-cell:nth-child(2),
+    .mat-mdc-cell:nth-child(2) {
+      display: none;
+    }
+  }
+
+  .structures-table {
+    .mat-mdc-header-cell:nth-child(5),
+    .mat-mdc-cell:nth-child(5) {
+      display: none;
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+// Loading States
+.mat-mdc-progress-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+// Empty States
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #666;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    color: #333;
+  }
+
+  p {
+    margin: 0 0 24px;
+  }
+}
+
+// Structure Type Colors
+.structure-type-admin {
+  color: $primary-color;
+}
+
+.structure-type-agency {
+  color: $accent-color;
+}
+
+.structure-type-formation {
+  color: $success-color;
+}
+
+// Zone Region Colors
+.zone-region-nord {
+  color: $primary-color;
+}
+
+.zone-region-centre {
+  color: $accent-color;
+}
+
+.zone-region-sud {
+  color: $success-color;
+}
+
+// Application Status Colors
+.app-status-active {
+  color: $success-color;
+}
+
+.app-status-inactive {
+  color: $warn-color;
+}
+
+// Enhanced Table Hover Effects
+.mat-mdc-row {
+  &:hover {
+    .mat-mdc-cell {
+      background: rgba(25, 118, 210, 0.02);
+    }
+  }
+}
+
+// Chip Enhancements
+.mat-mdc-chip {
+  &.mat-mdc-chip-selected {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Search Field Enhancements
+.search-field {
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+}
+
+// Action Button Enhancements
+.header-actions button {
+  transition: $transition;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// Table Action Buttons
+.mat-mdc-icon-button {
+  transition: $transition;
+
+  &:hover {
+    background: rgba(25, 118, 210, 0.1);
+    transform: scale(1.1);
+  }
+}
+
+// Status Indicator Enhancements
+.status-indicator {
+  transition: $transition;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Responsive Grid for Cards
+@media (min-width: 1200px) {
+  .tab-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+// Print Styles
+@media print {
+  .page-header,
+  .search-card,
+  .mat-mdc-paginator,
+  .mat-mdc-menu-trigger {
+    display: none !important;
+  }
+
+  .table-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

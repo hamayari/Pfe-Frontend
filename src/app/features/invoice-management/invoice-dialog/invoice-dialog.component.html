@@ -1,0 +1,326 @@
+<div class="invoice-dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+      {{ isEditMode ? 'Modifier la facture' : 'Nouvelle facture' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="invoiceForm" class="invoice-form">
+      <mat-stepper #stepper linear>
+        <!-- Étape 1: Informations de base -->
+        <mat-step [stepControl]="invoiceForm" label="Informations de base">
+          <div class="step-content">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Référence *</mat-label>
+                <input matInput formControlName="reference" placeholder="REF-2024-001">
+                <mat-error *ngIf="isFieldInvalid('reference')">
+                  {{ getErrorMessage('reference') }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Numéro de facture</mat-label>
+                <input matInput formControlName="invoiceNumber" placeholder="FACT-2024-001">
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Client *</mat-label>
+                <mat-select formControlName="clientId">
+                  <mat-option value="">Sélectionner un client</mat-option>
+                  <!-- Options de clients à ajouter -->
+                </mat-select>
+                <mat-error *ngIf="isFieldInvalid('clientId')">
+                  {{ getErrorMessage('clientId') }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Convention</mat-label>
+                <mat-select formControlName="conventionId">
+                  <mat-option value="">Sélectionner une convention</mat-option>
+                  <!-- Options de conventions à ajouter -->
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Date d'émission *</mat-label>
+                <input matInput [matDatepicker]="issuePicker" formControlName="issueDate">
+                <mat-datepicker-toggle matSuffix [for]="issuePicker"></mat-datepicker-toggle>
+                <mat-datepicker #issuePicker></mat-datepicker>
+                <mat-error *ngIf="isFieldInvalid('issueDate')">
+                  {{ getErrorMessage('issueDate') }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Date d'échéance *</mat-label>
+                <input matInput [matDatepicker]="duePicker" formControlName="dueDate">
+                <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+                <mat-datepicker #duePicker></mat-datepicker>
+                <button matSuffix mat-icon-button type="button" (click)="onDueDateChange()" 
+                        matTooltip="Calculer automatiquement (30 jours)">
+                  <mat-icon>schedule</mat-icon>
+                </button>
+                <mat-error *ngIf="isFieldInvalid('dueDate')">
+                  {{ getErrorMessage('dueDate') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperNext [disabled]="!invoiceForm.get('reference')?.valid || !invoiceForm.get('clientId')?.valid">
+              Suivant
+            </button>
+          </div>
+        </mat-step>
+
+        <!-- Étape 2: Montants et paiement -->
+        <mat-step [stepControl]="invoiceForm" label="Montants et paiement">
+          <div class="step-content">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Montant HT *</mat-label>
+                <input matInput type="number" formControlName="amount" placeholder="0.00">
+                <mat-error *ngIf="isFieldInvalid('amount')">
+                  {{ getErrorMessage('amount') }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Devise *</mat-label>
+                <mat-select formControlName="currency">
+                  <mat-option *ngFor="let currency of currencies" [value]="currency.value">
+                    {{ currency.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="isFieldInvalid('currency')">
+                  {{ getErrorMessage('currency') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Taux de TVA (%)</mat-label>
+                <input matInput type="number" formControlName="taxRate" placeholder="0">
+                <mat-error *ngIf="isFieldInvalid('taxRate')">
+                  {{ getErrorMessage('taxRate') }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Remise (%)</mat-label>
+                <input matInput type="number" formControlName="discount" placeholder="0">
+                <mat-error *ngIf="isFieldInvalid('discount')">
+                  {{ getErrorMessage('discount') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="total-calculation">
+              <div class="total-item">
+                <span>Montant HT:</span>
+                <span>{{ invoiceForm.get('amount')?.value || 0 | currency:'EUR':'symbol':'1.2-2' }}</span>
+              </div>
+              <div class="total-item" *ngIf="invoiceForm.get('taxRate')?.value > 0">
+                <span>TVA ({{ invoiceForm.get('taxRate')?.value }}%):</span>
+                <span>{{ (invoiceForm.get('amount')?.value || 0) * (invoiceForm.get('taxRate')?.value || 0) / 100 | currency:'EUR':'symbol':'1.2-2' }}</span>
+              </div>
+              <div class="total-item" *ngIf="invoiceForm.get('discount')?.value > 0">
+                <span>Remise ({{ invoiceForm.get('discount')?.value }}%):</span>
+                <span>-{{ calculateTotalAmount() - (invoiceForm.get('amount')?.value || 0) | currency:'EUR':'symbol':'1.2-2' }}</span>
+              </div>
+              <div class="total-item total">
+                <span><strong>Total TTC:</strong></span>
+                <span><strong>{{ calculateTotalAmount() | currency:'EUR':'symbol':'1.2-2' }}</strong></span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Méthode de paiement *</mat-label>
+                <mat-select formControlName="paymentMethod">
+                  <mat-option *ngFor="let method of paymentMethods" [value]="method.value">
+                    {{ method.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="isFieldInvalid('paymentMethod')">
+                  {{ getErrorMessage('paymentMethod') }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Statut *</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                    <span class="status-option">
+                      <span class="status-dot" [class]="'status-' + getStatusColor(status.value)"></span>
+                      {{ status.label }}
+                    </span>
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="isFieldInvalid('status')">
+                  {{ getErrorMessage('status') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Précédent</button>
+            <button mat-button matStepperNext [disabled]="!invoiceForm.get('amount')?.valid">
+              Suivant
+            </button>
+          </div>
+        </mat-step>
+
+        <!-- Étape 3: Lignes de facture -->
+        <mat-step [stepControl]="invoiceForm" label="Lignes de facture">
+          <div class="step-content">
+            <div class="items-header">
+              <h3>Lignes de facture</h3>
+              <button mat-raised-button color="primary" type="button" (click)="addInvoiceItem()">
+                <mat-icon>add</mat-icon>
+                Ajouter une ligne
+              </button>
+            </div>
+
+            <div class="items-list" formArrayName="items">
+              <div class="item-row" *ngFor="let item of itemsArray.controls; let i = index" [formGroupName]="i">
+                <div class="item-description">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Description</mat-label>
+                    <input matInput formControlName="description" placeholder="Description du produit/service">
+                  </mat-form-field>
+                </div>
+
+                <div class="item-quantity">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Quantité</mat-label>
+                    <input matInput type="number" formControlName="quantity" min="1">
+                  </mat-form-field>
+                </div>
+
+                <div class="item-price">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Prix unitaire</mat-label>
+                    <input matInput type="number" formControlName="unitPrice" min="0" step="0.01">
+                  </mat-form-field>
+                </div>
+
+                <div class="item-total">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Total</mat-label>
+                    <input matInput type="number" formControlName="total" readonly>
+                  </mat-form-field>
+                </div>
+
+                <div class="item-actions">
+                  <button mat-icon-button type="button" (click)="removeInvoiceItem(i)" color="warn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="no-items" *ngIf="itemsArray.length === 0">
+              <mat-icon>receipt</mat-icon>
+              <p>Aucune ligne de facture ajoutée</p>
+              <button mat-stroked-button type="button" (click)="addInvoiceItem()">
+                Ajouter la première ligne
+              </button>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Précédent</button>
+            <button mat-button matStepperNext>Suivant</button>
+          </div>
+        </mat-step>
+
+        <!-- Étape 4: Détails et tags -->
+        <mat-step [stepControl]="invoiceForm" label="Détails et tags">
+          <div class="step-content">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3" 
+                          placeholder="Description détaillée de la facture"></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Notes</mat-label>
+                <textarea matInput formControlName="notes" rows="3" 
+                          placeholder="Notes additionnelles"></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="tags-section">
+              <h4>Tags</h4>
+              <div class="tags-input">
+                <mat-form-field appearance="outline">
+                  <mat-label>Ajouter un tag</mat-label>
+                  <input matInput #tagInput placeholder="Tapez un tag et appuyez sur Entrée">
+                  <mat-hint>Appuyez sur Entrée pour ajouter</mat-hint>
+                </mat-form-field>
+                <button mat-icon-button type="button" 
+                        (click)="addTag(tagInput.value); tagInput.value = ''"
+                        [disabled]="!tagInput.value.trim()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+
+              <div class="available-tags">
+                <span class="tag-label">Tags disponibles:</span>
+                <button mat-chip *ngFor="let tag of availableTags" 
+                        (click)="addTag(tag)"
+                        [disabled]="invoiceForm.get('tags')?.value?.includes(tag)">
+                  {{ tag }}
+                </button>
+              </div>
+
+              <div class="selected-tags" *ngIf="invoiceForm.get('tags')?.value?.length > 0">
+                <span class="tag-label">Tags sélectionnés:</span>
+                <div class="chip-container">
+                  <mat-chip *ngFor="let tag of invoiceForm.get('tags')?.value" 
+                           (removed)="removeTag(tag)">
+                    {{ tag }}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Précédent</button>
+            <button mat-raised-button color="primary" (click)="onSubmit()" 
+                    [disabled]="invoiceForm.invalid || isLoading">
+              <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+              <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+              {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+            </button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Annuler</button>
+  </mat-dialog-actions>
+</div>
+

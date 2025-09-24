@@ -1,0 +1,26 @@
+<div class="quick-actions">
+  <ng-container *ngIf="displayedActions.length > 0; else noActions">
+    <div class="actions-grid">
+      <ng-container *ngFor="let action of displayedActions; trackBy: trackByAction">
+        <a 
+          [routerLink]="action.link"
+          class="action-item"
+          matTooltip="{{ action.description }}"
+          matTooltipPosition="above"
+        >
+          <div class="action-icon" [ngClass]="getButtonClass(action)">
+            <mat-icon>{{ action.icon }}</mat-icon>
+          </div>
+          <div class="action-title">{{ action.title }}</div>
+        </a>
+      </ng-container>
+    </div>
+  </ng-container>
+  
+  <ng-template #noActions>
+    <div class="no-actions">
+      <mat-icon>add_circle_outline</mat-icon>
+      <p>Aucune action rapide disponible</p>
+    </div>
+  </ng-template>
+</div>

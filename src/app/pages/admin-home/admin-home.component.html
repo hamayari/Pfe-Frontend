@@ -1,0 +1,37 @@
+<div class="admin-layout">
+  <!-- Topbar -->
+  <app-simplified-topbar
+    [appName]="'GestionPro Admin'"
+    [userName]="'Admin User'"
+    [userRole]="'Administrator'"
+    [userEmail]="'admin@gestionpro.com'"
+    [notificationCount]="5"
+    [isDarkMode]="isDarkMode"
+    (searchChange)="onSearchChange($event)"
+    (themeToggle)="onThemeToggle($event)"
+    (logoutEvent)="onLogout()"
+    (profileEvent)="onProfileClick()"
+    (settingsEvent)="onSettingsClick()">
+  </app-simplified-topbar>
+
+  <!-- Main Content with Sidebar -->
+  <div class="main-container">
+    <!-- Sidebar -->
+    <app-unified-sidebar
+      [appName]="'GestionPro Admin'"
+      [userName]="'Admin User'"
+      [userRole]="'Administrator'"
+      [notificationCount]="5"
+      [collapsed]="sidebarCollapsed"
+      (collapseChange)="onSidebarCollapse($event)"
+      (logoutEvent)="onLogout()">
+      
+      <!-- Dashboard Content -->
+      <div class="dashboard-container">
+        <app-complete-admin-dashboard></app-complete-admin-dashboard>
+      </div>
+      
+    </app-unified-sidebar>
+  </div>
+</div>
+

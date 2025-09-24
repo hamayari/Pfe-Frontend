@@ -1,0 +1,479 @@
+.invoice-management-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .stats-header {
+    margin-bottom: 24px;
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+
+      .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        mat-card-content {
+          display: flex;
+          align-items: center;
+          padding: 20px;
+
+          .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+
+            mat-icon {
+              font-size: 28px;
+              width: 28px;
+              height: 28px;
+              color: white;
+            }
+
+            &.total {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            &.paid {
+              background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            }
+
+            &.pending {
+              background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            }
+
+            &.overdue {
+              background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            }
+          }
+
+          .stat-info {
+            flex: 1;
+
+            h3 {
+              margin: 0 0 4px 0;
+              font-size: 28px;
+              font-weight: 700;
+              color: #2c3e50;
+            }
+
+            p {
+              margin: 0 0 4px 0;
+              font-size: 14px;
+              color: #7f8c8d;
+              font-weight: 500;
+            }
+
+            small {
+              font-size: 12px;
+              color: #95a5a6;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .notifications-section {
+    margin-bottom: 24px;
+
+    .notification-card {
+      border-radius: 12px;
+      border-left: 4px solid #f39c12;
+
+      .notification-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        gap: 12px;
+
+        .warning-icon {
+          color: #e74c3c;
+        }
+
+        .info-icon {
+          color: #3498db;
+        }
+
+        span {
+          flex: 1;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .left-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .right-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      border-radius: 8px;
+      font-weight: 500;
+    }
+  }
+
+  .filters-card {
+    margin-bottom: 24px;
+    border-radius: 12px;
+
+    .filters-form {
+      .filters-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        mat-form-field {
+          width: 100%;
+        }
+
+        mat-slide-toggle {
+          margin-top: 16px;
+        }
+      }
+    }
+  }
+
+  .table-card {
+    border-radius: 12px;
+
+    .table-container {
+      position: relative;
+      min-height: 400px;
+
+      .invoice-table {
+        width: 100%;
+
+        .mat-column-select {
+          width: 50px;
+          text-align: center;
+        }
+
+        .mat-column-reference {
+          width: 150px;
+        }
+
+        .mat-column-client {
+          width: 200px;
+        }
+
+        .mat-column-convention {
+          width: 180px;
+        }
+
+        .mat-column-amount {
+          width: 120px;
+          text-align: right;
+        }
+
+        .mat-column-issueDate,
+        .mat-column-dueDate {
+          width: 120px;
+        }
+
+        .mat-column-status {
+          width: 140px;
+        }
+
+        .mat-column-paymentMethod {
+          width: 150px;
+        }
+
+        .mat-column-actions {
+          width: 60px;
+          text-align: center;
+        }
+
+        .invoice-reference {
+          .invoice-number {
+            display: block;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 2px;
+          }
+        }
+
+        .client-info {
+          .client-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+          }
+
+          .client-email {
+            font-size: 12px;
+            color: #7f8c8d;
+          }
+        }
+
+        .convention-info {
+          .convention-ref {
+            font-weight: 500;
+            margin-bottom: 2px;
+          }
+
+          .convention-title {
+            font-size: 12px;
+            color: #7f8c8d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .amount-info {
+          text-align: right;
+
+          .amount {
+            font-weight: 600;
+            color: #2c3e50;
+          }
+
+          .currency {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-left: 4px;
+          }
+        }
+
+        .due-date {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          &.overdue {
+            color: #e74c3c;
+            font-weight: 500;
+
+            .overdue-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+
+          &.expiring-soon {
+            color: #f39c12;
+            font-weight: 500;
+
+            .expiring-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+        }
+
+        .status-chip {
+          padding: 4px 12px;
+          border-radius: 16px;
+          font-size: 12px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          &.status-green {
+            background-color: #d4edda;
+            color: #155724;
+          }
+
+          &.status-blue {
+            background-color: #d1ecf1;
+            color: #0c5460;
+          }
+
+          &.status-red {
+            background-color: #f8d7da;
+            color: #721c24;
+          }
+
+          &.status-black {
+            background-color: #d6d8db;
+            color: #1b1e21;
+          }
+
+          &.status-orange {
+            background-color: #fff3cd;
+            color: #856404;
+          }
+
+          &.status-grey {
+            background-color: #e2e3e5;
+            color: #383d41;
+          }
+        }
+
+        .payment-method {
+          font-size: 12px;
+          color: #6c757d;
+        }
+
+        .action-buttons {
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+      .selected-row {
+        background-color: #e3f2fd !important;
+      }
+
+      .overdue-row {
+        background-color: #fff5f5 !important;
+      }
+
+      .expiring-row {
+        background-color: #fffbf0 !important;
+      }
+
+      .loading-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+
+        p {
+          margin-top: 16px;
+          color: #7f8c8d;
+        }
+      }
+
+      .empty-state {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #7f8c8d;
+
+        mat-icon {
+          font-size: 64px;
+          width: 64px;
+          height: 64px;
+          margin-bottom: 16px;
+          opacity: 0.5;
+        }
+
+        h3 {
+          margin: 0 0 8px 0;
+          font-size: 20px;
+          font-weight: 500;
+        }
+
+        p {
+          margin: 0 0 16px 0;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .invoice-management-container {
+    padding: 16px;
+
+    .stats-header .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .action-bar {
+      flex-direction: column;
+      gap: 16px;
+
+      .left-actions {
+        justify-content: center;
+      }
+    }
+
+    .filters-card .filters-form .filters-row {
+      grid-template-columns: 1fr;
+    }
+
+    .table-container {
+      overflow-x: auto;
+
+      .invoice-table {
+        min-width: 800px;
+      }
+    }
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .invoice-management-container {
+    .stats-header .stat-card {
+      background: #2c3e50;
+      color: white;
+
+      .stat-info h3 {
+        color: white;
+      }
+
+      .stat-info p,
+      .stat-info small {
+        color: #bdc3c7;
+      }
+    }
+
+    .action-bar,
+    .filters-card,
+    .table-card {
+      background: #2c3e50;
+      color: white;
+    }
+
+    .table-container .invoice-table {
+      .selected-row {
+        background-color: #34495e !important;
+      }
+
+      .overdue-row {
+        background-color: #4a2c2a !important;
+      }
+
+      .expiring-row {
+        background-color: #4a3c2a !important;
+      }
+    }
+  }
+}
+
+
+

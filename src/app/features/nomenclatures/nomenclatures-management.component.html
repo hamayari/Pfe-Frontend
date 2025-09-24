@@ -1,0 +1,394 @@
+<div class="nomenclatures-management-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <mat-icon class="header-icon">category</mat-icon>
+        <h1>Gestion des Nomenclatures</h1>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="onAddApplication()">
+          <mat-icon>add</mat-icon>
+          Nouvelle Application
+        </button>
+        <button mat-raised-button color="accent" (click)="onAddZone()">
+          <mat-icon>location_on</mat-icon>
+          Nouvelle Zone
+        </button>
+        <button mat-raised-button color="warn" (click)="onAddStructure()">
+          <mat-icon>business</mat-icon>
+          Nouvelle Structure
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Bar -->
+  <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="primary"></mat-progress-bar>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <mat-tab-group [(selectedIndex)]="selectedTab" class="management-tabs">
+      
+      <!-- Applications Tab -->
+      <mat-tab label="Applications">
+        <div class="tab-content">
+          <!-- Search Section -->
+          <mat-card class="search-card">
+            <mat-card-content>
+              <div class="search-row">
+                <mat-form-field class="search-field" appearance="outline">
+                  <mat-icon matPrefix>search</mat-icon>
+                  <input matInput 
+                         [(ngModel)]="searchTerm"
+                         placeholder="Rechercher applications..."
+                         (input)="applyFilter()">
+                </mat-form-field>
+                <button mat-raised-button color="primary" (click)="exportData('applications')">
+                  <mat-icon>download</mat-icon>
+                  Exporter
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Applications Table -->
+          <mat-card class="table-card">
+            <mat-card-content>
+              <table mat-table [dataSource]="applicationsDataSource" matSort class="applications-table">
+                
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom de l'Application</th>
+                  <td mat-cell *matCellDef="let app">
+                    <div class="app-info">
+                      <span class="app-name">{{ app.name }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Code Column -->
+                <ng-container matColumnDef="code">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Code</th>
+                  <td mat-cell *matCellDef="let app">
+                    <mat-chip color="primary" selected>{{ app.code }}</mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Description Column -->
+                <ng-container matColumnDef="description">
+                  <th mat-header-cell *matHeaderCellDef>Description</th>
+                  <td mat-cell *matCellDef="let app">{{ app.description }}</td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+                  <td mat-cell *matCellDef="let app">
+                    <div class="status-indicator" [ngClass]="getStatusColor(app.status)">
+                      <mat-icon>{{ getStatusIcon(app.status) }}</mat-icon>
+                      <span>{{ app.status | titlecase }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Created At Column -->
+                <ng-container matColumnDef="createdAt">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Créé le</th>
+                  <td mat-cell *matCellDef="let app">{{ app.createdAt | date:'short' }}</td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let app">
+                    <button mat-icon-button [matMenuTriggerFor]="appMenu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #appMenu="matMenu">
+                      <button mat-menu-item (click)="onEditApplication(app)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Modifier</span>
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="onDeleteApplication(app)" class="danger-action">
+                        <mat-icon>delete</mat-icon>
+                        <span>Supprimer</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons></mat-paginator>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Geographic Zones Tab -->
+      <mat-tab label="Zones Géographiques">
+        <div class="tab-content">
+          <!-- Search Section -->
+          <mat-card class="search-card">
+            <mat-card-content>
+              <div class="search-row">
+                <mat-form-field class="search-field" appearance="outline">
+                  <mat-icon matPrefix>search</mat-icon>
+                  <input matInput 
+                         [(ngModel)]="searchTerm"
+                         placeholder="Rechercher zones..."
+                         (input)="applyFilter()">
+                </mat-form-field>
+                <button mat-raised-button color="primary" (click)="exportData('zones')">
+                  <mat-icon>download</mat-icon>
+                  Exporter
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Zones Table -->
+          <mat-card class="table-card">
+            <mat-card-content>
+              <table mat-table [dataSource]="zonesDataSource" matSort class="zones-table">
+                
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom de la Zone</th>
+                  <td mat-cell *matCellDef="let zone">
+                    <div class="zone-info">
+                      <span class="zone-name">{{ zone.name }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Country Column -->
+                <ng-container matColumnDef="country">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Pays</th>
+                  <td mat-cell *matCellDef="let zone">{{ zone.country }}</td>
+                </ng-container>
+
+                <!-- Region Column -->
+                <ng-container matColumnDef="region">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Région</th>
+                  <td mat-cell *matCellDef="let zone">
+                    <mat-chip color="accent" selected>{{ zone.region }}</mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Code Column -->
+                <ng-container matColumnDef="code">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Code</th>
+                  <td mat-cell *matCellDef="let zone">
+                    <span class="zone-code">{{ zone.code }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+                  <td mat-cell *matCellDef="let zone">
+                    <div class="status-indicator" [ngClass]="getStatusColor(zone.status)">
+                      <mat-icon>{{ getStatusIcon(zone.status) }}</mat-icon>
+                      <span>{{ zone.status | titlecase }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Created At Column -->
+                <ng-container matColumnDef="createdAt">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Créé le</th>
+                  <td mat-cell *matCellDef="let zone">{{ zone.createdAt | date:'short' }}</td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let zone">
+                    <button mat-icon-button [matMenuTriggerFor]="zoneMenu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #zoneMenu="matMenu">
+                      <button mat-menu-item (click)="onEditZone(zone)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Modifier</span>
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="onDeleteZone(zone)" class="danger-action">
+                        <mat-icon>delete</mat-icon>
+                        <span>Supprimer</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['name', 'country', 'region', 'code', 'status', 'createdAt', 'actions']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['name', 'country', 'region', 'code', 'status', 'createdAt', 'actions'];"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons></mat-paginator>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Structures Tab -->
+      <mat-tab label="Structures">
+        <div class="tab-content">
+          <!-- Search Section -->
+          <mat-card class="search-card">
+            <mat-card-content>
+              <div class="search-row">
+                <mat-form-field class="search-field" appearance="outline">
+                  <mat-icon matPrefix>search</mat-icon>
+                  <input matInput 
+                         [(ngModel)]="searchTerm"
+                         placeholder="Rechercher structures..."
+                         (input)="applyFilter()">
+                </mat-form-field>
+                <button mat-raised-button color="primary" (click)="exportData('structures')">
+                  <mat-icon>download</mat-icon>
+                  Exporter
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Structures Table -->
+          <mat-card class="table-card">
+            <mat-card-content>
+              <table mat-table [dataSource]="structuresDataSource" matSort class="structures-table">
+                
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom de la Structure</th>
+                  <td mat-cell *matCellDef="let structure">
+                    <div class="structure-info">
+                      <span class="structure-name">{{ structure.name }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="type">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                  <td mat-cell *matCellDef="let structure">
+                    <mat-chip [color]="getStructureTypeColor(structure.type)" selected>
+                      {{ structure.type }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Location Column -->
+                <ng-container matColumnDef="location">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Localisation</th>
+                  <td mat-cell *matCellDef="let structure">
+                    <div class="location-info">
+                      <mat-icon>location_on</mat-icon>
+                      <span>{{ structure.location }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Contact Person Column -->
+                <ng-container matColumnDef="contactPerson">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Contact</th>
+                  <td mat-cell *matCellDef="let structure">
+                    <div class="contact-info">
+                      <span class="contact-name">{{ structure.contactPerson }}</span>
+                      <span class="contact-phone">{{ structure.phone }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Email Column -->
+                <ng-container matColumnDef="email">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+                  <td mat-cell *matCellDef="let structure">{{ structure.email }}</td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+                  <td mat-cell *matCellDef="let structure">
+                    <div class="status-indicator" [ngClass]="getStatusColor(structure.status)">
+                      <mat-icon>{{ getStatusIcon(structure.status) }}</mat-icon>
+                      <span>{{ structure.status | titlecase }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Created At Column -->
+                <ng-container matColumnDef="createdAt">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Créé le</th>
+                  <td mat-cell *matCellDef="let structure">{{ structure.createdAt | date:'short' }}</td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let structure">
+                    <button mat-icon-button [matMenuTriggerFor]="structureMenu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #structureMenu="matMenu">
+                      <button mat-menu-item (click)="onEditStructure(structure)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Modifier</span>
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="onDeleteStructure(structure)" class="danger-action">
+                        <mat-icon>delete</mat-icon>
+                        <span>Supprimer</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['name', 'type', 'location', 'contactPerson', 'email', 'status', 'createdAt', 'actions']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['name', 'type', 'location', 'contactPerson', 'email', 'status', 'createdAt', 'actions'];"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons></mat-paginator>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

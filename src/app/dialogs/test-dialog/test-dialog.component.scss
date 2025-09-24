@@ -1,0 +1,139 @@
+/* Styles pour le dialog de test */
+.test-dialog {
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border-radius: 12px 12px 0 0;
+    color: white;
+
+    .dialog-title {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: white;
+
+      .title-icon {
+        margin-right: 12px;
+        color: white;
+        font-size: 24px;
+      }
+    }
+
+    .close-button {
+      color: white;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .dialog-content {
+    padding: 24px;
+
+    .test-content {
+      text-align: center;
+
+      h3 {
+        color: #4CAF50;
+        margin-bottom: 16px;
+      }
+
+      p {
+        color: #666;
+        margin-bottom: 24px;
+      }
+
+      .test-info {
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: left;
+
+        .info-item {
+          margin-bottom: 12px;
+          padding: 8px 0;
+          border-bottom: 1px solid #e0e0e0;
+
+          &:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+          }
+
+          strong {
+            color: #4CAF50;
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    padding: 20px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 0 0 12px 12px;
+
+    .cancel-btn {
+      color: #666;
+      font-weight: 500;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+/* Styles pour l'état d'authentification */
+.auth-status {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+
+  .status-item {
+    margin-bottom: 8px;
+    padding: 4px 0;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    strong {
+      color: #333;
+      margin-right: 8px;
+    }
+  }
+
+  .status-connected {
+    color: #4CAF50;
+    font-weight: 600;
+  }
+
+  .status-disconnected {
+    color: #f44336;
+    font-weight: 600;
+  }
+}
+
+.auth-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  button {
+    min-width: 140px;
+  }
+}
+

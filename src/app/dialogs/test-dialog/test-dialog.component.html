@@ -1,0 +1,79 @@
+<div class="test-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon class="title-icon">check_circle</mat-icon>
+      Test de Centrage et Authentification
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="test-content">
+      <h3>🎯 Test de Centrage Parfait</h3>
+      <p>Ce dialog doit être parfaitement centré au milieu de l'écran.</p>
+      
+      <div class="test-info">
+        <div class="info-item">
+          <strong>Position :</strong> Centre de l'écran
+        </div>
+        <div class="info-item">
+          <strong>Largeur :</strong> 600px (responsive)
+        </div>
+        <div class="info-item">
+          <strong>Animation :</strong> Entrée fluide
+        </div>
+        <div class="info-item">
+          <strong>Backdrop :</strong> Flou et semi-transparent
+        </div>
+      </div>
+
+      <hr style="margin: 20px 0; border: 1px solid #e0e0e0;">
+
+      <h3>🔐 Test d'Authentification</h3>
+      <p>Vérifiez l'état de connexion pour résoudre les erreurs 401.</p>
+      
+      <div class="auth-status">
+        <div class="status-item">
+          <strong>État de connexion :</strong> 
+          <span [class]="isAuthenticated ? 'status-connected' : 'status-disconnected'">
+            {{ isAuthenticated ? '✅ Connecté' : '❌ Non connecté' }}
+          </span>
+        </div>
+        <div class="status-item" *ngIf="currentUser">
+          <strong>Utilisateur :</strong> {{ currentUser.username }}
+        </div>
+        <div class="status-item" *ngIf="currentUser">
+          <strong>Rôles :</strong> {{ currentUser.roles.join(', ') }}
+        </div>
+        <div class="status-item" *ngIf="currentUser">
+          <strong>Token :</strong> {{ currentUser.accessToken ? '✅ Présent' : '❌ Absent' }}
+        </div>
+      </div>
+
+      <div class="auth-actions" style="margin-top: 20px;">
+        <button mat-raised-button color="primary" (click)="testLogin()" *ngIf="!isAuthenticated">
+          <mat-icon>login</mat-icon>
+          Se connecter (Test)
+        </button>
+        <button mat-raised-button color="warn" (click)="testLogout()" *ngIf="isAuthenticated">
+          <mat-icon>logout</mat-icon>
+          Se déconnecter
+        </button>
+        <button mat-raised-button color="accent" (click)="testAPI()" *ngIf="isAuthenticated">
+          <mat-icon>api</mat-icon>
+          Tester API Admin
+        </button>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="close()" class="cancel-btn">
+      <mat-icon>close</mat-icon>
+      Fermer
+    </button>
+  </mat-dialog-actions>
+</div>
+

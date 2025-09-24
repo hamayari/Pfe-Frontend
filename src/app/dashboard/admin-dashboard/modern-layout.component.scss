@@ -1,0 +1,361 @@
+// Layout Principal - Tout Visible à 100% Écran
+// Garantit qu'aucune scrollbar n'apparaisse à 100% de zoom
+
+// Variables de layout
+$header-height: 64px;
+$sidebar-width: 280px;
+$sidebar-collapsed-width: 70px;
+$footer-height: 60px;
+$content-padding: 20px;
+
+// Layout Container Principal
+.modern-layout {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; // IMPORTANT: Pas de scroll sur le container principal
+  display: grid;
+  grid-template-areas: 
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-rows: $header-height 1fr $footer-height;
+  grid-template-columns: $sidebar-width 1fr;
+  background: #f8fafc;
+  
+  // Mode sidebar collapsed
+  &.sidebar-collapsed {
+    grid-template-columns: $sidebar-collapsed-width 1fr;
+  }
+  
+  // Thème sombre
+  &.dark-theme {
+    background: #0f1419;
+    
+    .main-content {
+      background: #0f1419;
+    }
+  }
+}
+
+// Header - Zone Supérieure
+.layout-header {
+  grid-area: header;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  position: relative;
+  
+  &.dark-theme {
+    background: #1a1a1a;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Sidebar - Navigation Gauche
+.layout-sidebar {
+  grid-area: sidebar;
+  background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 25%, #7986cb 50%, #9fa8da 75%, #c5cae9 100%);
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 999;
+  
+  // Scrollbar personnalisée pour la sidebar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+  
+  // Mode collapsed
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+  }
+}
+
+// Contenu Principal - Zone Centrale
+.main-content {
+  grid-area: main;
+  background: #f8fafc;
+  overflow: hidden; // IMPORTANT: Pas de scroll sur le contenu principal
+  position: relative;
+  
+  // Container du contenu avec padding
+  .content-container {
+    height: 100%;
+    padding: $content-padding;
+    overflow-y: auto; // Scroll uniquement sur le contenu interne
+    overflow-x: hidden;
+    
+    // Scrollbar personnalisée pour le contenu
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+      
+      &:hover {
+        background: #94a3b8;
+      }
+    }
+  }
+  
+  // Thème sombre
+  .dark-theme & {
+    background: #0f1419;
+    
+    .content-container {
+      &::-webkit-scrollbar-track {
+        background: #1e293b;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #475569;
+        
+        &:hover {
+          background: #64748b;
+        }
+      }
+    }
+  }
+}
+
+// Footer - Zone Inférieure
+.layout-footer {
+  grid-area: footer;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  position: relative;
+  
+  &.dark-theme {
+    background: #1a1a1a;
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Responsive - Adaptation Mobile
+@media (max-width: 768px) {
+  .modern-layout {
+    grid-template-areas: 
+      "header"
+      "main"
+      "footer";
+    grid-template-rows: $header-height 1fr $footer-height;
+    grid-template-columns: 1fr;
+    
+    .layout-sidebar {
+      position: fixed;
+      left: -100%;
+      top: $header-height;
+      height: calc(100vh - #{$header-height} - #{$footer-height});
+      width: $sidebar-width;
+      transition: left 0.3s ease;
+      z-index: 998;
+      
+      &.mobile-open {
+        left: 0;
+      }
+    }
+    
+    .main-content {
+      .content-container {
+        padding: 16px;
+      }
+    }
+  }
+}
+
+// Responsive - Adaptation Tablet
+@media (min-width: 769px) and (max-width: 1024px) {
+  .modern-layout {
+    grid-template-columns: 240px 1fr;
+    
+    .layout-sidebar {
+      width: 240px;
+    }
+    
+    .main-content {
+      .content-container {
+        padding: 18px;
+      }
+    }
+  }
+}
+
+// Responsive - Adaptation Desktop Large
+@media (min-width: 1440px) {
+  .modern-layout {
+    grid-template-columns: 320px 1fr;
+    
+    .layout-sidebar {
+      width: 320px;
+    }
+    
+    .main-content {
+      .content-container {
+        padding: 24px;
+      }
+    }
+  }
+}
+
+// Overlay pour mobile
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 997;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// Toggle Sidebar Button (Mobile)
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  width: 48px;
+  height: 48px;
+  background: #3f51b5;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #5c6bc0;
+    transform: scale(1.1);
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+}
+
+// Animations d'entrée
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.layout-header {
+  animation: slideInFromTop 0.6s ease-out;
+}
+
+.layout-sidebar {
+  animation: slideInFromLeft 0.6s ease-out 0.1s both;
+}
+
+.main-content {
+  animation: slideInFromLeft 0.6s ease-out 0.2s both;
+}
+
+.layout-footer {
+  animation: slideInFromBottom 0.6s ease-out 0.3s both;
+}
+
+// Transitions fluides
+.modern-layout * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// États de focus pour l'accessibilité
+.sidebar-toggle:focus-visible {
+  outline: 2px solid #3f51b5;
+  outline-offset: 2px;
+}
+
+// Support des lecteurs d'écran
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

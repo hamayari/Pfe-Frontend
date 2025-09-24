@@ -1,0 +1,87 @@
+<div class="nomenclature-tree-view">
+  <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="nomenclature-tree">
+    <!-- This is the tree node template for leaf nodes -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="tree-node">
+      <div class="node-content" [class.selectable]="selectable || showCheckboxes">
+        <!-- Checkbox for selection -->
+        <mat-checkbox
+          *ngIf="showCheckboxes"
+          class="node-checkbox"
+          [checked]="checklistSelection.isSelected(node)"
+          (click)="$event.stopPropagation()"
+          (change)="toggleNodeSelection(node)">
+        </mat-checkbox>
+        
+        <!-- Node icon -->
+        <mat-icon class="node-icon" [ngClass]="getNodeBadgeClass(node)">
+          {{ getNodeIcon(node) }}
+        </mat-icon>
+        
+        <!-- Node label -->
+        <span class="node-label" [class.selected]="selectedId === node.nomenclature.id">
+          {{ node.name }}
+        </span>
+        
+        <!-- Status badge -->
+        <span class="node-status" [class.active]="node.nomenclature.isActive">
+          {{ node.nomenclature.isActive ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+    </mat-tree-node>
+    
+    <!-- This is the tree node template for expandable nodes -->
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding class="tree-node">
+      <div class="node-content" [class.selectable]="selectable || showCheckboxes">
+        <!-- Toggle button -->
+        <button
+          mat-icon-button
+          matTreeNodeToggle
+          [attr.aria-label]="'Toggle ' + node.name"
+          (click)="$event.stopPropagation()">
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+          </mat-icon>
+        </button>
+        
+        <!-- Checkbox for selection -->
+        <mat-checkbox
+          *ngIf="showCheckboxes"
+          class="node-checkbox"
+          [checked]="checklistSelection.isSelected(node)"
+          (click)="$event.stopPropagation()"
+          (change)="toggleNodeSelection(node)">
+        </mat-checkbox>
+        
+        <!-- Node icon -->
+        <mat-icon class="node-icon" [ngClass]="getNodeBadgeClass(node)">
+          {{ getNodeIcon(node) }}
+        </mat-icon>
+        
+        <!-- Node label -->
+        <span 
+          class="node-label expandable" 
+          [class.selected]="selectedId === node.nomenclature.id"
+          (click)="toggleNode(node)">
+          {{ node.name }}
+          <span class="node-count" *ngIf="node.nomenclature.childrenCount !== undefined">
+            ({{ node.nomenclature.childrenCount }})
+          </span>
+        </span>
+        
+        <!-- Status badge -->
+        <span class="node-status" [class.active]="node.nomenclature.isActive">
+          {{ node.nomenclature.isActive ? 'Actif' : 'Inactif' }}
+        </span>
+        
+        <!-- Loading indicator -->
+        <mat-spinner *ngIf="node.isLoading" diameter="16" class="node-loading"></mat-spinner>
+      </div>
+    </mat-tree-node>
+  </mat-tree>
+  
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!nomenclatures || nomenclatures.length === 0">
+    <mat-icon>folder_open</mat-icon>
+    <p>Aucune nomenclature trouvée</p>
+  </div>
+</div>

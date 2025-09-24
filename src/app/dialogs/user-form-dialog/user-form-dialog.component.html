@@ -1,0 +1,141 @@
+<div class="user-form-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon class="title-icon">person_add</mat-icon>
+      Ajouter un Utilisateur
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <mat-dialog-content class="dialog-content">
+      
+      <!-- Section Informations de connexion -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon class="section-icon">account_circle</mat-icon>
+          Informations de connexion
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nom d'utilisateur *</mat-label>
+            <input matInput formControlName="username" placeholder="Entrez le nom d'utilisateur">
+            <mat-icon matSuffix>account_circle</mat-icon>
+            <mat-error *ngIf="userForm.get('username')?.invalid">
+              {{ getErrorMessage('username') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Email *</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="Entrez l'email">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="userForm.get('email')?.invalid">
+              {{ getErrorMessage('email') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section Informations personnelles -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon class="section-icon">person</mat-icon>
+          Informations personnelles
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Prénom *</mat-label>
+            <input matInput formControlName="firstName" placeholder="Entrez le prénom">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error *ngIf="userForm.get('firstName')?.invalid">
+              {{ getErrorMessage('firstName') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nom *</mat-label>
+            <input matInput formControlName="lastName" placeholder="Entrez le nom">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error *ngIf="userForm.get('lastName')?.invalid">
+              {{ getErrorMessage('lastName') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section Rôles -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon class="section-icon">security</mat-icon>
+          Rôles et permissions
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>Rôle *</mat-label>
+            <mat-select formControlName="role" placeholder="Sélectionnez le rôle">
+              <mat-option *ngFor="let role of roles" [value]="role.value">
+                <mat-icon class="role-icon">{{ role.icon }}</mat-icon>
+                {{ role.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="userForm.get('role')?.invalid">
+              Veuillez sélectionner un rôle
+            </mat-error>
+          </mat-form-field>
+        </div>
+        
+        <!-- Affichage du rôle sélectionné -->
+        <div class="form-row" *ngIf="userForm.get('role')?.value">
+          <div class="selected-role">
+            <span class="selected-role-label">Rôle sélectionné :</span>
+            <div class="role-chip">
+              <mat-icon class="role-chip-icon">{{ getRoleIcon(userForm.get('role')?.value) }}</mat-icon>
+              {{ getRoleLabel(userForm.get('role')?.value) }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Options -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon class="section-icon">settings</mat-icon>
+          Options du compte
+        </h3>
+        
+        <div class="form-row options-row">
+          <mat-checkbox formControlName="enabled" color="primary" class="checkbox-item">
+            <span class="checkbox-label">
+              <mat-icon class="checkbox-icon">check_circle</mat-icon>
+              Compte activé
+            </span>
+          </mat-checkbox>
+          
+          <mat-checkbox formControlName="mustChangePassword" color="primary" class="checkbox-item">
+            <span class="checkbox-label">
+              <mat-icon class="checkbox-icon">lock_reset</mat-icon>
+              Changement de mot de passe obligatoire
+            </span>
+          </mat-checkbox>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button type="button" mat-button (click)="close()" class="cancel-btn">
+        <mat-icon>close</mat-icon>
+        Annuler
+      </button>
+      <button type="submit" mat-flat-button color="primary" [disabled]="userForm.invalid" class="submit-btn">
+        <mat-icon>save</mat-icon>
+        Créer l'utilisateur
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

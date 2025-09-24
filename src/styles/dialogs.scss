@@ -1,0 +1,338 @@
+/* ===== STYLES GLOBAUX POUR LES DIALOGS CENTRÉS - VERSION CORRIGÉE ===== */
+
+/* Backdrop du dialog */
+.dialog-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* ===== CENTRAGE PARFAIT - APPROCHE UNIFIÉE ===== */
+
+/* 1. Container principal du dialog */
+.cdk-overlay-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 1000 !important;
+}
+
+/* 2. Pane du dialog - CENTRAGE PARFAIT */
+.cdk-overlay-pane {
+  pointer-events: auto !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  /* Dimensions fixes pour éviter le débordement */
+  width: auto !important;
+  height: auto !important;
+}
+
+/* 3. Container du dialog - Styles visuels uniquement */
+.centered-dialog .mat-dialog-container {
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  /* PAS de position ou transform ici - géré par cdk-overlay-pane */
+  margin: 0 !important;
+  /* Dimensions */
+  width: 600px !important;
+  max-width: 95vw !important;
+  max-height: 80vh !important;
+}
+
+/* 4. Animation d'entrée CORRIGÉE - préserve le centrage */
+@keyframes dialogSlideIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* 5. Application de l'animation */
+.centered-dialog .mat-dialog-container {
+  animation: dialogSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+/* Animation d'entrée du dialog - SUPPRIMÉE (redondante avec la version corrigée ci-dessus) */
+
+/* Styles pour tous les dialogs */
+.user-form-dialog,
+.structure-form-dialog,
+.nomenclature-form-dialog {
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px 12px 0 0;
+
+    .dialog-title {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+
+      .title-icon {
+        margin-right: 12px;
+        font-size: 24px;
+      }
+    }
+
+    .close-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .dialog-content {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+
+    .form-section {
+      margin-bottom: 24px;
+      padding: 20px;
+      background-color: #fafafa;
+      border-radius: 8px;
+      border: 1px solid #e8e8e8;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: #d0d0d0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        margin: 0 0 16px 0;
+        color: #333;
+        font-size: 1.1rem;
+        font-weight: 600;
+
+        .section-icon {
+          margin-right: 10px;
+          font-size: 20px;
+        }
+      }
+
+      .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+
+        .form-field {
+          flex: 1;
+          min-width: 200px;
+        }
+
+        .form-field-full {
+          width: 100%;
+        }
+
+        .checkbox-group {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .checkbox-item {
+          .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+
+            .checkbox-icon {
+              margin-right: 8px;
+              font-size: 18px;
+            }
+          }
+        }
+
+        .options-row {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    padding: 20px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    .cancel-btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+    }
+
+    .submit-btn {
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+/* Styles spécifiques par type de dialog */
+.user-form-dialog {
+  .dialog-title .title-icon { color: #1976d2; }
+  .section-icon { color: #1976d2; }
+  .submit-btn { background-color: #1976d2; }
+}
+
+.structure-form-dialog {
+  .dialog-title .title-icon { color: #9c27b0; }
+  .section-icon { color: #9c27b0; }
+  .submit-btn { background-color: #9c27b0; }
+}
+
+.nomenclature-form-dialog {
+  .dialog-title .title-icon { color: #f44336; }
+  .section-icon { color: #f44336; }
+  .submit-btn { background-color: #f44336; }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .centered-dialog .mat-dialog-container {
+    margin: 16px;
+    width: calc(100% - 32px);
+    max-width: none;
+  }
+
+  .user-form-dialog,
+  .structure-form-dialog,
+  .nomenclature-form-dialog {
+    .dialog-content {
+      padding: 16px;
+
+      .form-section {
+        padding: 16px;
+
+        .form-row {
+          flex-direction: column;
+          gap: 12px;
+
+          .form-field {
+            min-width: auto;
+          }
+        }
+      }
+    }
+
+    .dialog-actions {
+      padding: 16px;
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
+
+/* Scrollbar personnalisée pour le contenu */
+.dialog-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ===== STYLES DE FORÇAGE POUR LE CENTRAGE PARFAIT - VERSION UNIFIÉE ===== */
+
+/* Styles spécifiques pour le backdrop */
+.cdk-overlay-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* Responsive design pour les dialogs */
+@media (max-width: 768px) {
+  .cdk-overlay-pane {
+    width: calc(100% - 32px) !important;
+    max-width: none !important;
+  }
+  
+  .centered-dialog .mat-dialog-container {
+    width: calc(100% - 32px) !important;
+    max-width: none !important;
+  }
+}
+
+/* ===== STYLES DE DÉBOGAGE POUR VÉRIFIER LE CENTRAGE ===== */
+
+/* Debug: Bordure rouge pour voir la position du dialog */
+.centered-dialog .mat-dialog-container {
+  /* Uncomment pour debug: border: 2px solid red !important; */
+}
+
+/* Debug: Bordure bleue pour voir la position du pane */
+.cdk-overlay-pane {
+  /* Uncomment pour debug: border: 2px solid blue !important; */
+}
+
+/* Debug: Bordure verte pour voir la position du container */
+.cdk-overlay-container {
+  /* Uncomment pour debug: border: 2px solid green !important; */
+}
+

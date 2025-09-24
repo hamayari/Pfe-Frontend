@@ -1,0 +1,232 @@
+
+<div class="nomenclature-detail-container" *ngIf="nomenclature">
+  <!-- Header with title and actions -->
+  <div class="detail-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button mat-icon-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>{{ nomenclature.label }}</h1>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Status toggle -->
+        <button 
+          mat-stroked-button 
+          [color]="getStatusColor(nomenclature.isActive)"
+          (click)="toggleStatus()"
+          [disabled]="loading"
+          class="status-button">
+          <mat-icon>{{ nomenclature.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
+          {{ getStatusText(nomenclature.isActive) }}
+        </button>
+        
+        <!-- Edit button -->
+        <button 
+          mat-stroked-button 
+          color="primary" 
+          (click)="editNomenclature()"
+          [disabled]="loading">
+          <mat-icon>edit</mat-icon>
+          Modifier
+        </button>
+        
+        <!-- More actions menu -->
+        <button 
+          mat-icon-button 
+          [matMenuTriggerFor]="moreMenu"
+          aria-label="Plus d'actions">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        
+        <mat-menu #moreMenu="matMenu">
+          <button mat-menu-item (click)="confirmDelete()">
+            <mat-icon color="warn">delete</mat-icon>
+            <span>Supprimer</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+    
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a [routerLink]="['/admin/nomenclatures']">Nomenclatures</a>
+      <mat-icon>chevron_right</mat-icon>
+      <span>{{ nomenclature.type | nomenclatureType }}</span>
+      <mat-icon>chevron_right</mat-icon>
+      <span class="current">{{ nomenclature.label }}</span>
+    </div>
+  </div>
+  
+  <!-- Main content -->
+  <div class="detail-content">
+    <mat-card class="detail-card">
+      <mat-tab-group [(selectedIndex)]="activeTabIndex" animationDuration="0ms">
+        <!-- Overview Tab -->
+        <mat-tab label="Vue d'ensemble">
+          <div class="tab-content">
+            <div class="detail-grid">
+              <!-- Left column -->
+              <div class="detail-column">
+                <!-- Code -->
+                <div class="detail-row">
+                  <div class="detail-label">Code</div>
+                  <div class="detail-value code">{{ nomenclature.code }}</div>
+                </div>
+                
+                <!-- Type -->
+                <div class="detail-row">
+                  <div class="detail-label">Type</div>
+                  <div class="detail-value">
+                    <span class="type-badge" [ngClass]="'type-' + nomenclature.type.toLowerCase()">
+                      {{ nomenclature.type | nomenclatureType }}
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="detail-row full-width" *ngIf="nomenclature.description">
+                  <div class="detail-label">Description</div>
+                  <div class="detail-value description">
+                    {{ nomenclature.description }}
+                  </div>
+                </div>
+                
+                <!-- Parent -->
+                <div class="detail-row" *ngIf="nomenclature.parent">
+                  <div class="detail-label">Parent</div>
+                  <div class="detail-value">
+                    <a 
+                      href="javascript:void(0)" 
+                      (click)="navigateToParent()"
+                      class="parent-link">
+                      {{ nomenclature.parent.label }}
+                      <mat-icon>open_in_new</mat-icon>
+                    </a>
+                  </div>
+                </div>
+                
+                <!-- Order -->
+                <div class="detail-row">
+                  <div class="detail-label">Ordre</div>
+                  <div class="detail-value">{{ nomenclature.order || 0 }}</div>
+                </div>
+              </div>
+              
+              <!-- Right column -->
+              <div class="detail-column">
+                <!-- Created At -->
+                <div class="detail-row">
+                  <div class="detail-label">Créé le</div>
+                  <div class="detail-value">
+                    <mat-icon>event</mat-icon>
+                    {{ formatDate(nomenclature.createdAt) }}
+                  </div>
+                </div>
+                
+                <!-- Updated At -->
+                <div class="detail-row" *ngIf="nomenclature.updatedAt">
+                  <div class="detail-label">Modifié le</div>
+                  <div class="detail-value">
+                    <mat-icon>update</mat-icon>
+                    {{ formatDate(nomenclature.updatedAt) }}
+                  </div>
+                </div>
+                
+                <!-- Created By -->
+                <div class="detail-row">
+                  <div class="detail-label">Créé par</div>
+                  <div class="detail-value">
+                    <mat-icon>person</mat-icon>
+                    {{ nomenclature.createdBy || 'Système' }}
+                  </div>
+                </div>
+                
+                <!-- Updated By -->
+                <div class="detail-row" *ngIf="nomenclature.updatedBy">
+                  <div class="detail-label">Modifié par</div>
+                  <div class="detail-value">
+                    <mat-icon>person_outline</mat-icon>
+                    {{ nomenclature.updatedBy }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Metadata section -->
+            <div class="metadata-section" *ngIf="hasMetadata(nomenclature.metadata)">
+              <h3>Métadonnées</h3>
+              <div class="metadata-grid">
+                <div class="metadata-item" *ngFor="let item of nomenclature.metadata | keyvalue">
+                  <div class="metadata-key">{{ getMetadataKey(item.key) | titlecase }}</div>
+                  <div class="metadata-value">{{ item.value }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        
+        <!-- Related Nomenclatures Tab -->
+        <mat-tab label="Éléments associés" *ngIf="relatedNomenclatures.length > 0">
+          <div class="tab-content">
+            <div class="related-items">
+              <div class="related-items-grid">
+                <mat-card 
+                  *ngFor="let item of relatedNomenclatures" 
+                  class="related-item"
+                  (click)="navigateToNomenclature(item.id)">
+                  <div class="item-header">
+                    <span class="item-type">{{ item.type | nomenclatureType }}</span>
+                    <span 
+                      class="item-status"
+                      [ngClass]="{'active': item.isActive, 'inactive': !item.isActive}">
+                      {{ item.isActive ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </div>
+                  <h3 class="item-title">{{ item.label }}</h3>
+                  <p class="item-code">{{ item.code }}</p>
+                  <p class="item-description" *ngIf="item.description">
+                    {{ item.description | truncate:100 }}
+                  </p>
+                  <div class="item-footer">
+                    <span class="item-date">
+                      <mat-icon>event</mat-icon>
+                      {{ formatDate(item.createdAt) }}
+                    </span>
+                  </div>
+                </mat-card>
+              </div>
+              
+              <div class="view-all-link" *ngIf="nomenclature.type">
+                <a 
+                  [routerLink]="['/admin/nomenclatures']" 
+                  [queryParams]="{ type: nomenclature.type }">
+                  Voir toutes les nomenclatures de type {{ nomenclature.type | nomenclatureType }}
+                  <mat-icon>arrow_forward</mat-icon>
+                </a>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        
+        <!-- History Tab -->
+        <mat-tab label="Historique">
+          <div class="tab-content">
+            <div class="history-placeholder">
+              <mat-icon>history</mat-icon>
+              <h3>Historique des modifications</h3>
+              <p>L'historique des modifications sera disponible dans une prochaine version.</p>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </div>
+  
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Chargement en cours...</p>
+  </div>
+</div>

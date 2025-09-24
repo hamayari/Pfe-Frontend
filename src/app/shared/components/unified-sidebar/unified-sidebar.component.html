@@ -1,0 +1,88 @@
+<mat-sidenav-container class="unified-sidebar-container">
+  <mat-sidenav #sidenav mode="side" opened class="unified-sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <mat-icon class="logo-icon">dashboard</mat-icon>
+        <span class="logo-text" *ngIf="!isCollapsed">Gestion Pro</span>
+      </div>
+      <button mat-icon-button (click)="toggleSidebar()" class="toggle-btn">
+        <mat-icon>{{ isCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      </button>
+    </div>
+
+    <mat-nav-list class="sidebar-nav">
+      <ng-container *ngFor="let section of sidebarItems">
+        <!-- Section Divider -->
+        <mat-divider *ngIf="section.divider"></mat-divider>
+        
+        <!-- Section Header -->
+        <div class="section-header" *ngIf="section.label && !isCollapsed">
+          <h3>{{ section.label }}</h3>
+        </div>
+
+        <!-- Menu Item -->
+        <a mat-list-item 
+           *ngIf="!section.children" 
+           [routerLink]="section.route"
+           [class.active]="section.active"
+           (click)="onItemClick(section)"
+           class="nav-item">
+          <mat-icon matListItemIcon>{{ section.icon }}</mat-icon>
+          <span matListItemTitle *ngIf="!isCollapsed">{{ section.label }}</span>
+          <mat-chip *ngIf="section.badge && section.badge > 0 && !isCollapsed" 
+                    matListItemMeta 
+                    color="warn" 
+                    class="badge-chip">
+            {{ section.badge }}
+          </mat-chip>
+        </a>
+
+        <!-- Expandable Menu Item -->
+        <mat-expansion-panel *ngIf="section.children" 
+                             class="expansion-panel"
+                             [expanded]="section.expanded">
+          <mat-expansion-panel-header class="expansion-header">
+            <mat-icon matPanelIcon>{{ section.icon }}</mat-icon>
+            <span matPanelTitle *ngIf="!isCollapsed">{{ section.label }}</span>
+            <mat-chip *ngIf="section.badge && section.badge > 0 && !isCollapsed" 
+                      matPanelDescription 
+                      class="badge-chip">
+              {{ section.badge }}
+            </mat-chip>
+          </mat-expansion-panel-header>
+
+          <mat-nav-list class="submenu">
+            <a mat-list-item 
+               *ngFor="let child of section.children"
+               [routerLink]="child.route"
+               [class.active]="child.active"
+               (click)="onItemClick(child)"
+               class="submenu-item">
+              <mat-icon matListItemIcon>{{ child.icon }}</mat-icon>
+              <span matListItemTitle>{{ child.label }}</span>
+              <mat-chip *ngIf="child.badge && child.badge > 0" 
+                        matListItemMeta 
+                        color="warn" 
+                        class="badge-chip">
+                {{ child.badge }}
+              </mat-chip>
+            </a>
+          </mat-nav-list>
+        </mat-expansion-panel>
+      </ng-container>
+    </mat-nav-list>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer" *ngIf="!isCollapsed">
+      <div class="footer-info">
+        <p class="app-version">v1.0.0</p>
+        <p class="copyright">&copy; 2024 Gestion Pro</p>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <!-- Main Content Area -->
+  <mat-sidenav-content class="main-content">
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

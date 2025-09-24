@@ -1,0 +1,388 @@
+<div class="users-management-container">
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des utilisateurs...</p>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <mat-icon>people</mat-icon>
+        Gestion des Utilisateurs
+      </h1>
+      <p class="page-subtitle">Administration complète des utilisateurs de la plateforme</p>
+    </div>
+    
+    <div class="header-right">
+      <button mat-raised-button color="primary" (click)="addUser()">
+        <mat-icon>person_add</mat-icon>
+        Nouvel Utilisateur
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon total">
+          <mat-icon>group</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.total }}</h3>
+          <p>Total Utilisateurs</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon active">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.active }}</h3>
+          <p>Utilisateurs Actifs</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon pending">
+          <mat-icon>pending</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.pending }}</h3>
+          <p>En Attente</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon inactive">
+          <mat-icon>cancel</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.inactive }}</h3>
+          <p>Inactifs</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Filtres et Recherche -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-header">
+        <h3>Filtres et Recherche</h3>
+        <button mat-button (click)="toggleAdvancedFilters()">
+          <mat-icon>{{ showAdvancedFilters ? 'expand_less' : 'expand_more' }}</mat-icon>
+          {{ showAdvancedFilters ? 'Masquer' : 'Afficher' }} filtres avancés
+        </button>
+      </div>
+
+      <!-- Filtres de base -->
+      <div class="basic-filters">
+        <mat-form-field class="search-field">
+          <mat-label>Rechercher un utilisateur</mat-label>
+          <input matInput 
+                 [(ngModel)]="filters.searchTerm" 
+                 (keyup)="onSearchChange($event)"
+                 placeholder="Nom, email, département...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field class="filter-field">
+          <mat-label>Rôle</mat-label>
+          <mat-select [(ngModel)]="filters.role" (selectionChange)="onFilterChange()">
+            <mat-option value="all">Tous les rôles</mat-option>
+            <mat-option value="Administrateur">Administrateur</mat-option>
+            <mat-option value="Commercial">Commercial</mat-option>
+            <mat-option value="Chef de Projet">Chef de Projet</mat-option>
+            <mat-option value="Décideur">Décideur</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="filter-field">
+          <mat-label>Statut</mat-label>
+          <mat-select [(ngModel)]="filters.status" (selectionChange)="onFilterChange()">
+            <mat-option value="all">Tous les statuts</mat-option>
+            <mat-option value="active">Actif</mat-option>
+            <mat-option value="pending">En attente</mat-option>
+            <mat-option value="inactive">Inactif</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="filter-field">
+          <mat-label>Gouvernorat</mat-label>
+          <mat-select [(ngModel)]="filters.governorate" (selectionChange)="onFilterChange()">
+            <mat-option value="all">Tous les gouvernorats</mat-option>
+            <mat-option value="Tunis">Tunis</mat-option>
+            <mat-option value="Sfax">Sfax</mat-option>
+            <mat-option value="Sousse">Sousse</mat-option>
+            <mat-option value="Monastir">Monastir</mat-option>
+            <mat-option value="Gabès">Gabès</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Filtres avancés -->
+      <mat-expansion-panel *ngIf="showAdvancedFilters" class="advanced-filters">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>tune</mat-icon>
+            Filtres avancés
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="advanced-filters-content">
+          <mat-form-field class="filter-field">
+            <mat-label>Période de création</mat-label>
+            <mat-select [(ngModel)]="filters.dateRange" (selectionChange)="onFilterChange()">
+              <mat-option value="all">Toutes les périodes</mat-option>
+              <mat-option value="today">Aujourd'hui</mat-option>
+              <mat-option value="week">Cette semaine</mat-option>
+              <mat-option value="month">Ce mois</mat-option>
+              <mat-option value="quarter">Ce trimestre</mat-option>
+              <mat-option value="year">Cette année</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-button color="warn" (click)="resetFilters()">
+            <mat-icon>clear</mat-icon>
+            Réinitialiser les filtres
+          </button>
+        </div>
+      </mat-expansion-panel>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tableau des utilisateurs -->
+  <mat-card class="users-table-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>table_view</mat-icon>
+        Liste des Utilisateurs
+        <span class="results-count">({{ filteredUsers.length }} résultat{{ filteredUsers.length > 1 ? 's' : '' }})</span>
+      </mat-card-title>
+      <mat-card-subtitle>
+        Gestion complète des utilisateurs avec actions CRUD
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="table-container">
+        <mat-table [dataSource]="usersDataSource" matSort class="users-table">
+          
+          <!-- Colonne Avatar -->
+          <ng-container matColumnDef="avatar">
+            <mat-header-cell *matHeaderCellDef> Avatar </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <div class="user-avatar">
+                <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.name" class="avatar-img">
+                <div *ngIf="!user.avatar" class="avatar-placeholder">
+                  {{ user.name.charAt(0) }}
+                </div>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Nom -->
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Nom </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <div class="user-name">
+                <strong>{{ user.name }}</strong>
+                <span class="user-phone" *ngIf="user.phone">{{ user.phone }}</span>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Email -->
+          <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <a [href]="'mailto:' + user.email" class="user-email">{{ user.email }}</a>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Rôle -->
+          <ng-container matColumnDef="role">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Rôle </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <mat-chip [color]="getRoleColor(user.role)" selected>
+                {{ user.role }}
+              </mat-chip>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Statut -->
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Statut </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <mat-chip [color]="getStatusColor(user.status)" selected>
+                <mat-icon>{{ getStatusIcon(user.status) }}</mat-icon>
+                {{ getStatusText(user.status) }}
+              </mat-chip>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Gouvernorat -->
+          <ng-container matColumnDef="governorate">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Gouvernorat </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <span class="governorate">{{ user.governorate }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Département -->
+          <ng-container matColumnDef="department">
+            <mat-header-cell *matHeaderCellDef> Département </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <span class="department">{{ user.department || '-' }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Date création -->
+          <ng-container matColumnDef="createdAt">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Date création </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <div class="date-info">
+                <div class="date">{{ formatDate(user.createdAt) }}</div>
+                <div class="time-ago">{{ getTimeAgo(user.createdAt) }}</div>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Dernière connexion -->
+          <ng-container matColumnDef="lastLogin">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Dernière connexion </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <div class="date-info">
+                <div class="date">{{ formatDate(user.lastLogin) }}</div>
+                <div class="time-ago">{{ getTimeAgo(user.lastLogin) }}</div>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Activé -->
+          <ng-container matColumnDef="enabled">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Activé </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <mat-slide-toggle 
+                [checked]="user.enabled"
+                (change)="toggleUserEnabled(user)"
+                [color]="'primary'">
+              </mat-slide-toggle>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Colonne Actions -->
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <div class="action-buttons">
+                <button mat-icon-button 
+                        (click)="viewUserDetails(user)" 
+                        matTooltip="Voir les détails"
+                        color="primary">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+
+                <button mat-icon-button 
+                        (click)="editUser(user)" 
+                        matTooltip="Modifier"
+                        color="accent"
+                        [disabled]="!canEditUser(user)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button mat-icon-button 
+                        [matMenuTriggerFor]="userMenu" 
+                        matTooltip="Plus d'actions"
+                        color="primary">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+
+                <mat-menu #userMenu="matMenu">
+                  <button mat-menu-item (click)="resetPassword(user)">
+                    <mat-icon>lock_reset</mat-icon>
+                    <span>Réinitialiser mot de passe</span>
+                  </button>
+                  
+                  <button mat-menu-item (click)="toggleUserStatus(user)">
+                    <mat-icon>{{ user.status === 'active' ? 'block' : 'check_circle' }}</mat-icon>
+                    <span>{{ user.status === 'active' ? 'Désactiver' : 'Activer' }}</span>
+                  </button>
+                  
+                  <mat-divider></mat-divider>
+                  
+                  <button mat-menu-item 
+                          (click)="deleteUser(user)"
+                          color="warn"
+                          [disabled]="!canDeleteUser(user)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Supprimer</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+
+        <!-- Pagination -->
+        <mat-paginator #usersPaginator 
+                       [pageSizeOptions]="pageSizeOptions"
+                       [pageSize]="pageSize"
+                       showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Actions en bas de page -->
+  <div class="bottom-actions">
+    <div class="export-actions">
+      <button mat-raised-button color="accent" (click)="exportUsers('csv')">
+        <mat-icon>file_download</mat-icon>
+        Export CSV
+      </button>
+      <button mat-raised-button color="accent" (click)="exportUsers('xlsx')">
+        <mat-icon>table_chart</mat-icon>
+        Export Excel
+      </button>
+      <button mat-raised-button color="accent" (click)="exportUsers('pdf')">
+        <mat-icon>picture_as_pdf</mat-icon>
+        Export PDF
+      </button>
+    </div>
+
+    <div class="bulk-actions">
+      <button mat-raised-button color="warn" disabled>
+        <mat-icon>delete_sweep</mat-icon>
+        Supprimer la sélection
+      </button>
+      <button mat-raised-button color="primary" disabled>
+        <mat-icon>group_work</mat-icon>
+        Actions groupées
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+

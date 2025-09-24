@@ -1,0 +1,218 @@
+<div class="messaging-container">
+  <!-- Sidebar des conversations -->
+  <div class="conversations-sidebar">
+    <div class="conversations-header">
+      <h3>Conversations</h3>
+    </div>
+    
+    <div class="conversations-list">
+      <div 
+        *ngFor="let conversation of conversations" 
+        class="conversation-item"
+        [class.active]="selectedConversation?._id === conversation._id"
+        (click)="selectConversation(conversation)"
+      >
+        <div class="conversation-avatar">
+          {{ getInitials(conversation.name) }}
+        </div>
+        
+        <div class="conversation-info">
+          <div class="conversation-name">{{ conversation.name }}</div>
+          <div class="conversation-preview">{{ conversation.lastMessage || 'Aucun message' }}</div>
+        </div>
+        
+        <div class="conversation-meta">
+          <div class="conversation-time">{{ formatTime(conversation.lastMessageTime) }}</div>
+          <div *ngIf="conversation.unreadCount > 0" class="conversation-unread">
+            {{ conversation.unreadCount }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zone de chat -->
+  <div class="chat-area" *ngIf="selectedConversation">
+    <!-- En-tête du chat -->
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-header-avatar">
+          {{ getInitials(selectedConversation.name) }}
+        </div>
+        <div class="chat-header-details">
+          <h4>{{ selectedConversation.name }}</h4>
+          <div class="chat-header-status">En ligne</div>
+        </div>
+      </div>
+      
+      <div class="chat-header-actions">
+        <button (click)="togglePinConversation(selectedConversation._id)">
+          📌
+        </button>
+        <button (click)="showPinnedMessages()">
+          📌 Messages épinglés
+        </button>
+      </div>
+    </div>
+
+    <!-- Zone des messages -->
+    <div class="messages-container" #messagesContainer>
+      <div class="messages-list">
+        <!-- Messages épinglés -->
+        <div *ngIf="hasPinnedMessages()" class="pinned-messages-section">
+          <div class="pinned-messages-header">
+            📌 Messages épinglés
+          </div>
+          <div *ngFor="let message of getPinnedMessages()" class="message-row">
+            <div class="message-avatar">
+              {{ getInitials(message.senderName) }}
+            </div>
+            <div class="message-content">
+              <div class="message-bubble pinned">
+                <div class="message-text">{{ message.content }}</div>
+                <div class="message-reactions">
+                  <div *ngFor="let reaction of message.reactions" class="reaction-group">
+                    <span class="reaction-emoji">{{ reaction.emoji }}</span>
+                    <span class="reaction-count">{{ reaction.count }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages normaux -->
+        <div 
+          *ngFor="let message of filteredMessages" 
+          class="message-row"
+          [class.own-message]="message.senderId === currentUserId"
+          [class.message-with-reply]="message.replyTo"
+        >
+          <!-- Avatar -->
+          <div class="message-avatar" *ngIf="message.senderId !== currentUserId">
+            {{ getInitials(message.senderName) }}
+          </div>
+          
+          <!-- Contenu du message -->
+          <div class="message-content">
+            <!-- En-tête du message -->
+            <div class="message-header" *ngIf="message.senderId !== currentUserId">
+              <span class="message-sender">{{ message.senderName }}</span>
+              <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+            </div>
+            
+            <!-- Réponse -->
+            <div *ngIf="message.replyTo" class="reply-container">
+              <div class="reply-content">
+                <div class="reply-header">
+                  <span class="reply-label">Réponse à</span>
+                  <span class="reply-text">{{ message.replyTo.senderName }}: {{ message.replyTo.content }}</span>
+                  <button class="close-reply" (click)="removeReply()">✕</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Bulle du message -->
+            <div 
+              class="message-bubble"
+              [class.deleted]="isMessageDeleted(message._id)"
+              [class.pinned]="message.pinned"
+              [ngClass]="getMessageBubbleClasses(message.content)"
+            >
+              <div class="message-text">{{ message.content }}</div>
+              
+              <!-- Réactions -->
+              <div class="message-reactions" *ngIf="message.reactions && message.reactions.length > 0">
+                <div *ngFor="let reaction of message.reactions" class="reaction-group">
+                  <span class="reaction-emoji">{{ reaction.emoji }}</span>
+                  <span class="reaction-count">{{ reaction.count }}</span>
+                </div>
+              </div>
+              
+              <!-- Actions sur la bulle -->
+              <div class="bubble-actions">
+                <button class="bubble-action" (click)="addReaction(message._id, '👍')">👍</button>
+                <button class="bubble-action" (click)="addReaction(message._id, '❤️')">❤️</button>
+                <button class="bubble-action" (click)="addReaction(message._id, '😂')">😂</button>
+                <button class="bubble-action" (click)="replyToMessage(message)">↩️</button>
+                <button class="bubble-action" (click)="pinMessage(message._id)">📌</button>
+                <button class="bubble-action" (click)="editMessage(message)">✏️</button>
+                <button class="bubble-action" (click)="deleteMessageForMe(message._id)">🗑️</button>
+              </div>
+            </div>
+            
+            <!-- Métadonnées -->
+            <div class="bubble-meta">
+              <div class="message-status">
+                <div class="ticks">
+                  <div class="tick" [class.sent]="message.status === 'sent'">✓</div>
+                  <div class="tick" [class.delivered]="message.status === 'delivered'">✓</div>
+                  <div class="tick" [class.read]="message.status === 'read'">✓</div>
+                </div>
+                <span class="status-icon">
+                  <span *ngIf="message.edited">✏️</span>
+                  <span *ngIf="message.pinned">📌</span>
+                </span>
+              </div>
+              
+              <button class="add-reaction-btn" (click)="showReactionPicker(message._id)">
+                😊
+              </button>
+            </div>
+            
+            <!-- Sélecteur de réactions -->
+            <div class="reaction-picker" [class.show]="activeReactionPicker === message._id">
+              <div class="reaction-grid">
+                <button 
+                  *ngFor="let emoji of reactionEmojis" 
+                  class="reaction-btn"
+                  (click)="addReaction(message._id, emoji)"
+                >
+                  {{ emoji }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de saisie -->
+    <div class="input-area">
+      <div class="input-container">
+        <div class="input-actions">
+          <button class="input-action">📎</button>
+          <button class="input-action">😊</button>
+        </div>
+        
+        <textarea
+          #messageInput
+          class="message-input"
+          placeholder="Tapez votre message..."
+          [(ngModel)]="newMessage"
+          (keydown.enter)="sendMessage($event)"
+          (input)="onInputChange()"
+          rows="1"
+        ></textarea>
+        
+        <button 
+          class="send-button"
+          [disabled]="!newMessage.trim()"
+          (click)="sendMessage()"
+        >
+          ➤
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucune conversation sélectionnée -->
+  <div class="chat-area" *ngIf="!selectedConversation">
+    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">
+      <div style="text-align: center;">
+        <h3>Sélectionnez une conversation</h3>
+        <p>Choisissez une conversation dans la liste pour commencer à discuter</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,305 @@
+// Page Profil Simple - Nouveaux styles
+.profile-card-simple {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e1e5e9;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .user-name {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .card-content {
+    padding: 20px 16px;
+    background: #f8f9fa;
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 12px 0;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &:hover {
+        transform: translateX(2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .info-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 14px;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+
+        i {
+          font-size: 16px;
+          color: #ffffff;
+        }
+      }
+
+      .info-content {
+        flex: 1;
+
+        label {
+          display: block;
+          font-size: 12px;
+          font-weight: 600;
+          color: #6c757d;
+          margin-bottom: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .info-value {
+          font-size: 14px;
+          color: #2c3e50;
+          font-weight: 500;
+
+          &.email-link {
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s ease;
+
+            &:hover {
+              color: #0056b3;
+              text-decoration: underline;
+            }
+          }
+
+          &.role-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Centrage vertical de la carte de profil
+.profile-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px); // Ajuster selon la hauteur du header
+  padding: 20px;
+}
+
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-header {
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+
+// Responsive pour la page profil simple
+@media (max-width: 768px) {
+  .profile-content {
+    min-height: calc(100vh - 150px);
+    padding: 15px;
+  }
+
+  .profile-card-simple {
+    max-width: 350px;
+
+    .card-header {
+      padding: 16px 14px;
+
+      .user-name {
+        font-size: 16px;
+      }
+    }
+
+    .card-content {
+      padding: 16px 14px;
+
+      .info-item {
+        margin-bottom: 12px;
+        padding: 12px;
+
+        .info-icon {
+          width: 32px;
+          height: 32px;
+          margin-right: 12px;
+
+          i {
+            font-size: 14px;
+          }
+        }
+
+        .info-content {
+          label {
+            font-size: 11px;
+          }
+
+          .info-value {
+            font-size: 13px;
+
+            &.role-badge {
+              font-size: 11px;
+              padding: 3px 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Centrage vertical de la carte de profil
+.profile-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px); // Ajuster selon la hauteur du header
+  padding: 20px;
+}
+
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-header {
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .profile-content {
+    min-height: calc(100vh - 120px);
+    padding: 10px;
+  }
+
+  .profile-card-simple {
+    max-width: 320px;
+
+    .card-header {
+      padding: 14px 12px;
+
+      .user-name {
+        font-size: 15px;
+      }
+    }
+
+    .card-content {
+      padding: 14px 12px;
+
+      .info-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 14px 12px;
+
+        .info-icon {
+          margin-right: 0;
+          margin-bottom: 8px;
+          width: 28px;
+          height: 28px;
+
+          i {
+            font-size: 12px;
+          }
+        }
+
+        .info-content {
+          label {
+            font-size: 10px;
+          }
+
+          .info-value {
+            font-size: 12px;
+
+            &.role-badge {
+              font-size: 10px;
+              padding: 2px 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Centrage vertical de la carte de profil
+.profile-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px); // Ajuster selon la hauteur du header
+  padding: 20px;
+}
+
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-header {
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+

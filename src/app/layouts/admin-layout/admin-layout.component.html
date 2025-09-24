@@ -1,0 +1,127 @@
+<div class="admin-container" [class.sidebar-open]="isSidebarOpen">
+  <!-- Top Toolbar -->
+  <mat-toolbar color="primary" class="toolbar" [class.sidebar-collapsed]="sidebarCollapsed">
+    <button mat-icon-button (click)="toggleSidebar()" class="menu-button">
+      <mat-icon>menu</mat-icon>
+    </button>
+    
+    <span class="toolbar-title" routerLink="/admin/dashboard">Admin Dashboard</span>
+    
+    <span class="spacer"></span>
+    
+    <!-- Notifications -->
+    <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" class="notification-button">
+      <mat-icon [matBadge]="unreadNotificationsCount" 
+                [matBadgeHidden]="unreadNotificationsCount === 0"
+                matBadgeColor="warn"
+                matBadgeSize="small">
+        notifications
+      </mat-icon>
+    </button>
+    <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
+      <div class="notifications-header">
+        <h3>Notifications</h3>
+        <button mat-button color="primary">Tout marquer comme lu</button>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="notifications-list">
+        <div class="notification-item unread">
+          <div class="notification-icon">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">Nouvelle convention en attente</div>
+            <div class="notification-message">Une nouvelle convention nécessite votre approbation</div>
+            <div class="notification-time">Il y a 2 minutes</div>
+          </div>
+        </div>
+        <div class="notification-item">
+          <div class="notification-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">Mise à jour système</div>
+            <div class="notification-message">La mise à jour 2.1.0 a été installée avec succès</div>
+            <div class="notification-time">Hier, 14:30</div>
+          </div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="notifications-footer">
+        <button mat-button color="primary" routerLink="/admin/notifications">Voir toutes les notifications</button>
+      </div>
+    </mat-menu>
+    
+    <!-- User Menu -->
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+      <div class="user-info">
+        <div class="user-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</div>
+        <div class="user-role" *ngIf="currentUser">{{ currentUser.role | titlecase }}</div>
+      </div>
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu" class="user-menu">
+      <button mat-menu-item routerLink="/admin/profile">
+        <mat-icon>person</mat-icon>
+        <span>Mon profil</span>
+      </button>
+      <button mat-menu-item routerLink="/admin/settings">
+        <mat-icon>settings</mat-icon>
+        <span>Paramètres</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        <span>Déconnexion</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+  
+  <!-- Modern Sidebar -->
+  <app-modern-sidebar 
+    [collapsed]="sidebarCollapsed" 
+    [darkTheme]="false"
+    (toggleCollapse)="onToggleSidebar()"
+    (navigationChange)="onNavigationChange($event)">
+  </app-modern-sidebar>
+  
+  <!-- Main Content -->
+  <div class="main-content" [class.sidebar-open]="isSidebarOpen" [class.sidebar-collapsed]="sidebarCollapsed">
+    <div class="content-container">
+      <router-outlet></router-outlet>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="#">Aide</a>
+          <a href="#">Confidentialité</a>
+          <a href="#">Conditions d'utilisation</a>
+        </div>
+        <div class="footer-copyright">
+          &copy; {{ currentYear }} Gestion Pro. Tous droits réservés.
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <!-- Quick Action Button (Mobile) -->
+  <button mat-fab color="primary" class="quick-action-fab" matTooltip="Actions rapides" [matMenuTriggerFor]="quickActions">
+    <mat-icon>add</mat-icon>
+  </button>
+  <mat-menu #quickActions="matMenu" class="quick-actions-menu">
+    <button mat-menu-item routerLink="/admin/users/new">
+      <mat-icon>person_add</mat-icon>
+      <span>Nouvel utilisateur</span>
+    </button>
+    <button mat-menu-item routerLink="/admin/conventions/new">
+      <mat-icon>note_add</mat-icon>
+      <span>Nouvelle convention</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon>add_chart</mat-icon>
+      <span>Nouveau rapport</span>
+    </button>
+  </mat-menu>
+</div>

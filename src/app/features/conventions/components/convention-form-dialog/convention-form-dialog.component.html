@@ -1,0 +1,88 @@
+<div class="convention-form-dialog">
+  <h2 mat-dialog-title>Nouvelle Convention</h2>
+  
+  <mat-dialog-content>
+    <form [formGroup]="conventionForm" class="convention-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Référence</mat-label>
+          <input matInput formControlName="reference" placeholder="CONV-2024-001">
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Client</mat-label>
+          <mat-select formControlName="clientId">
+            <mat-option *ngFor="let client of filteredApplications | async" [value]="client.id">
+              {{ client.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Gouvernorat</mat-label>
+          <mat-select formControlName="governorate">
+            <mat-option *ngFor="let zone of filteredZones | async" [value]="zone">
+              {{ zone }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Structure</mat-label>
+          <mat-select formControlName="structure">
+            <mat-option *ngFor="let structure of filteredStructures | async" [value]="structure">
+              {{ structure }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Application</mat-label>
+          <mat-select formControlName="application">
+            <mat-option *ngFor="let app of filteredApplications | async" [value]="app">
+              {{ app }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Montant</mat-label>
+          <input matInput type="number" formControlName="amount" placeholder="0">
+        </mat-form-field>
+      </div>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Commercial</mat-label>
+          <mat-select formControlName="commercialId">
+            <mat-option *ngFor="let commercial of filteredCommercials | async" [value]="commercial.id">
+              {{ commercial.firstName }} {{ commercial.lastName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Chef de Projet</mat-label>
+          <mat-select formControlName="projectManagerId">
+            <mat-option *ngFor="let pm of filteredProjectManagers | async" [value]="pm.id">
+              {{ pm.firstName }} {{ pm.lastName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Annuler</button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="conventionForm.invalid">
+      Enregistrer
+    </button>
+  </mat-dialog-actions>
+</div>
+
+

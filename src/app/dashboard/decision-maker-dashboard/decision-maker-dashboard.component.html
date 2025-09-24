@@ -1,0 +1,416 @@
+<div class="dashboard-container">
+  <!-- Header Professionnel (même que admin) -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1 class="page-title">Dashboard Décideur</h1>
+    </div>
+    
+    <div class="header-center">
+      <!-- Barre de recherche globale -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="material-icons search-icon">search</i>
+          <input type="text" 
+                 class="search-input" 
+                 placeholder="Rechercher KPIs, rapports..."
+                 [(ngModel)]="searchQuery"
+                 (keyup.enter)="performSearch()">
+          <button class="search-btn" (click)="performSearch()">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <!-- Notifications -->
+      <div class="notification-container">
+        <button class="header-icon-btn" (click)="toggleNotifications()" [class.has-notifications]="hasNotifications" title="Notifications">
+          <i class="material-icons">notifications</i>
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Messages -->
+      <div class="messages-container">
+        <button class="header-icon-btn" (click)="toggleMessages()" [class.has-messages]="hasMessages" title="Messages">
+          <i class="material-icons">mail</i>
+          <span class="message-badge" *ngIf="messageCount > 0">{{ messageCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Paramètres -->
+      <button class="header-icon-btn" (click)="toggleSettings()" title="Paramètres">
+        <i class="material-icons">settings</i>
+      </button>
+      
+      <!-- Mode sombre/clair -->
+      <button class="header-icon-btn" (click)="toggleDarkMode()" [title]="darkMode ? 'Mode clair' : 'Mode sombre'">
+        <i class="material-icons">{{ darkMode ? 'light_mode' : 'dark_mode' }}</i>
+      </button>
+      
+      <!-- Profil utilisateur -->
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <img [src]="currentUser?.avatar || getDefaultAvatar()" 
+               [alt]="currentUser?.username || 'Décideur'"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+        </div>
+        <div class="user-details">
+          <div class="username">{{ currentUser?.username || 'Décideur' }}</div>
+          <div class="role">Décideur</div>
+        </div>
+        <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
+      </div>
+
+      <!-- Menu dropdown utilisateur -->
+      <div class="user-menu" [class.open]="userMenuOpen">
+        <div class="menu-item" (click)="goToProfile()">
+          <i class="material-icons">person</i>
+          <span>Mon Profil</span>
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item logout" (click)="logout()">
+          <i class="material-icons">logout</i>
+          <span>Se Déconnecter</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- KPI Cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>assessment</mat-icon></div>
+        <mat-card-title>{{ kpis.paymentRate }}</mat-card-title>
+        <mat-card-subtitle>Taux de Paiement</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>description</mat-icon></div>
+        <mat-card-title>{{ kpis.totalConventions }}</mat-card-title>
+        <mat-card-subtitle>Conventions Totales</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>people</mat-icon></div>
+        <mat-card-title>{{ kpis.totalUsers }}</mat-card-title>
+        <mat-card-subtitle>Utilisateurs Actifs</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>trending_up</mat-icon></div>
+        <mat-card-title>{{ kpis.monthlyRevenue | currency:'TND' }}</mat-card-title>
+        <mat-card-subtitle>Revenus Mensuels</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>warning</mat-icon></div>
+        <mat-card-title>{{ kpis.activeAlerts }}</mat-card-title>
+        <mat-card-subtitle>Alertes Actives</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <div mat-card-avatar><mat-icon>schedule</mat-icon></div>
+        <mat-card-title>{{ kpis.responseTime }}</mat-card-title>
+        <mat-card-subtitle>Temps de Réponse</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+  </div>
+
+  <!-- Dark mode toggle -->
+  <div style="text-align:right; margin-bottom:10px;">
+    <button mat-icon-button (click)="toggleDarkMode()" aria-label="Activer/désactiver le mode sombre">
+      <mat-icon>dark_mode</mat-icon>
+    </button>
+  </div>
+
+  <!-- Advanced Filters -->
+  <div class="filters-section">
+    <h3>Filtres avancés</h3>
+    <form class="filters-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Gouvernorat</mat-label>
+        <mat-select [(ngModel)]="filters.governorate" name="governorate">
+          <mat-option value="">Tous</mat-option>
+          <mat-option *ngFor="let g of governorates" [value]="g">{{ g }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Structure</mat-label>
+        <mat-select [(ngModel)]="filters.structure" name="structure">
+          <mat-option value="">Toutes</mat-option>
+          <mat-option *ngFor="let s of structures" [value]="s">{{ s }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Application</mat-label>
+        <mat-select [(ngModel)]="filters.application" name="application">
+          <mat-option value="">Toutes</mat-option>
+          <mat-option *ngFor="let a of applications" [value]="a">{{ a }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="filters.status" name="status">
+          <mat-option value="">Tous</mat-option>
+          <mat-option *ngFor="let st of statuses" [value]="st">{{ st }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Période</mat-label>
+        <mat-select [(ngModel)]="filters.dateRange" name="dateRange">
+          <mat-option value="">Toutes</mat-option>
+          <mat-option *ngFor="let dr of dateRanges" [value]="dr">{{ dr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Type de Graphique</mat-label>
+        <mat-select [(ngModel)]="filters.chartType" name="chartType">
+          <mat-option *ngFor="let ct of chartTypes" [value]="ct">{{ ct | titlecase }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="filter-actions">
+        <button mat-raised-button color="primary" (click)="applyFilters()">
+          <mat-icon>filter_list</mat-icon>
+          Appliquer
+        </button>
+        <button mat-stroked-button (click)="clearFilters()">
+          <mat-icon>clear</mat-icon>
+          Effacer
+        </button>
+        <button mat-stroked-button (click)="refreshData()">
+          <mat-icon>refresh</mat-icon>
+          Actualiser
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Charts and Visualizations -->
+  <div class="visualizations">
+    <!-- Chart.js Bar Chart -->
+    <mat-card class="chart-card">
+        <mat-card-header>
+            <mat-card-title>Performances par Région</mat-card-title>
+        <mat-card-subtitle>Graphique en barres interactif</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+        <div class="chart-container">
+            <canvas baseChart
+              [data]="barChartData"
+              [options]="barChartOptions"
+            [type]="barChartType">
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Chart.js Line Chart -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Évolution des Revenus</mat-card-title>
+        <mat-card-subtitle>Tendance mensuelle</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="lineChartData"
+            [options]="lineChartOptions"
+            [type]="lineChartType">
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Chart.js Pie Chart -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Répartition par Région</mat-card-title>
+        <mat-card-subtitle>Distribution en pourcentage</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="pieChartData"
+            [options]="pieChartOptions"
+            [type]="pieChartType">
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Chart.js Doughnut Chart -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Statut des Paiements</mat-card-title>
+        <mat-card-subtitle>État des factures</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="doughnutChartData"
+            [options]="doughnutChartOptions"
+            [type]="doughnutChartType">
+            </canvas>
+        </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Chart.js Radar Chart -->
+    <mat-card class="chart-card">
+        <mat-card-header>
+        <mat-card-title>Indicateurs de Performance</mat-card-title>
+        <mat-card-subtitle>Objectifs vs Réalisé</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="radarChartData"
+            [options]="radarChartOptions"
+            [type]="radarChartType">
+          </canvas>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- ApexCharts Heatmap -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Heatmap des Retards par Application</mat-card-title>
+        <mat-card-subtitle>Visualisation des anomalies</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <apx-chart
+          [series]="heatmapSeries"
+          [chart]="heatmapChart"
+          [xaxis]="heatmapXAxis"
+          [yaxis]="heatmapYAxis"
+          [dataLabels]="heatmapDataLabels"
+          [grid]="heatmapGrid"
+          [stroke]="heatmapStroke"
+          [title]="heatmapTitle"
+          [legend]="heatmapLegend"
+          [fill]="heatmapFill"
+          [tooltip]="heatmapTooltip"
+          aria-label="Heatmap des retards">
+        </apx-chart>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ApexCharts Trend Chart -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Tendances Annuelles</mat-card-title>
+        <mat-card-subtitle>Revenus et conventions</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <apx-chart
+          [series]="trendSeries"
+          [chart]="trendChart"
+          [xaxis]="trendXAxis"
+          [yaxis]="trendYAxis"
+          aria-label="Tendances annuelles">
+        </apx-chart>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Export Actions -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Exports des Données</mat-card-title>
+        <mat-card-subtitle>Génération de rapports</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="export-actions">
+          <button mat-raised-button color="primary" (click)="exportConventions()">
+            <mat-icon>cloud_download</mat-icon>
+            Exporter les Conventions (CSV)
+          </button>
+          <button mat-raised-button color="accent" (click)="exportInvoices()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Exporter les Factures (PDF)
+          </button>
+          <button mat-raised-button color="warn" (click)="exportData('excel')">
+            <mat-icon>table_chart</mat-icon>
+            Export Excel Complet
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- System Monitoring -->
+    <mat-card class="chart-card" *ngIf="systemStats">
+      <mat-card-header>
+        <mat-card-title>État du Système</mat-card-title>
+        <mat-card-subtitle>Métriques en temps réel</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="system-metrics">
+          <div class="metric-item">
+            <span class="metric-label">CPU:</span>
+            <mat-progress-bar 
+              [value]="systemStats.cpuUsage" 
+              [color]="systemStats.cpuUsage > 80 ? 'warn' : 'primary'">
+            </mat-progress-bar>
+            <span class="metric-value">{{ systemStats.cpuUsage }}%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">RAM:</span>
+            <mat-progress-bar 
+              [value]="systemStats.ramUsage" 
+              [color]="systemStats.ramUsage > 80 ? 'warn' : 'primary'">
+            </mat-progress-bar>
+            <span class="metric-value">{{ systemStats.ramUsage }}%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Disque:</span>
+            <mat-progress-bar 
+              [value]="systemStats.diskUsage" 
+              [color]="systemStats.diskUsage > 80 ? 'warn' : 'primary'">
+            </mat-progress-bar>
+            <span class="metric-value">{{ systemStats.diskUsage }}%</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Alerts Panel -->
+    <mat-card class="chart-card" *ngIf="alerts.length > 0">
+      <mat-card-header>
+        <mat-card-title>Alertes Actives</mat-card-title>
+        <mat-card-subtitle>{{ alerts.length }} alertes en cours</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="alerts-list">
+          <div *ngFor="let alert of alerts" class="alert-item">
+            <span class="alert-chip" [ngClass]="alert.type === 'critical' ? 'alert-critical' : 'alert-warning'">
+              {{ alert.type | titlecase }}
+            </span>
+            <span class="alert-message">{{ alert.message }}</span>
+            <div class="alert-actions">
+              <button mat-icon-button (click)="acknowledgeAlert(alert.id)">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button (click)="dismissAlert(alert.id)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

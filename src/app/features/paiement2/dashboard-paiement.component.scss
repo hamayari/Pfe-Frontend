@@ -1,0 +1,221 @@
+/* Styles du composant dashboard-paiement */ 
+.paiement-dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 2rem 0;
+}
+
+.dashboard-paiement-stats, .dashboard-paiement-notifications, .dashboard-paiement-factures {
+  margin-bottom: 0;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: #f5f8fd;
+  border-radius: 10px;
+  padding: 1.2rem 1rem;
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.04);
+}
+
+.stats-label {
+  font-size: 1rem;
+  color: var(--text-secondary, #757575);
+  font-weight: 500;
+}
+
+.stats-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary-color, #1976d2);
+}
+
+.loading-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+}
+
+.dashboard-paiement-notifications .notif-item {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #eee;
+  font-size: 1.05em;
+}
+
+.dashboard-paiement-notifications .notif-item.lu {
+  opacity: 0.5;
+}
+
+.dashboard-paiement-notifications mat-icon {
+  font-size: 1.5rem;
+}
+
+.notif-message {
+  flex: 1;
+  font-weight: 500;
+}
+
+.notif-date {
+  color: #888;
+  font-size: 0.95em;
+  margin-left: 0.5rem;
+}
+
+.empty-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #888;
+  font-size: 1.1em;
+  padding: 1.5rem 0;
+  justify-content: center;
+}
+
+.facture-filters {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.upload-message {
+  margin-left: 0.7rem;
+  font-size: 0.97em;
+  color: var(--primary-color, #1976d2);
+  font-weight: 500;
+}
+
+.paiement-table {
+  width: 100%;
+  margin-bottom: 1.2rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.paiement-table .timeline-cell {
+  min-width: 220px;
+  max-width: 260px;
+  padding: 0.2rem 0.3rem;
+  background: #f7fafd;
+  border-radius: 10px;
+  box-shadow: none;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.paiement-table app-process-timeline {
+  width: 100%;
+  min-width: 180px;
+  max-width: 240px;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 8px;
+  padding: 0.2rem 0.1rem;
+}
+
+.paiement-table .timeline-wrapper {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0.2rem 0;
+}
+
+.paiement-table .header {
+  background: none;
+  color: var(--primary-color, #1976d2);
+  padding: 0.3rem 0.5rem 0.2rem 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px 6px 0 0;
+  margin-bottom: 0.2rem;
+}
+
+.paiement-table .timeline-title {
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+.paiement-table .timeline-dot {
+  width: 14px;
+  height: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.paiement-table .timeline-item {
+  min-width: 60px;
+  padding: 0 2px;
+}
+
+.paiement-table .timeline-content {
+  max-width: 80px;
+}
+
+.mat-chip {
+  font-size: 1em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .facture-filters {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .paiement-table .timeline-cell, .paiement-table app-process-timeline {
+    min-width: 120px;
+    max-width: 160px;
+  }
+  .paiement-table .timeline-content {
+    max-width: 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .paiement-dashboard-wrapper {
+    padding: 0.5rem 0;
+  }
+  .dashboard-paiement-stats, .dashboard-paiement-notifications, .dashboard-paiement-factures {
+    margin-bottom: 0.7rem;
+    border-radius: 8px;
+  }
+  .stats-item {
+    padding: 0.7rem 0.5rem;
+  }
+  .empty-placeholder {
+    font-size: 1em;
+  }
+} 

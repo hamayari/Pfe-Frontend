@@ -1,0 +1,147 @@
+<div class="login-container" [class.compact]="isModal">
+  <!-- Section gauche - Formulaire -->
+  <div class="login-form-section">
+    <div class="login-form-card">
+      <div class="logo-section" *ngIf="!isModal">
+        <div class="logo-icon">
+          <mat-icon>{{ roleIcon }}</mat-icon>
+        </div>
+        <h1>{{ roleLabel }}</h1>
+        <p *ngIf="selectedRole">Connexion pour le rôle: <strong>{{ selectedRole }}</strong></p>
+        <p *ngIf="!selectedRole">Connectez-vous à votre compte</p>
+      </div>
+      
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <!-- Champ nom d'utilisateur -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nom d'utilisateur</mat-label>
+          <mat-icon matPrefix class="field-icon">person</mat-icon>
+          <input 
+            matInput
+            type="text" 
+            formControlName="username" 
+            placeholder="Nom d'utilisateur*"
+            required>
+          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+            Le nom d'utilisateur est requis
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('username')?.hasError('minlength')">
+            Le nom d'utilisateur doit contenir au moins 3 caractères
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Champ mot de passe -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Mot de passe</mat-label>
+          <mat-icon matPrefix class="field-icon">lock</mat-icon>
+          <input 
+            matInput
+            [type]="showPassword ? 'text' : 'password'" 
+            formControlName="password" 
+            placeholder="Mot de passe*"
+            required>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Le mot de passe est requis
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+            Le mot de passe doit contenir au moins 6 caractères
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Message d'erreur -->
+        <div class="error-message" *ngIf="errorMessage">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Bouton de connexion principal -->
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          class="login-button"
+          [disabled]="!loginForm.valid || isLoading"
+          [class.loading]="isLoading">
+          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+          <mat-icon *ngIf="!isLoading" class="login-icon">arrow_forward</mat-icon>
+          <span>{{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}</span>
+        </button>
+      </form>
+
+      <a href="#" class="forgot-password" (click)="forgotPassword($event)">
+        <mat-icon class="help-icon">help_outline</mat-icon>
+        Mot de passe oublié ?
+      </a>
+
+      <!-- Indication des rôles disponibles -->
+      <div class="role-hints">
+        <span class="role-hint" [class.active]="selectedRole==='ADMIN'">
+          <mat-icon>admin_panel_settings</mat-icon>
+          Admin
+        </span>
+        <span class="role-hint" [class.active]="selectedRole==='COMMERCIAL'">
+          <mat-icon>business</mat-icon>
+          Commercial
+        </span>
+        <span class="role-hint" [class.active]="selectedRole==='PROJECT_MANAGER'">
+          <mat-icon>assignment</mat-icon>
+          Chef de Projet
+        </span>
+        <span class="role-hint" [class.active]="selectedRole==='DECISION_MAKER'">
+          <mat-icon>gavel</mat-icon>
+          Décideur
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section droite - Informations -->
+  <div class="login-info-section" *ngIf="!isModal">
+    <div class="info-content">
+      <div class="info-icon">
+        <mat-icon>security</mat-icon>
+      </div>
+      <h2>Authentification Sécurisée</h2>
+      <p>Accédez à votre espace de travail personnalisé avec des identifiants sécurisés.</p>
+      
+      <div class="features-list">
+        <div class="feature-item">
+          <mat-icon>dashboard</mat-icon>
+          <span>Tableau de bord personnalisé</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>security</mat-icon>
+          <span>Connexion sécurisée</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>accessibility</mat-icon>
+          <span>Interface adaptée à votre rôle</span>
+        </div>
+      </div>
+
+      <div class="credentials-info">
+        <mat-icon>info</mat-icon>
+        <p>Vous serez redirigé vers votre tableau de bord personnalisé après connexion.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+

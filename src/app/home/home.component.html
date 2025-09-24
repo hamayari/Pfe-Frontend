@@ -1,0 +1,342 @@
+<!-- Navigation Bar -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <i>🏢</i>
+      <span>GestionPro</span>
+    </div>
+    
+    <div class="navbar-menu">
+      <a href="#home" class="nav-link" (click)="onNavLinkClick($event, 'home')">Accueil</a>
+      <a href="#about" class="nav-link" (click)="onNavLinkClick($event, 'about')">À propos</a>
+      <a href="#roles" class="nav-link" (click)="onNavLinkClick($event, 'roles')">Rôles</a>
+      <a href="#features" class="nav-link" (click)="onNavLinkClick($event, 'features')">Fonctionnalités</a>
+      <a href="#contact" class="nav-link" (click)="onNavLinkClick($event, 'contact')">Contact</a>
+    </div>
+    
+    <div class="navbar-actions">
+      <button class="btn btn-primary" (click)="navigateToRolesSection()">
+        Se connecter
+      </button>
+      
+      
+      
+      <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+        ☰
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section with Background Image -->
+<section class="hero-section" id="home">
+  <div class="hero-background">
+    <img src="assets/background-theme.svg" alt="Background Theme" class="background-image">
+  </div>
+  
+  <div class="hero-content">
+    <h1 class="hero-title">GestionPro</h1>
+    <h2 class="hero-subtitle">La plateforme de gestion d'entreprise nouvelle génération</h2>
+    <p class="hero-description">
+      Simplifiez la gestion de votre entreprise avec notre solution complète et intuitive. 
+      Accédez à vos outils selon votre rôle et optimisez votre productivité.
+    </p>
+    
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-large" (click)="navigateToRolesSection()">
+        Découvrir nos solutions
+      </button>
+      <button class="btn btn-secondary btn-large" (click)="scrollToSection('about')">
+        En savoir plus
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">À propos de GestionPro</h2>
+      <p class="section-subtitle">
+        Une solution innovante pour la gestion d'entreprise moderne
+      </p>
+    </div>
+    
+    <div class="about-content">
+      <div class="about-text">
+        <h3>Pourquoi choisir GestionPro ?</h3>
+        <p>
+          GestionPro révolutionne la façon dont les entreprises gèrent leurs opérations quotidiennes. 
+          Notre plateforme intuitive s'adapte à chaque rôle et offre des outils spécialisés pour 
+          maximiser l'efficacité et la productivité.
+        </p>
+        
+        <ul class="about-features">
+          <li><i>✅</i> Interface intuitive et moderne</li>
+          <li><i>✅</i> Gestion des rôles et permissions</li>
+          <li><i>✅</i> Tableaux de bord personnalisés</li>
+          <li><i>✅</i> Sécurité de niveau entreprise</li>
+        </ul>
+      </div>
+      
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Entreprises</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">50K+</div>
+          <div class="stat-label">Utilisateurs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">99.9%</div>
+          <div class="stat-label">Disponibilité</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal de connexion avec le LoginComponent -->
+<div class="auth-modal-overlay" *ngIf="showAuthModal" (click)="closeLoginModal()">
+  <div class="auth-modal" (click)="$event.stopPropagation()">
+    <div class="auth-modal-header">
+      <h2>{{ getRoleSpace(selectedRole || '') }}</h2>
+      <button class="close-btn" (click)="closeLoginModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="auth-modal-content">
+      <!-- Utilisation du LoginComponent avec le rôle sélectionné -->
+      <app-login 
+        [selectedRole]="selectedRole || ''"
+        [isModal]="true"
+        (loginSuccess)="closeLoginModal()">
+      </app-login>
+    </div>
+  </div>
+</div>
+
+<!-- Section des rôles -->
+<section id="roles" class="roles-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Choisissez votre espace de travail</h2>
+      <p>Sélectionnez votre rôle pour accéder à votre espace personnalisé</p>
+    </div>
+    
+    <div class="roles-grid">
+      <div class="role-card" *ngFor="let role of roles | keyvalue">
+        <div class="role-icon">
+          <mat-icon [style.color]="role.value.color">{{ getRoleIcon(role.key) }}</mat-icon>
+        </div>
+        <div class="role-content">
+          <h3>{{ role.value.displayName }}</h3>
+          <p>{{ role.value.description }}</p>
+          <ul class="role-responsibilities">
+            <li *ngFor="let responsibility of role.value.responsibilities">
+              {{ responsibility }}
+            </li>
+          </ul>
+          <button class="role-btn" 
+                  [style.background-color]="role.value.color"
+                  (click)="openLoginModal(role.key)">
+            <mat-icon>login</mat-icon>
+            Se connecter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Fonctionnalités principales</h2>
+      <p class="section-subtitle">
+        Découvrez les outils puissants qui font de GestionPro la solution de référence
+      </p>
+    </div>
+    
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">
+          🛡️
+        </div>
+        <h3>Sécurité avancée</h3>
+        <p>Protection des données avec chiffrement de bout en bout et authentification multi-facteurs</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          📱
+        </div>
+        <h3>Responsive design</h3>
+        <p>Interface adaptée à tous les appareils : ordinateur, tablette et smartphone</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          🔄
+        </div>
+        <h3>Synchronisation temps réel</h3>
+        <p>Données synchronisées instantanément entre tous vos appareils et utilisateurs</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          📊
+        </div>
+        <h3>Analytics avancés</h3>
+        <p>Tableaux de bord personnalisables avec analyses détaillées et rapports automatisés</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          👥
+        </div>
+        <h3>Gestion d'équipe</h3>
+        <p>Organisation des équipes avec permissions granulaires et workflows personnalisables</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          ☁️
+        </div>
+        <h3>Cloud sécurisé</h3>
+        <p>Hébergement cloud haute disponibilité avec sauvegarde automatique et récupération d'urgence</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Contactez-nous</h2>
+      <p class="section-subtitle">
+        Une question ? Un projet ? N'hésitez pas à nous contacter
+      </p>
+    </div>
+    
+    <div class="contact-content">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <h4>Adresse</h4>
+            <p>123 Rue de l'Innovation, 75001 Paris, France</p>
+          </div>
+        </div>
+        
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <h4>Email</h4>
+            <p>contact@gestionpro.fr</p>
+          </div>
+        </div>
+        
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <h4>Téléphone</h4>
+            <p>+33 1 23 45 67 89</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="contact-form">
+        <h3>Envoyez-nous un message</h3>
+        <form (ngSubmit)="onSubmitContactForm()">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Nom complet</label>
+              <input type="text" id="name" name="name" class="form-control" 
+                     [(ngModel)]="contactForm.name" required>
+            </div>
+            
+            <div class="contact-item">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" class="form-control" 
+                     [(ngModel)]="contactForm.email" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="subject">Sujet</label>
+            <input type="text" id="subject" name="subject" class="form-control" 
+                   [(ngModel)]="contactForm.subject" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" class="form-control" 
+                      [(ngModel)]="contactForm.message" required></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-block" [disabled]="isProcessing">
+            Envoyer le message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>GestionPro</h4>
+        <p>La plateforme de gestion d'entreprise nouvelle génération, conçue pour optimiser votre productivité et simplifier vos opérations quotidiennes.</p>
+        
+        <div class="social-links">
+          <a href="#">LinkedIn</a>
+          <a href="#">Twitter</a>
+          <a href="#">Facebook</a>
+        </div>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Produits</h4>
+        <ul>
+          <li><a href="#">Gestion des utilisateurs</a></li>
+          <li><a href="#">Tableaux de bord</a></li>
+          <li><a href="#">Rapports et analytics</a></li>
+          <li><a href="#">Intégrations</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Centre d'aide</a></li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Formation</a></li>
+          <li><a href="#">Contact support</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Entreprise</h4>
+        <ul>
+          <li><a href="#">À propos</a></li>
+          <li><a href="#">Carrières</a></li>
+          <li><a href="#">Presse</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2024 GestionPro. Tous droits réservés. | <a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a></p>
+    </div>
+  </div>
+</footer> 

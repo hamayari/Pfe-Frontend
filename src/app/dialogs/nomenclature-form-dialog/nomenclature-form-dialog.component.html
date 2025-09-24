@@ -1,0 +1,97 @@
+<div class="nomenclature-form-dialog">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>category</mat-icon>
+    Ajouter une Nomenclature
+  </h2>
+
+  <form [formGroup]="nomenclatureForm" (ngSubmit)="onSubmit()">
+    <mat-dialog-content class="dialog-content">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Libellé *</mat-label>
+          <input matInput formControlName="libelle" placeholder="Nom de la nomenclature">
+          <mat-error *ngIf="nomenclatureForm.get('libelle')?.invalid">
+            {{ getErrorMessage('libelle') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Type *</mat-label>
+          <mat-select formControlName="type" placeholder="Sélectionnez le type" (selectionChange)="onTypeChange()">
+            <mat-option *ngFor="let type of nomenclatureTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="nomenclatureForm.get('type')?.invalid">
+            Veuillez sélectionner un type
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Version</mat-label>
+          <input matInput formControlName="version" placeholder="Version (ex: 1.0)">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field" *ngIf="nomenclatureForm.get('type')?.value === 'ZONE_GEOGRAPHIQUE'">
+          <mat-label>Gouvernement *</mat-label>
+          <mat-select formControlName="gouvernement" placeholder="Sélectionnez le gouvernement">
+            <mat-option *ngFor="let gouvernement of gouvernorats" [value]="gouvernement.name">
+              {{ gouvernement.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="nomenclatureForm.get('gouvernement')?.invalid">
+            Veuillez sélectionner un gouvernement
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Description *</mat-label>
+          <textarea matInput formControlName="description" rows="3" placeholder="Description détaillée"></textarea>
+          <mat-error *ngIf="nomenclatureForm.get('description')?.invalid">
+            {{ getErrorMessage('description') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Usage *</mat-label>
+          <textarea matInput formControlName="usage" rows="2" placeholder="Comment utiliser cette nomenclature"></textarea>
+          <mat-error *ngIf="nomenclatureForm.get('usage')?.invalid">
+            {{ getErrorMessage('usage') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row options-row">
+        <mat-checkbox formControlName="active" color="primary">
+          Nomenclature active
+        </mat-checkbox>
+        
+        <mat-form-field appearance="outline" class="priority-field">
+          <mat-label>Priorité</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option value="LOW">Faible</mat-option>
+            <mat-option value="MEDIUM">Moyenne</mat-option>
+            <mat-option value="HIGH">Élevée</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button type="button" mat-button (click)="close()" class="cancel-btn">
+        <mat-icon>close</mat-icon>
+        Annuler
+      </button>
+      <button type="submit" mat-flat-button color="primary" [disabled]="nomenclatureForm.invalid" class="submit-btn">
+        <mat-icon>save</mat-icon>
+        Créer la nomenclature
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

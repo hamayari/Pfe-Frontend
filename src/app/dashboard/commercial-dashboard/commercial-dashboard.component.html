@@ -1,0 +1,1004 @@
+<div class="commercial-dashboard-container">
+  <!-- Header Professionnel (même que admin) -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1 class="page-title">Dashboard Commercial</h1>
+    </div>
+    
+    <div class="header-center">
+      <!-- Barre de recherche globale -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="material-icons search-icon">search</i>
+          <input type="text" 
+                 class="search-input" 
+                 placeholder="Rechercher conventions, factures..."
+                 [(ngModel)]="searchQuery"
+                 (keyup.enter)="performSearch()">
+          <button class="search-btn" (click)="performSearch()">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <!-- Notifications -->
+      <div class="notification-container">
+        <button class="header-icon-btn" (click)="toggleNotifications()" [class.has-notifications]="hasNotifications" title="Notifications">
+          <i class="material-icons">notifications</i>
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Messages -->
+      <div class="messages-container">
+        <button class="header-icon-btn" (click)="toggleMessages()" [class.has-messages]="hasMessages" title="Messages">
+          <i class="material-icons">mail</i>
+          <span class="message-badge" *ngIf="messageCount > 0">{{ messageCount }}</span>
+        </button>
+      </div>
+      
+      <!-- Paramètres -->
+      <button class="header-icon-btn" (click)="toggleSettings()" title="Paramètres">
+        <i class="material-icons">settings</i>
+      </button>
+      
+      <!-- Mode sombre/clair -->
+      <button class="header-icon-btn" (click)="toggleDarkMode()" [title]="darkMode ? 'Mode clair' : 'Mode sombre'">
+        <i class="material-icons">{{ darkMode ? 'light_mode' : 'dark_mode' }}</i>
+      </button>
+      
+      <!-- Profil utilisateur -->
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <img [src]="currentUser?.avatar || getDefaultAvatar()" 
+               [alt]="currentUser?.username || 'Commercial'"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+        </div>
+        <div class="user-details">
+          <div class="username">{{ currentUser?.username || 'Commercial' }}</div>
+          <div class="role">Commercial Métier</div>
+        </div>
+        <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
+      </div>
+
+      <!-- Menu dropdown utilisateur -->
+      <div class="user-menu" [class.open]="userMenuOpen">
+        <div class="menu-item" (click)="goToProfile()">
+          <i class="material-icons">person</i>
+          <span>Mon Profil</span>
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item logout" (click)="logout()">
+          <i class="material-icons">logout</i>
+          <span>Se Déconnecter</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar Commercial -->
+  <div class="commercial-sidebar">
+    <!-- Profil utilisateur -->
+    <div class="sidebar-profile">
+      <div class="profile-avatar">
+        <img [src]="currentUser?.avatar || getDefaultAvatar()" 
+             [alt]="currentUser?.username || 'Commercial'"
+             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">{{ currentUser?.username || 'Commercial' }}</div>
+        <div class="profile-role">Commercial Métier</div>
+      </div>
+      <button class="logout-btn" (click)="logout()" mat-icon-button>
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+
+    <!-- Menu principal -->
+    <nav class="sidebar-menu">
+      <!-- Section Tableau de Bord -->
+      <div class="menu-section">
+        <div class="section-title">PRINCIPAL</div>
+        <div class="menu-item" [class.active]="activeSection === 'dashboard'" (click)="setActiveSection('dashboard')">
+          <mat-icon>dashboard</mat-icon>
+          <span>Tableau de Bord</span>
+        </div>
+      </div>
+
+                  <!-- Section Conventions -->
+                  <div class="menu-section">
+                    <div class="section-title">CONVENTIONS</div>
+                    <div class="menu-item" [class.active]="activeSection === 'conventions'" (click)="navigateToConventions()">
+                      <mat-icon>description</mat-icon>
+                      <span>Mes Conventions</span>
+                    </div>
+                    <div class="menu-item" [class.active]="activeSection === 'new-convention'" (click)="setActiveSection('new-convention')">
+                      <mat-icon>add_circle</mat-icon>
+                      <span>Nouvelle Convention</span>
+                    </div>
+                    <div class="menu-item" [class.active]="activeSection === 'convention-tracking'" (click)="setActiveSection('convention-tracking')">
+                      <mat-icon>track_changes</mat-icon>
+                      <span>Suivi Conventions</span>
+                    </div>
+                  </div>
+
+      <!-- Section Factures -->
+      <div class="menu-section">
+        <div class="section-title">FACTURES</div>
+        <div class="menu-item" [class.active]="activeSection === 'invoices'" (click)="navigateToInvoices()">
+          <mat-icon>receipt</mat-icon>
+          <span>Mes Factures</span>
+          <span class="badge" *ngIf="overdueInvoices.length > 0">{{ overdueInvoices.length }}</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'generate-invoice'" (click)="setActiveSection('generate-invoice')">
+          <mat-icon>receipt_long</mat-icon>
+          <span>Générer Facture</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'invoice-status'" (click)="setActiveSection('invoice-status')">
+          <mat-icon>payment</mat-icon>
+          <span>Statuts Factures</span>
+        </div>
+      </div>
+
+      <!-- Section Notifications -->
+      <div class="menu-section">
+        <div class="section-title">NOTIFICATIONS</div>
+        <div class="menu-item" [class.active]="activeSection === 'notifications'" (click)="navigateToNotifications()">
+          <mat-icon>notifications</mat-icon>
+          <span>Alertes</span>
+          <span class="badge" *ngIf="upcomingInvoices.length > 0">{{ upcomingInvoices.length }}</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'due-dates'" (click)="setActiveSection('due-dates')">
+          <mat-icon>schedule</mat-icon>
+          <span>Échéances</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'alerts'" (click)="setActiveSection('alerts')">
+          <mat-icon>warning</mat-icon>
+          <span>Alertes SMS/Email</span>
+        </div>
+      </div>
+
+      <!-- Section Calendrier -->
+      <div class="menu-section">
+        <div class="section-title">CALENDRIER</div>
+        <div class="menu-item" [class.active]="activeSection === 'calendar'" (click)="navigateToCalendar()">
+          <mat-icon>calendar_today</mat-icon>
+          <span>Vue Calendrier</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'events'" (click)="setActiveSection('events')">
+          <mat-icon>event</mat-icon>
+          <span>Événements</span>
+        </div>
+      </div>
+
+      <!-- Section Fonctions secondaires -->
+      <div class="menu-section">
+        <div class="section-title">OUTILS</div>
+        <div class="menu-item" [class.active]="activeSection === 'history'" (click)="setActiveSection('history')">
+          <mat-icon>history</mat-icon>
+          <span>Historique</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'exports'" (click)="setActiveSection('exports')">
+          <mat-icon>cloud_download</mat-icon>
+          <span>Exports</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'reports'" (click)="setActiveSection('reports')">
+          <mat-icon>assessment</mat-icon>
+          <span>Rapports</span>
+        </div>
+      </div>
+
+      <!-- Section Profil -->
+      <div class="menu-section">
+        <div class="section-title">PROFIL</div>
+        <div class="menu-item" [class.active]="activeSection === 'profile'" (click)="setActiveSection('profile')">
+          <mat-icon>person</mat-icon>
+          <span>Mon Profil</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'settings'" (click)="setActiveSection('settings')">
+          <mat-icon>settings</mat-icon>
+          <span>Paramètres</span>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <!-- Header Professionnel (identique au dashboard admin) -->
+    <header class="dashboard-header">
+      <div class="header-left">
+        <h1 class="page-title">Dashboard Commercial</h1>
+      </div>
+      
+      <div class="header-center">
+        <!-- Barre de recherche globale -->
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <i class="material-icons search-icon">search</i>
+            <input type="text" 
+                   class="search-input" 
+                   placeholder="Rechercher conventions, factures, clients..."
+                   [(ngModel)]="searchQuery"
+                   (keyup.enter)="performSearch()">
+            <button class="search-btn" (click)="performSearch()">
+              <i class="material-icons">search</i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="header-right">
+        <!-- Notifications -->
+        <div class="notification-container">
+          <button class="header-icon-btn" (click)="toggleNotifications()" [class.has-notifications]="hasNotifications" title="Notifications">
+            <i class="material-icons">notifications</i>
+            <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+          </button>
+        </div>
+        
+        <!-- Messages -->
+        <div class="messages-container">
+          <button class="header-icon-btn" (click)="toggleMessages()" [class.has-messages]="hasMessages" title="Messages">
+            <i class="material-icons">mail</i>
+            <span class="message-badge" *ngIf="messageCount > 0">{{ messageCount }}</span>
+          </button>
+        </div>
+        
+        <!-- Paramètres -->
+        <button class="header-icon-btn" (click)="toggleSettings()" title="Paramètres">
+          <i class="material-icons">settings</i>
+        </button>
+        
+        <!-- Mode sombre/clair -->
+        <button class="header-icon-btn" (click)="toggleDarkMode()" [title]="darkMode ? 'Mode clair' : 'Mode sombre'">
+          <i class="material-icons">{{ darkMode ? 'light_mode' : 'dark_mode' }}</i>
+        </button>
+        
+        <!-- Profil utilisateur -->
+        <div class="user-profile" (click)="toggleUserMenu()">
+          <div class="user-avatar">
+            <img [src]="currentUser?.avatar || getDefaultAvatar()" 
+                 [alt]="currentUser?.username || 'Commercial'"
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+          </div>
+          <div class="user-details">
+            <div class="username">{{ currentUser?.username || 'Commercial' }}</div>
+            <div class="role">Commercial Métier</div>
+          </div>
+          <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
+        </div>
+
+        <!-- Menu dropdown utilisateur -->
+        <div class="user-menu" [class.open]="userMenuOpen">
+          <div class="menu-item" (click)="goToProfile()">
+            <i class="material-icons">person</i>
+            <span>Mon Profil</span>
+          </div>
+          <div class="menu-divider"></div>
+          <div class="menu-item logout" (click)="logout()">
+            <i class="material-icons">logout</i>
+            <span>Se Déconnecter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Actions rapides compactes -->
+    <div class="quick-actions-compact">
+      <div class="action-group">
+        <button class="action-btn primary" (click)="createConvention()" matTooltip="Nouvelle Convention">
+          <mat-icon>add</mat-icon>
+          <span class="action-label">Nouvelle Convention</span>
+        </button>
+        <button class="action-btn secondary" (click)="generateInvoices()" 
+                [disabled]="selectedConventions.length === 0"
+                matTooltip="Générer Factures">
+          <mat-icon>receipt_long</mat-icon>
+          <span class="action-label">Générer Facture</span>
+          <span class="action-badge" *ngIf="selectedConventions.length > 0">{{ selectedConventions.length }}</span>
+        </button>
+        <button class="action-btn tertiary" [matMenuTriggerFor]="exportMenu" matTooltip="Exporter">
+          <mat-icon>download</mat-icon>
+          <span class="action-label">Exporter</span>
+        </button>
+      </div>
+
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportData()">
+          <mat-icon>table_chart</mat-icon>
+          Conventions Excel
+        </button>
+        <button mat-menu-item (click)="exportData()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Conventions PDF
+        </button>
+        <button mat-menu-item (click)="exportData()">
+          <mat-icon>table_chart</mat-icon>
+          Factures Excel
+        </button>
+        <button mat-menu-item (click)="exportData()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Factures PDF
+        </button>
+      </mat-menu>
+    </div>
+
+    <!-- Zone KPI (grille 2x2 responsive) -->
+    <div class="kpi-section">
+      <div class="kpi-grid">
+        <!-- Conventions Totales -->
+        <div class="kpi-card clickable" (click)="drillDown('conventions')">
+          <div class="kpi-header">
+            <div class="kpi-icon success">
+              <mat-icon>description</mat-icon>
+            </div>
+            <div class="kpi-title">
+              <h3>{{ kpiMetrics.totalConventions }}</h3>
+              <p>Conventions Totales</p>
+            </div>
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-detail" (click)="drillDown('conventions-active', $event)">
+              <span class="detail-label">Actives</span>
+              <span class="detail-value success">{{ kpiMetrics.activeConventions }}</span>
+            </div>
+            <div class="kpi-detail" (click)="drillDown('conventions-expired', $event)">
+              <span class="detail-label">Expirées</span>
+              <span class="detail-value warning">{{ kpiMetrics.expiredConventions }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Factures Totales -->
+        <div class="kpi-card clickable" (click)="drillDown('invoices')">
+          <div class="kpi-header">
+            <div class="kpi-icon primary">
+              <mat-icon>receipt</mat-icon>
+            </div>
+            <div class="kpi-title">
+              <h3>{{ kpiMetrics.totalInvoices }}</h3>
+              <p>Factures Totales</p>
+            </div>
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-detail" (click)="drillDown('invoices-paid', $event)">
+              <span class="detail-label">Payées</span>
+              <span class="detail-value success">{{ kpiMetrics.paidInvoices }}</span>
+            </div>
+            <div class="kpi-detail" (click)="drillDown('invoices-overdue', $event)">
+              <span class="detail-label">En retard</span>
+              <span class="detail-value danger">{{ kpiMetrics.overdueInvoices }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Taux de Recouvrement -->
+        <div class="kpi-card clickable" (click)="drillDown('collection-rate')">
+          <div class="kpi-header">
+            <div class="kpi-icon warning">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="kpi-title">
+              <h3>{{ getCollectionRate() | number:'1.0-1' }}%</h3>
+              <p>Taux de Recouvrement</p>
+            </div>
+          </div>
+          <div class="kpi-progress">
+            <mat-progress-bar mode="determinate" [value]="getCollectionRate()" color="primary"></mat-progress-bar>
+            <div class="kpi-details">
+              <span class="detail-label">En attente</span>
+              <span class="detail-value">{{ getPendingAmount() | currency:'EUR' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Délai Moyen de Paiement -->
+        <div class="kpi-card clickable" (click)="drillDown('payment-delay')">
+          <div class="kpi-header">
+            <div class="kpi-icon info">
+              <mat-icon>schedule</mat-icon>
+            </div>
+            <div class="kpi-title">
+              <h3>{{ getAveragePaymentTime() | number:'1.0-0' }} jours</h3>
+              <p>Délai Moyen</p>
+            </div>
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-detail">
+              <span class="detail-label">Revenus mensuels</span>
+              <span class="detail-value">{{ kpiMetrics.monthlyRevenue | currency:'EUR' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertes critiques (bandeau compact) -->
+    <div class="alerts-banner" *ngIf="overdueInvoices.length > 0 || upcomingInvoices.length > 0">
+      <div class="alert-item danger" *ngIf="overdueInvoices.length > 0" (click)="drillDown('invoices-overdue')">
+        <div class="alert-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="alert-content">
+          <span class="alert-count">{{ overdueInvoices.length }}</span>
+          <span class="alert-text">Facture(s) en retard</span>
+        </div>
+        <div class="alert-actions">
+          <button mat-icon-button (click)="sendReminder(overdueInvoices[0])" matTooltip="Envoyer rappel">
+            <mat-icon>email</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert-item warning" *ngIf="upcomingInvoices.length > 0" (click)="drillDown('invoices-upcoming')">
+        <div class="alert-icon">
+          <mat-icon>schedule</mat-icon>
+        </div>
+        <div class="alert-content">
+          <span class="alert-count">{{ upcomingInvoices.length }}</span>
+          <span class="alert-text">Facture(s) à échéance</span>
+        </div>
+        <div class="alert-actions">
+          <button mat-icon-button (click)="viewUpcomingInvoices($event)" matTooltip="Voir détails">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglets de suivi (restructurés) -->
+    <div class="tabs-section">
+      <mat-tab-group class="modern-tabs" [selectedIndex]="activeTabIndex" (selectedIndexChange)="onTabChange($event)">
+        <!-- Onglet Conventions -->
+        <mat-tab label="Conventions">
+          <div class="tab-content">
+            <!-- Filtres et actions -->
+            <div class="tab-toolbar">
+              <div class="search-section">
+                <mat-form-field appearance="outline" class="search-field">
+                  <mat-label>Rechercher conventions</mat-label>
+                  <input matInput placeholder="Référence, titre, gouvernorat..." 
+                         [(ngModel)]="searchTerm" 
+                         (input)="onConventionSearch($event)">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+              </div>
+              <div class="actions-section">
+                <span class="selection-info" *ngIf="selectedConventions.length > 0">
+                  {{ selectedConventions.length }} sélectionnée(s)
+                </span>
+                <button mat-stroked-button (click)="clearFilters()" *ngIf="searchTerm">
+                  <mat-icon>clear</mat-icon>
+                  Effacer
+                </button>
+              </div>
+            </div>
+
+            <!-- Tableau des conventions -->
+            <mat-card class="table-card">
+              <mat-card-header>
+                <mat-card-title>Mes Conventions</mat-card-title>
+                <div class="card-actions">
+                  <button mat-icon-button [matMenuTriggerFor]="exportConventionsMenu" matTooltip="Exporter">
+                    <mat-icon>download</mat-icon>
+                  </button>
+                  <mat-menu #exportConventionsMenu="matMenu">
+                    <button mat-menu-item (click)="exportData()">
+                      <mat-icon>table_chart</mat-icon>
+                      Excel
+                    </button>
+                    <button mat-menu-item (click)="exportData()">
+                      <mat-icon>picture_as_pdf</mat-icon>
+                      PDF
+                    </button>
+                  </mat-menu>
+                </div>
+              </mat-card-header>
+          <mat-card-content>
+            <div class="table-container">
+              <table mat-table [dataSource]="filteredConventions" class="data-table">
+                <!-- Checkbox Column -->
+                <ng-container matColumnDef="select">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                                  [checked]="selection.hasValue() && isAllSelected()"
+                                  [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                  </th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                                  (change)="selection.toggle(row); toggleConventionSelection(row.id)"
+                                  [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                  </td>
+                </ng-container>
+
+                <!-- Référence -->
+                <ng-container matColumnDef="reference">
+                  <th mat-header-cell *matHeaderCellDef>Référence</th>
+                  <td mat-cell *matCellDef="let element">{{ element.reference }}</td>
+                </ng-container>
+
+                <!-- Titre -->
+                <ng-container matColumnDef="title">
+                  <th mat-header-cell *matHeaderCellDef>Titre</th>
+                  <td mat-cell *matCellDef="let element">{{ element.title }}</td>
+                </ng-container>
+
+                <!-- Gouvernorat -->
+                <ng-container matColumnDef="governorate">
+                  <th mat-header-cell *matHeaderCellDef>Gouvernorat</th>
+                  <td mat-cell *matCellDef="let element">{{ element.governorate }}</td>
+                </ng-container>
+
+                <!-- Statut -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Statut</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span class="status-badge" [ngClass]="getStatusClass(element.status)">
+                      {{ getStatusLabel(element.status) }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Montant -->
+                <ng-container matColumnDef="amount">
+                  <th mat-header-cell *matHeaderCellDef>Montant</th>
+                  <td mat-cell *matCellDef="let element">{{ element.amount | currency:'EUR' }}</td>
+                </ng-container>
+
+                <!-- Date d'échéance -->
+                <ng-container matColumnDef="dueDate">
+                  <th mat-header-cell *matHeaderCellDef>Échéance</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span [ngClass]="{'overdue': isOverdue(element.dueDate)}">
+                      {{ element.dueDate | date:'shortDate' }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Colonne Tags -->
+                <ng-container matColumnDef="tags">
+                  <th mat-header-cell *matHeaderCellDef>Tag</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span *ngIf="element.tag" [ngClass]="getTagClass(element.tag)" class="tag-chip-designed">{{ element.tag }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Actions -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button [matMenuTriggerFor]="actionMenu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #actionMenu="matMenu">
+                      <button mat-menu-item (click)="editConvention(element)">
+                        <mat-icon>edit</mat-icon>
+                        Modifier
+                      </button>
+                      <button mat-menu-item (click)="deleteConvention(element)" class="delete-action">
+                        <mat-icon>delete</mat-icon>
+                        Supprimer
+                      </button>
+                      <button mat-menu-item (click)="addTagToConvention(element, 'Prioritaire')">
+                        <mat-icon>label</mat-icon>
+                        Ajouter tag: Prioritaire
+                      </button>
+                      <button mat-menu-item (click)="addTagToConvention(element, 'Important')">
+                        <mat-icon>label</mat-icon>
+                        Ajouter tag: Important
+                      </button>
+                      <button mat-menu-item (click)="addTagToConvention(element, 'Urgent')">
+                        <mat-icon>label</mat-icon>
+                        Ajouter tag: Urgent
+                      </button>
+                      <button mat-menu-item (click)="addTagToConvention(element, 'Nouveau')">
+                        <mat-icon>label</mat-icon>
+                        Ajouter tag: Nouveau
+                      </button>
+                      <button mat-menu-item (click)="addTagToConvention(element, 'Renouvellement')">
+                        <mat-icon>label</mat-icon>
+                        Ajouter tag: Renouvellement
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="conventionColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: conventionColumns;"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Factures -->
+    <mat-tab label="Factures">
+      <div class="tab-content">
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Mes Factures</mat-card-title>
+            <div class="card-actions">
+              <span class="selection-info" *ngIf="selectedInvoices.length > 0">
+                {{ selectedInvoices.length }} sélectionnée(s)
+              </span>
+              <button mat-stroked-button color="warn" (click)="deleteAllInvoices()" 
+                      matTooltip="Supprimer toutes les factures">
+                <mat-icon>delete_forever</mat-icon>
+                Supprimer toutes
+              </button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="table-container">
+              <table mat-table [dataSource]="filteredInvoices" class="data-table">
+                <!-- Checkbox Column -->
+                <ng-container matColumnDef="select">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox></mat-checkbox>
+                  </th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (change)="toggleInvoiceSelection(row.id)"></mat-checkbox>
+                  </td>
+                </ng-container>
+
+                <!-- Numéro de facture -->
+                <ng-container matColumnDef="invoiceNumber">
+                  <th mat-header-cell *matHeaderCellDef>N° Facture</th>
+                  <td mat-cell *matCellDef="let element">{{ element.reference || element.invoiceNumber || 'N/A' }}</td>
+                </ng-container>
+
+                <!-- Convention -->
+                <ng-container matColumnDef="convention">
+                  <th mat-header-cell *matHeaderCellDef>Convention</th>
+                  <td mat-cell *matCellDef="let element">{{ element.conventionReference || 'N/A' }}</td>
+                </ng-container>
+
+                <!-- Montant -->
+                <ng-container matColumnDef="amount">
+                  <th mat-header-cell *matHeaderCellDef>Montant</th>
+                  <td mat-cell *matCellDef="let element">{{ element.amount | currency:'EUR' }}</td>
+                </ng-container>
+
+                <!-- Statut -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Statut</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span class="status-badge" [ngClass]="getInvoiceStatusClass(element.status)">
+                      {{ getInvoiceStatusLabel(element.status) }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Date d'échéance -->
+                <ng-container matColumnDef="dueDate">
+                  <th mat-header-cell *matHeaderCellDef>Échéance</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span [ngClass]="{'overdue': isOverdue(element.dueDate)}">
+                      {{ element.dueDate | date:'shortDate' }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Retard -->
+                <ng-container matColumnDef="overdue">
+                  <th mat-header-cell *matHeaderCellDef>Retard</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span [ngClass]="getOverdueStatusClass(element)" class="overdue-status">
+                      {{ getOverdueStatusText(element) }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Actions -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button [matMenuTriggerFor]="invoiceActionMenu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #invoiceActionMenu="matMenu">
+                      <button mat-menu-item (click)="sendReminder(element)">
+                        <mat-icon>email</mat-icon>
+                        Envoyer rappel
+                      </button>
+                      <button mat-menu-item (click)="markAsPaid(element)">
+                        <mat-icon>check_circle</mat-icon>
+                        Marquer comme payée
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="downloadInvoicePDF(element)">
+                        <mat-icon>picture_as_pdf</mat-icon>
+                        Télécharger PDF
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="deleteSelectedInvoices()" 
+                              [disabled]="selectedInvoices.length === 0"
+                              class="delete-action">
+                        <mat-icon>delete_forever</mat-icon>
+                        Supprimer toutes ({{ selectedInvoices.length }})
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="invoiceColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: invoiceColumns;"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Notifications -->
+    <mat-tab label="Notifications">
+      <div class="tab-content">
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Historique des Notifications</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="notifications-list">
+              <div class="notification-item">
+                <div class="notification-icon">
+                  <mat-icon class="notification-email">email</mat-icon>
+                </div>
+                <div class="notification-content">
+                  <div class="notification-header">
+                    <span class="notification-subject">Rappel de paiement envoyé</span>
+                    <span class="notification-time">{{ currentDate | date:'short' }}</span>
+                  </div>
+                  <div class="notification-details">
+                    <span class="notification-recipient">client@example.com</span>
+                    <span class="notification-status status-sent">Envoyé</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Calendrier -->
+    <mat-tab label="Calendrier">
+      <div class="tab-content">
+        <div class="calendar-controls">
+          <button mat-flat-button color="primary">
+            <mat-icon>calendar_today</mat-icon>
+            Vue Calendrier
+          </button>
+          <button mat-stroked-button color="accent" [matMenuTriggerFor]="exportCalendarMenu">
+            <mat-icon>download</mat-icon>
+            Exporter Calendrier
+          </button>
+          <mat-menu #exportCalendarMenu="matMenu">
+            <button mat-menu-item>
+              <mat-icon>event</mat-icon>
+              Format iCal (.ics)
+            </button>
+            <button mat-menu-item>
+              <mat-icon>picture_as_pdf</mat-icon>
+              PDF
+            </button>
+            <button mat-menu-item>
+              <mat-icon>table_chart</mat-icon>
+              Excel
+            </button>
+          </mat-menu>
+        </div>
+
+        <div class="calendar-events-list">
+          <mat-card class="table-card">
+            <mat-card-header>
+              <mat-card-title>Événements du Calendrier</mat-card-title>
+              <mat-card-subtitle>Prochaines échéances et événements importants</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="events-list">
+                <div class="event-item event-pending" *ngFor="let convention of conventions.slice(0, 5)">
+                  <div class="event-icon">
+                    <mat-icon>schedule</mat-icon>
+                  </div>
+                  <div class="event-details">
+                    <div class="event-title">{{ convention.title }}</div>
+                    <div class="event-description">Échéance: {{ convention.dueDate | date:'fullDate' }}</div>
+                    <div class="event-date">{{ convention.dueDate | date:'shortDate' }}</div>
+                  </div>
+                  <div class="event-status">
+                    <span class="status-badge">{{ getStatusLabel(convention.status) }}</span>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- Cycle de Vente (timeline horizontale simplifiée) -->
+    <div class="sales-cycle-section">
+      <div class="section-header">
+        <h2>Cycle de Vente</h2>
+        <p>Suivi du processus commercial</p>
+      </div>
+      <div class="timeline-horizontal">
+        <div class="timeline-step completed" (click)="drillDown('conventions')">
+          <div class="step-icon">
+            <mat-icon>description</mat-icon>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Création Convention</div>
+            <div class="step-count">{{ kpiMetrics.totalConventions }}</div>
+            <div class="step-status">Validé</div>
+          </div>
+        </div>
+        
+        <div class="timeline-connector completed"></div>
+        
+        <div class="timeline-step active" (click)="drillDown('invoices')">
+          <div class="step-icon">
+            <mat-icon>receipt</mat-icon>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Génération Facture</div>
+            <div class="step-count">{{ kpiMetrics.totalInvoices }}</div>
+            <div class="step-status">En cours</div>
+          </div>
+        </div>
+        
+        <div class="timeline-connector" [class.completed]="kpiMetrics.paidInvoices > 0"></div>
+        
+        <div class="timeline-step" [class.completed]="kpiMetrics.paidInvoices > 0" (click)="drillDown('payments')">
+          <div class="step-icon">
+            <mat-icon>payment</mat-icon>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Suivi Paiement</div>
+            <div class="step-count">{{ kpiMetrics.paidInvoices }}</div>
+            <div class="step-status">{{ kpiMetrics.paidInvoices > 0 ? 'Payé' : 'En attente' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone Analytique -->
+    <div class="analytics-section">
+      <div class="section-header">
+        <h2>Analyses & Rapports</h2>
+        <p>Vue d'ensemble des performances</p>
+      </div>
+      <div class="analytics-grid">
+        <!-- Graphique Factures par Mois -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>Factures par Mois</h3>
+            <button mat-icon-button [matMenuTriggerFor]="chartMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #chartMenu="matMenu">
+              <button mat-menu-item (click)="exportChart('monthly')">
+                <mat-icon>download</mat-icon>
+                Exporter
+              </button>
+            </mat-menu>
+          </div>
+          <div class="chart-container">
+            <div class="chart-placeholder">
+              <mat-icon>bar_chart</mat-icon>
+              <p>Graphique en barres - Factures mensuelles</p>
+              <div class="chart-data">
+                <div class="chart-bar" style="height: 60%">
+                  <span class="bar-value">€45K</span>
+                </div>
+                <div class="chart-bar" style="height: 80%">
+                  <span class="bar-value">€52K</span>
+                </div>
+                <div class="chart-bar" style="height: 45%">
+                  <span class="bar-value">€38K</span>
+                </div>
+                <div class="chart-bar" style="height: 70%">
+                  <span class="bar-value">€48K</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graphique Conventions par Gouvernorat -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>Conventions par Gouvernorat</h3>
+            <button mat-icon-button [matMenuTriggerFor]="pieChartMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #pieChartMenu="matMenu">
+              <button mat-menu-item (click)="exportChart('governorate')">
+                <mat-icon>download</mat-icon>
+                Exporter
+              </button>
+            </mat-menu>
+          </div>
+          <div class="chart-container">
+            <div class="chart-placeholder">
+              <mat-icon>pie_chart</mat-icon>
+              <p>Graphique camembert - Répartition géographique</p>
+              <div class="pie-data">
+                <div class="pie-segment" style="--percentage: 35%; --color: #4F8DF9;">
+                  <span class="segment-label">Tunis (35%)</span>
+                </div>
+                <div class="pie-segment" style="--percentage: 25%; --color: #2ECC71;">
+                  <span class="segment-label">Sfax (25%)</span>
+                </div>
+                <div class="pie-segment" style="--percentage: 20%; --color: #F39C12;">
+                  <span class="segment-label">Sousse (20%)</span>
+                </div>
+                <div class="pie-segment" style="--percentage: 20%; --color: #E74C3C;">
+                  <span class="segment-label">Autres (20%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Ajoute cette méthode dans le composant TS :
+// getTagClass(tag: string): string {
+//   switch (tag?.toLowerCase()) {
+//     case 'important': return 'tag-important';
+//     case 'prioritaire': return 'tag-prioritaire';
+//     case 'renouvellement': return 'tag-renouvellement';
+//     case 'urgent': return 'tag-urgent';
+//     default: return 'tag-default';
+//   }
+// }
+</script>
+<style>
+.tag-chip-designed {
+  display: inline-block;
+  border-radius: 16px;
+  padding: 2px 12px;
+  font-size: 0.95em;
+  font-weight: 500;
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  box-shadow: 0 1px 2px rgba(25, 118, 210, 0.08);
+}
+.tag-important {
+  background: #fff3e0;
+  color: #e65100;
+}
+.tag-prioritaire {
+  background: #ffebee;
+  color: #c62828;
+}
+.tag-renouvellement {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.tag-urgent {
+  background: #ffeb3b;
+  color: #d84315;
+}
+.tag-default {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+</style>

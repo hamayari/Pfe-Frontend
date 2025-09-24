@@ -1,0 +1,374 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-container">
+      <!-- Basic Information Section -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>info</mat-icon>
+            Informations de base
+          </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <!-- Reference -->
+            <mat-form-field appearance="outline" class="reference-field">
+              <mat-label>Référence</mat-label>
+              <input matInput formControlName="reference" placeholder="Référence de la convention" required>
+              <mat-hint>La référence est générée automatiquement</mat-hint>
+              <mat-error *ngIf="form.get('reference')?.hasError('required')">
+                La référence est obligatoire
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Status -->
+            <mat-form-field appearance="outline" class="status-field">
+              <mat-label>Statut</mat-label>
+              <mat-select formControlName="status" required>
+                <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                  {{ status.label }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.get('status')?.hasError('required')">
+                Le statut est obligatoire
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Label -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Libellé</mat-label>
+            <input matInput formControlName="label" placeholder="Libellé de la convention" required>
+            <mat-error *ngIf="form.get('label')?.hasError('required')">
+              Le libellé est obligatoire
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" placeholder="Description détaillée" rows="3"></textarea>
+            <mat-hint>Maximum 1000 caractères</mat-hint>
+          </mat-form-field>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Dates Section -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>date_range</mat-icon>
+            Période de validité
+          </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <!-- Start Date -->
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Date de début</mat-label>
+              <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" required>
+              <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+              <mat-error *ngIf="form.get('startDate')?.hasError('required')">
+                La date de début est obligatoire
+              </mat-error>
+            </mat-form-field>
+
+            <!-- End Date -->
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Date de fin</mat-label>
+              <input matInput [matDatepicker]="endDatePicker" formControlName="endDate" required>
+              <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+              <mat-error *ngIf="form.get('endDate')?.hasError('required')">
+                La date de fin est obligatoire
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="date-validation-error" *ngIf="form.get('endDate')?.value && form.get('startDate')?.value && 
+              form.get('endDate')?.value < form.get('startDate')?.value">
+            <mat-icon>warning</mat-icon>
+            <span>La date de fin doit être postérieure à la date de début</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Nomenclature Section -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>category</mat-icon>
+            Nomenclatures
+          </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <!-- Application -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Application</mat-label>
+            <input type="text" matInput formControlName="applicationId" 
+                   [matAutocomplete]="autoApplication" required>
+            <mat-autocomplete #autoApplication="matAutocomplete" [displayWith]="displayNomenclature">
+              <mat-option *ngFor="let option of filteredApplications | async" [value]="option">
+                {{ option.code }} - {{ option.label }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="form.get('applicationId')?.hasError('required')">
+              L'application est obligatoire
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Zone -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Zone</mat-label>
+            <input type="text" matInput formControlName="zoneId" 
+                   [matAutocomplete]="autoZone" required>
+            <mat-autocomplete #autoZone="matAutocomplete" [displayWith]="displayNomenclature">
+              <mat-option *ngFor="let option of filteredZones | async" [value]="option">
+                {{ option.code }} - {{ option.label }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="form.get('zoneId')?.hasError('required')">
+              La zone est obligatoire
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Structure -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Structure</mat-label>
+            <input type="text" matInput formControlName="structureId" 
+                   [matAutocomplete]="autoStructure" required>
+            <mat-autocomplete #autoStructure="matAutocomplete" [displayWith]="displayNomenclature">
+              <mat-option *ngFor="let option of filteredStructures | async" [value]="option">
+                {{ option.code }} - {{ option.label }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="form.get('structureId')?.hasError('required')">
+              La structure est obligatoire
+            </mat-error>
+          </mat-form-field>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Team Section -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>people</mat-icon>
+            Équipe
+          </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <!-- Commercial -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Commercial</mat-label>
+            <input type="text" matInput formControlName="commercialId" 
+                   [matAutocomplete]="autoCommercial" required>
+            <mat-autocomplete #autoCommercial="matAutocomplete" [displayWith]="displayUser">
+              <mat-option *ngFor="let option of filteredCommercials | async" [value]="option">
+                {{ option.firstName }} {{ option.lastName }} ({{ option.email }})
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="form.get('commercialId')?.hasError('required')">
+              Le commercial est obligatoire
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Project Manager -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Chef de projet (optionnel)</mat-label>
+            <input type="text" matInput formControlName="projectManagerId" 
+                   [matAutocomplete]="autoProjectManager">
+            <mat-autocomplete #autoProjectManager="matAutocomplete" [displayWith]="displayUser">
+              <mat-option *ngFor="let option of filteredProjectManagers | async" [value]="option">
+                {{ option.firstName }} {{ option.lastName }} ({{ option.email }})
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Financial Information Section -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>euro_symbol</mat-icon>
+            Informations financières
+          </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <!-- Total Amount -->
+            <mat-form-field appearance="outline" class="amount-field">
+              <mat-label>Montant total</mat-label>
+              <input matInput type="number" formControlName="totalAmount" min="0" step="0.01" required>
+              <span matTextSuffix>{{ form.get('currency')?.value || 'MAD' }} &nbsp;</span>
+              <mat-error *ngIf="form.get('totalAmount')?.hasError('required')">
+                Le montant est obligatoire
+              </mat-error>
+              <mat-error *ngIf="form.get('totalAmount')?.hasError('min')">
+                Le montant doit être positif
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Currency -->
+            <mat-form-field appearance="outline" class="currency-field">
+              <mat-label>Devise</mat-label>
+              <mat-select formControlName="currency" required>
+                <mat-option *ngFor="let currency of currencyOptions" [value]="currency.value">
+                  {{ currency.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Payment Terms -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="payment-terms-field">
+              <mat-label>Conditions de paiement</mat-label>
+              <mat-select formControlName="paymentTerms" required>
+                <mat-option *ngFor="let term of paymentTermOptions" [value]="term.value">
+                  {{ term.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Custom Payment Term Days -->
+            <mat-form-field appearance="outline" class="custom-days-field" 
+                          *ngIf="form.get('paymentTerms')?.value === 'CUSTOM'">
+              <mat-label>Nombre de jours</mat-label>
+              <input matInput type="number" formControlName="customPaymentTermDays" min="1" max="365">
+              <span matSuffix>jours</span>
+              <mat-error *ngIf="form.get('customPaymentTermDays')?.hasError('required')">
+                Le nombre de jours est obligatoire
+              </mat-error>
+              <mat-error *ngIf="form.get('customPaymentTermDays')?.hasError('min')">
+                Minimum 1 jour
+              </mat-error>
+              <mat-error *ngIf="form.get('customPaymentTermDays')?.hasError('max')">
+                Maximum 365 jours
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Additional Information Section -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>note</mat-icon>
+            Informations complémentaires
+          </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <!-- Notes -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notes internes</mat-label>
+            <textarea matInput formControlName="notes" placeholder="Notes internes non visibles par le client" rows="3"></textarea>
+            <mat-hint>Ces notes sont réservées à un usage interne</mat-hint>
+          </mat-form-field>
+
+          <!-- Terms and Conditions -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Conditions générales</mat-label>
+            <textarea matInput formControlName="termsAndConditions" placeholder="Conditions générales de la convention" rows="5"></textarea>
+            <mat-hint>Ces conditions seront incluses dans le document final</mat-hint>
+          </mat-form-field>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Documents Section -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>attach_file</mat-icon>
+            Documents associés
+          </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div formArrayName="documents" *ngIf="!isViewMode">
+            <div *ngFor="let document of documents.controls; let i = index" [formGroupName]="i" class="document-row">
+              <div class="document-preview" *ngIf="document.get('file')?.value">
+                <mat-icon>insert_drive_file</mat-icon>
+                <span class="file-name">{{ document.get('name')?.value }}</span>
+                <button mat-icon-button color="warn" (click)="removeDocument(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              
+              <div class="document-upload" *ngIf="!document.get('file')?.value">
+                <input type="file" #fileInput (change)="onFileSelected($event, i)" style="display: none">
+                <button mat-stroked-button type="button" (click)="fileInput.click()">
+                  <mat-icon>cloud_upload</mat-icon>
+                  Sélectionner un fichier
+                </button>
+                <span class="file-hint" *ngIf="!document.get('file')?.value">
+                  Aucun fichier sélectionné
+                </span>
+                <button mat-icon-button color="warn" (click)="removeDocument(i)" *ngIf="documents.length > 1">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              
+              <mat-form-field appearance="outline" class="full-width document-description">
+                <mat-label>Description du document</mat-label>
+                <input matInput formControlName="description" placeholder="Description du document">
+              </mat-form-field>
+            </div>
+            
+            <div class="add-document">
+              <button mat-button type="button" (click)="addDocument()" color="primary">
+                <mat-icon>add</mat-icon>
+                Ajouter un document
+              </button>
+            </div>
+          </div>
+          
+          <div *ngIf="isViewMode && documents.length === 0" class="no-documents">
+            <p>Aucun document associé à cette convention</p>
+          </div>
+          
+          <div *ngIf="isViewMode && documents.length > 0" class="documents-list">
+            <div *ngFor="let doc of documents.controls; let i = index" class="document-item">
+              <mat-icon>insert_drive_file</mat-icon>
+              <div class="document-info">
+                <div class="document-name">{{ doc.get('name')?.value }}</div>
+                <div class="document-description" *ngIf="doc.get('description')?.value">
+                  {{ doc.get('description')?.value }}
+                </div>
+              </div>
+              <button mat-icon-button color="primary" (click)="downloadDocument(doc.get('file')?.value)">
+                <mat-icon>download</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isSubmitting">
+    {{ isViewMode ? 'Fermer' : 'Annuler' }}
+  </button>
+  <button mat-raised-button 
+          color="primary" 
+          (click)="onSubmit()" 
+          [disabled]="!isFormValid || isSubmitting"
+          *ngIf="!isViewMode">
+    <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+    <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+    {{ submitButtonText }}
+  </button>
+</mat-dialog-actions>

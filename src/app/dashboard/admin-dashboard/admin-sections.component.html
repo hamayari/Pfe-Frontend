@@ -1,0 +1,158 @@
+<div class="admin-sections-container">
+  <!-- Header de la page -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Sections Administratives
+      </h1>
+      <p class="page-subtitle">Accédez rapidement à toutes les fonctionnalités d'administration</p>
+    </div>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="quick-actions-section">
+    <h2 class="section-title">
+      <mat-icon>flash_on</mat-icon>
+      Actions Rapides
+    </h2>
+    <div class="quick-actions-grid">
+      <button 
+        *ngFor="let action of quickActions"
+        mat-raised-button
+        [color]="action.color"
+        class="quick-action-button"
+        (click)="action.action()"
+        matTooltip="{{ action.label }}">
+        <mat-icon>{{ action.icon }}</mat-icon>
+        <span class="action-label">{{ action.label }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Grille des sections -->
+  <div class="sections-grid">
+    <mat-card 
+      *ngFor="let section of sectionCards"
+      class="section-card"
+      [class]="'section-' + section.id"
+      (click)="navigateToSection(section.id)">
+      
+      <mat-card-header>
+        <div class="section-icon" [style.background-color]="getSectionColor(section.color)">
+          <mat-icon>{{ section.icon }}</mat-icon>
+        </div>
+        <mat-card-title>{{ section.title }}</mat-card-title>
+        <mat-card-subtitle>{{ section.description }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Statistiques -->
+        <div class="section-stats" *ngIf="section.stats">
+          <div class="stat-item">
+            <span class="stat-count">{{ section.stats.count }}</span>
+            <span class="stat-label">{{ section.stats.label }}</span>
+          </div>
+          <div class="stat-trend" *ngIf="section.stats.trend">
+            <mat-icon 
+              [style.color]="getTrendColor(section.stats.trend)"
+              class="trend-icon">
+              {{ getTrendIcon(section.stats.trend) }}
+            </mat-icon>
+          </div>
+        </div>
+
+        <!-- Actions spécifiques -->
+        <div class="section-actions" *ngIf="section.actions">
+          <mat-divider></mat-divider>
+          <div class="actions-list">
+            <button 
+              *ngFor="let action of section.actions"
+              mat-button
+              color="primary"
+              class="section-action-button"
+              (click)="$event.stopPropagation(); action.action()"
+              matTooltip="{{ action.label }}">
+              <mat-icon>{{ action.icon }}</mat-icon>
+              <span>{{ action.label }}</span>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button 
+          mat-raised-button
+          [color]="section.color"
+          class="navigate-button"
+          (click)="$event.stopPropagation(); navigateToSection(section.id)">
+          <mat-icon>arrow_forward</mat-icon>
+          Accéder
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Section d'aide et informations -->
+  <div class="help-section">
+    <mat-card class="help-card">
+      <mat-card-header>
+        <div class="help-icon">
+          <mat-icon>help_outline</mat-icon>
+        </div>
+        <mat-card-title>Besoin d'aide ?</mat-card-title>
+        <mat-card-subtitle>Guide rapide des fonctionnalités</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="help-content">
+          <div class="help-item">
+            <mat-icon>dashboard</mat-icon>
+            <div class="help-text">
+              <strong>Dashboard :</strong> Vue d'ensemble avec KPIs et graphiques
+            </div>
+          </div>
+          <div class="help-item">
+            <mat-icon>people</mat-icon>
+            <div class="help-text">
+              <strong>Utilisateurs :</strong> Gestion complète des comptes et rôles
+            </div>
+          </div>
+          <div class="help-item">
+            <mat-icon>category</mat-icon>
+            <div class="help-text">
+              <strong>Nomenclatures :</strong> Configuration des référentiels
+            </div>
+          </div>
+          <div class="help-item">
+            <mat-icon>notifications_active</mat-icon>
+            <div class="help-text">
+              <strong>Alertes :</strong> Surveillance système et notifications
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

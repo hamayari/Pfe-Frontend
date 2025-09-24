@@ -1,0 +1,50 @@
+/* Styles spécifiques pour le dialog utilisateur */
+.user-form-dialog {
+  /* Les styles sont maintenant gérés globalement dans dialogs.scss */
+}
+
+/* Icônes des rôles */
+.role-icon {
+  margin-right: 8px;
+  color: #1976d2;
+  font-size: 18px;
+}
+
+/* Styles pour le rôle sélectionné */
+.selected-role {
+  margin-top: 16px;
+  
+  .selected-role-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 12px;
+  }
+  
+  .role-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #e3f2fd;
+    border: 1px solid #2196f3;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1976d2;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #bbdefb;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    }
+    
+    .role-chip-icon {
+      font-size: 18px;
+      margin-right: 8px;
+      color: #1976d2;
+    }
+  }
+}
+

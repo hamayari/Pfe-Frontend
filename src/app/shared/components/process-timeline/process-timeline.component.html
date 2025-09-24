@@ -1,0 +1,18 @@
+<div class="timeline-wrapper">
+  <div *ngIf="processTitle" class="header">
+    <h2>{{ processTitle }}</h2>
+  </div>
+  <div class="timeline-items">
+      <div *ngFor="let step of steps; let i = index" class="timeline-item" [ngClass]="step.status">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+              <p class="timeline-title">{{ step.title }}</p>
+              <p class="timeline-date">{{ step.date }}</p>
+          </div>
+      </div>
+  </div>
+  <div class="timeline-container">
+      <div class="timeline-bar-bg"></div>
+      <div class="timeline-progress" [style.width.%]="calculateProgress()"></div>
+  </div>
+</div>
