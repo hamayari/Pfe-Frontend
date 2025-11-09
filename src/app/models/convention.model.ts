@@ -21,4 +21,6 @@ export interface Convention {
   paymentTerms?: any;
   echeances?: any[];
   dueDate?: Date;
+  createdBy?: string;
+  commercial?: string; // Nom du commercial qui a créé la convention
 }

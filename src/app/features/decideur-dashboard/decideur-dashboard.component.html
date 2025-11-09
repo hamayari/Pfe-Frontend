@@ -1,0 +1,673 @@
+<div class="decideur-dashboard-container">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon>analytics</mat-icon>
+        <span>Décideur</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" (click)="scrollToSection('dashboard')">
+        <mat-icon>dashboard</mat-icon>
+        <span>Tableau de Bord</span>
+      </a>
+      
+      
+      <a class="nav-item" (click)="scrollToSection('conventions')">
+        <mat-icon>description</mat-icon>
+        <span>Conventions</span>
+      </a>
+      
+      <a class="nav-item" (click)="scrollToSection('filtres')">
+        <mat-icon>receipt</mat-icon>
+        <span>Filtres & Factures</span>
+      </a>
+      
+      <a class="nav-item" (click)="scrollToSection('analytics')">
+        <mat-icon>analytics</mat-icon>
+        <span>Analyses Détaillées</span>
+      </a>
+      
+      <a class="nav-item" (click)="scrollToSection('performance')">
+        <mat-icon>trending_up</mat-icon>
+        <span>Performance</span>
+      </a>
+      
+      <a class="nav-item" (click)="scrollToSection('kpis')">
+        <mat-icon>assessment</mat-icon>
+        <span>Indicateurs Clés</span>
+      </a>
+      
+      <a class="nav-item" (click)="scrollToSection('kpi-alerts-section')">
+        <mat-icon>notifications_active</mat-icon>
+        <span>Gestion Alertes KPI</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" routerLink="/profile">
+        <mat-icon>person</mat-icon>
+        <span>Mon Profil</span>
+      </a>
+      <a class="nav-item" routerLink="/decideur/parametres">
+        <mat-icon>settings</mat-icon>
+        <span>Paramètres</span>
+      </a>
+      <a class="nav-item" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Déconnexion</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Header Professionnel -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1 class="page-title">Dashboard Décideur</h1>
+    </div>
+    
+    <div class="header-center">
+      <!-- Barre de recherche globale -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="material-icons search-icon">search</i>
+          <input type="text" 
+                 class="search-input" 
+                 placeholder="Rechercher conventions, factures..."
+                 [(ngModel)]="searchQuery"
+                 (keyup.enter)="performSearch()">
+          <button class="search-btn" (click)="performSearch()">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <!-- Notifications -->
+      <div class="notification-container">
+        <button class="header-icon-btn" [class.has-notifications]="notificationCount > 0" title="Notifications">
+          <i class="material-icons">notifications</i>
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </button>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-container">
+        <button class="header-icon-btn" (click)="openMessaging()" [class.has-messages]="messageCount > 0" title="Messages">
+          <i class="material-icons">mail</i>
+          <span class="message-badge" *ngIf="messageCount > 0">{{ messageCount }}</span>
+        </button>
+      </div>
+
+      <!-- Paramètres -->
+      <button class="header-icon-btn" (click)="openSettings()" title="Paramètres">
+        <i class="material-icons">settings</i>
+      </button>
+
+      <!-- Mode sombre/clair -->
+      <button class="header-icon-btn" (click)="toggleTheme()" [title]="isDarkMode ? 'Mode clair' : 'Mode sombre'">
+        <i class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</i>
+      </button>
+
+      <!-- Profil utilisateur -->
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <img [src]="getDefaultAvatar()" 
+               alt="Décideur"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
+        </div>
+        <div class="user-details">
+          <div class="username">Décideur</div>
+          <div class="role">DECIDEUR</div>
+        </div>
+        <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="dashboard-container">
+      <!-- Header Section -->
+      <div id="dashboard" class="dashboard-header">
+        <div class="header-content">
+          <h1>
+            <mat-icon>dashboard</mat-icon>
+            Tableau de Bord Décisionnel
+          </h1>
+          <p>Vue d'ensemble et indicateurs clés de performance</p>
+        </div>
+      </div>
+
+      <!-- KPIs Grid (déplacé en premier) -->
+      <div id="kpis" class="kpis-grid">
+        <mat-card *ngFor="let kpi of kpis" class="kpi-card" [class]="'kpi-' + kpi.color">
+          <mat-card-content>
+            <div class="kpi-header">
+              <mat-icon [class]="'icon-' + kpi.color">{{ kpi.icon }}</mat-icon>
+              <span class="kpi-trend" [class.positive]="kpi.trend.startsWith('+')">
+                {{ kpi.trend }}
+              </span>
+              <!-- Badge d'alerte si KPI anormal -->
+              <span *ngIf="kpi.hasAlert" class="alert-badge" [class.critical]="kpi.alertSeverity === 'HIGH'">
+                <mat-icon>warning</mat-icon>
+                {{ kpi.alertSeverity === 'HIGH' ? 'CRITIQUE' : 'ATTENTION' }}
+              </span>
+            </div>
+            <div class="kpi-body">
+              <h2>{{ kpi.value }}</h2>
+              <p class="kpi-title">{{ kpi.title }}</p>
+              <p class="kpi-subtitle">{{ kpi.subtitle }}</p>
+              
+              <!-- Message d'alerte si KPI anormal -->
+              <div *ngIf="kpi.hasAlert" class="kpi-alert-message">
+                <mat-icon>info</mat-icon>
+                <p>{{ kpi.alertMessage }}</p>
+              </div>
+              
+              <!-- Bouton pour voir les détails de l'alerte -->
+              <button *ngIf="kpi.hasAlert" mat-raised-button color="warn" class="alert-details-btn" 
+                      (click)="viewKpiAlertDetails(kpi)">
+                <mat-icon>notifications_active</mat-icon>
+                Afficher alertes détails
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Section Gestion Alertes KPI -->
+      <div id="kpi-alerts-section" class="section-container">
+        <app-kpi-alerts-section [userRole]="'DECIDEUR'"></app-kpi-alerts-section>
+      </div>
+
+      <!-- Zone de Filtres Interactifs -->
+      <mat-card id="filtres" class="filters-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>filter_list</mat-icon>
+            Filtres Interactifs
+          </mat-card-title>
+          <!-- Bouton Réinitialiser caché -->
+        </mat-card-header>
+        <mat-card-content>
+          <div class="filters-grid">
+            <!-- Filtre Période -->
+            <mat-form-field appearance="outline">
+              <mat-label>Période</mat-label>
+              <mat-select [(ngModel)]="filters.periode" (selectionChange)="applyFilters()">
+                <mat-option *ngFor="let periode of periodes" [value]="periode.value">
+                  {{ periode.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>calendar_today</mat-icon>
+            </mat-form-field>
+
+            <!-- Dates personnalisées (si période personnalisée) -->
+            <mat-form-field appearance="outline" *ngIf="isCustomPeriod()">
+              <mat-label>Date début</mat-label>
+              <input matInput [matDatepicker]="pickerDebut" [(ngModel)]="filters.dateDebut" (dateChange)="applyFilters()">
+              <mat-datepicker-toggle matSuffix [for]="pickerDebut"></mat-datepicker-toggle>
+              <mat-datepicker #pickerDebut></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" *ngIf="isCustomPeriod()">
+              <mat-label>Date fin</mat-label>
+              <input matInput [matDatepicker]="pickerFin" [(ngModel)]="filters.dateFin" (dateChange)="applyFilters()">
+              <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+              <mat-datepicker #pickerFin></mat-datepicker>
+            </mat-form-field>
+
+            <!-- Filtre Gouvernorat -->
+            <mat-form-field appearance="outline">
+              <mat-label>Gouvernorat</mat-label>
+              <mat-select [(ngModel)]="filters.gouvernorats" multiple (selectionChange)="applyFilters()">
+                <mat-option *ngFor="let gouv of gouvernorats" [value]="gouv">
+                  {{ gouv }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>location_on</mat-icon>
+            </mat-form-field>
+
+            <!-- Filtre Structure -->
+            <mat-form-field appearance="outline">
+              <mat-label>Structure</mat-label>
+              <mat-select [(ngModel)]="filters.structures" multiple (selectionChange)="applyFilters()">
+                <mat-option *ngFor="let struct of structures" [value]="struct">
+                  {{ struct }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>business</mat-icon>
+            </mat-form-field>
+
+            <!-- Filtre Application -->
+            <mat-form-field appearance="outline">
+              <mat-label>Application</mat-label>
+              <mat-select [(ngModel)]="filters.applications" multiple (selectionChange)="applyFilters()">
+                <mat-option *ngFor="let app of applications" [value]="app">
+                  {{ app }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>apps</mat-icon>
+            </mat-form-field>
+
+            <!-- Filtre Statut Convention -->
+            <mat-form-field appearance="outline">
+              <mat-label>Statut Convention</mat-label>
+              <mat-select [(ngModel)]="filters.statutConvention" (selectionChange)="applyFilters()">
+                <mat-option *ngFor="let statut of statutsConvention" [value]="statut.value">
+                  {{ statut.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>description</mat-icon>
+            </mat-form-field>
+
+            <!-- Filtre Statut Facture -->
+            <mat-form-field appearance="outline">
+              <mat-label>Statut Facture</mat-label>
+              <mat-select [(ngModel)]="filters.statutFacture" (selectionChange)="applyFilters()">
+                <mat-option *ngFor="let statut of statutsFacture" [value]="statut.value">
+                  {{ statut.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>receipt</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Filtres actifs -->
+          <div class="active-filters" *ngIf="filters.gouvernorats.length > 0 || filters.structures.length > 0 || filters.applications.length > 0">
+            <h4>Filtres actifs :</h4>
+            <div class="filter-chips">
+              <mat-chip *ngFor="let gouv of filters.gouvernorats" [removable]="true" (removed)="removeGouvernorat(gouv)">
+                {{ gouv }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+              <mat-chip *ngFor="let struct of filters.structures" [removable]="true" (removed)="removeStructure(struct)">
+                {{ struct }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+              <mat-chip *ngFor="let app of filters.applications" [removable]="true" (removed)="removeApplication(app)">
+                {{ app }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Tableau de Données Détaillé (déplacé ici pour être juste après les filtres) -->
+      <mat-card id="conventions" class="data-table-card" style="margin-top: 32px;">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>table_chart</mat-icon>
+            Conventions Détaillées
+          </mat-card-title>
+          <div class="table-actions">
+            <button mat-raised-button color="primary" (click)="exportExcel()">
+              <mat-icon>download</mat-icon>
+              Excel
+            </button>
+            <button mat-raised-button color="accent" (click)="exportPDF()">
+              <mat-icon>picture_as_pdf</mat-icon>
+              PDF
+            </button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Indicateur de chargement -->
+          <div *ngIf="isLoadingConventions" class="loading-container">
+            <mat-icon class="loading-spinner">refresh</mat-icon>
+            <p>Chargement des conventions...</p>
+          </div>
+
+          <!-- Message si aucune convention -->
+          <div *ngIf="!isLoadingConventions && conventionsData.length === 0" class="no-data-container">
+            <mat-icon>inbox</mat-icon>
+            <p>Aucune convention trouvée</p>
+          </div>
+
+          <!-- Tableau des conventions -->
+          <div class="table-container" *ngIf="!isLoadingConventions && conventionsData.length > 0">
+            <table mat-table [dataSource]="paginatedConventions" class="conventions-table" matSort>
+              
+              <!-- Colonne Référence -->
+              <ng-container matColumnDef="reference">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Référence</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="reference-badge">{{ element.reference }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Libellé -->
+              <ng-container matColumnDef="libelle">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Libellé Convention</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="libelle-text">{{ element.libelle }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Structure -->
+              <ng-container matColumnDef="structure">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Structure</th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-chip class="structure-chip">{{ element.structure }}</mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Gouvernorat -->
+              <ng-container matColumnDef="gouvernorat">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Gouvernorat</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="gouvernorat-text">
+                    <mat-icon>location_on</mat-icon>
+                    {{ element.gouvernorat }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Montant -->
+              <ng-container matColumnDef="montant">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="montant-text">{{ element.montant | number:'1.0-0' }} DT</span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Statut Facture -->
+              <ng-container matColumnDef="statutFacture">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut Facture</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="statut-badge" [class]="getStatutClass(element.statutFacture)">
+                    <mat-icon>{{ getStatutIcon(element.statutFacture) }}</mat-icon>
+                    {{ getStatutLabel(element.statutFacture) }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Échéance -->
+              <ng-container matColumnDef="echeance">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Échéance</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="echeance-text" [class.depassee]="isEcheanceDepassee(element.echeance)">
+                    <mat-icon>event</mat-icon>
+                    {{ element.echeance | date:'dd/MM/yyyy' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Commercial -->
+              <ng-container matColumnDef="commercial">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Commercial</th>
+                <td mat-cell *matCellDef="let element">
+                  <span class="commercial-text">
+                    <mat-icon>person</mat-icon>
+                    {{ element.commercial }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Actions -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let element">
+                  <button mat-icon-button [matMenuTriggerFor]="menu" class="action-menu-button">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="viewDetails(element)">
+                      <mat-icon>visibility</mat-icon>
+                      <span>Voir détails</span>
+                    </button>
+                    <button mat-menu-item (click)="editConvention(element)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Modifier</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <mat-paginator 
+            [length]="totalItems"
+            [pageSize]="pageSize"
+            [pageIndex]="pageIndex"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons>
+          </mat-paginator>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Main Grid -->
+      <div class="dashboard-grid">
+        <!-- Performance Chart -->
+        <mat-card id="performance" class="chart-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>trending_up</mat-icon>
+              Évolution du Chiffre d'Affaires
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="isLoadingPerformance" class="loading-state">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p>Chargement des données...</p>
+            </div>
+            <div *ngIf="!isLoadingPerformance && performanceData.length === 0" class="empty-state">
+              <mat-icon>show_chart</mat-icon>
+              <p>Aucune donnée de performance disponible</p>
+            </div>
+            <div *ngIf="!isLoadingPerformance && performanceData.length > 0" class="chart-container">
+              <div class="chart-bars">
+                <div *ngFor="let data of performanceData" class="chart-bar-wrapper">
+                  <div class="chart-bar" [style.height.%]="(data.value / 1250000) * 100">
+                    <span class="bar-value">{{ (data.value / 1000) }}K</span>
+                  </div>
+                  <span class="bar-label">{{ data.month }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Recent Activities -->
+        <mat-card class="activities-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>history</mat-icon>
+              Activités Récentes
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="isLoadingActivities" class="loading-state">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p>Chargement des activités...</p>
+            </div>
+            <div *ngIf="!isLoadingActivities && recentActivities.length === 0" class="empty-state">
+              <mat-icon>history</mat-icon>
+              <p>Aucune activité récente</p>
+            </div>
+            <div *ngIf="!isLoadingActivities && recentActivities.length > 0" class="activities-list">
+              <div *ngFor="let activity of recentActivities" class="activity-item">
+                <div class="activity-icon" [class]="'icon-' + activity.color">
+                  <mat-icon>{{ activity.icon }}</mat-icon>
+                </div>
+                <div class="activity-content">
+                  <h4>{{ activity.title }}</h4>
+                  <p>{{ activity.description }}</p>
+                  <span class="activity-time">{{ activity.time }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Graphiques Avancés -->
+      <div id="analytics" class="advanced-charts">
+        <h2>
+          <mat-icon>insert_chart</mat-icon>
+          Analyses Détaillées
+        </h2>
+
+        <div class="charts-grid-advanced">
+          <!-- Répartition par Gouvernorat -->
+          <mat-card class="chart-card-advanced">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>location_on</mat-icon>
+                Répartition par Gouvernorat
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="bar-chart-horizontal">
+                <div *ngFor="let item of gouvernoratData" class="bar-item">
+                  <div class="bar-label-section">
+                    <span class="bar-name">{{ item.name }}</span>
+                    <span class="bar-stats">{{ item.value }} conventions • {{ (item.montant / 1000) }}K DT</span>
+                  </div>
+                  <div class="bar-visual">
+                    <div class="bar-fill" [style.width.%]="(item.value / 15) * 100">
+                      <span class="bar-value">{{ item.value }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Répartition par Structure (Pie Chart) -->
+          <mat-card class="chart-card-advanced">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>business</mat-icon>
+                Répartition par Structure
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <!-- Indicateur de chargement -->
+              <div *ngIf="isLoadingStructure" class="loading-container">
+                <mat-icon class="loading-spinner">refresh</mat-icon>
+                <p>Chargement...</p>
+              </div>
+
+              <!-- Message si aucune donnée -->
+              <div *ngIf="!isLoadingStructure && structureData.length === 0" class="no-data-container">
+                <mat-icon>inbox</mat-icon>
+                <p>Aucune donnée disponible</p>
+              </div>
+
+              <!-- Graphique -->
+              <div class="pie-chart-container" *ngIf="!isLoadingStructure && structureData.length > 0">
+                <div class="pie-chart">
+                  <svg viewBox="0 0 200 200" class="pie-svg">
+                    <!-- Segments générés dynamiquement -->
+                    <circle *ngIf="structureData[0]" cx="100" cy="100" r="80" [attr.fill]="structureData[0].color" stroke="white" stroke-width="2" 
+                            [attr.stroke-dasharray]="(structureData[0].value / 100 * 502.4) + ' 502.4'"
+                            transform="rotate(-90 100 100)"/>
+                    <circle *ngIf="structureData[1]" cx="100" cy="100" r="80" [attr.fill]="structureData[1].color" stroke="white" stroke-width="2"
+                            [attr.stroke-dasharray]="(structureData[1].value / 100 * 502.4) + ' 502.4'"
+                            [attr.stroke-dashoffset]="-(structureData[0].value / 100 * 502.4)"
+                            transform="rotate(-90 100 100)"/>
+                    <circle *ngIf="structureData[2]" cx="100" cy="100" r="80" [attr.fill]="structureData[2].color" stroke="white" stroke-width="2"
+                            [attr.stroke-dasharray]="(structureData[2].value / 100 * 502.4) + ' 502.4'"
+                            [attr.stroke-dashoffset]="-((structureData[0].value + structureData[1].value) / 100 * 502.4)"
+                            transform="rotate(-90 100 100)"/>
+                    <circle *ngIf="structureData[3]" cx="100" cy="100" r="80" [attr.fill]="structureData[3].color" stroke="white" stroke-width="2"
+                            [attr.stroke-dasharray]="(structureData[3].value / 100 * 502.4) + ' 502.4'"
+                            [attr.stroke-dashoffset]="-((structureData[0].value + structureData[1].value + structureData[2].value) / 100 * 502.4)"
+                            transform="rotate(-90 100 100)"/>
+                    <circle *ngIf="structureData[4]" cx="100" cy="100" r="80" [attr.fill]="structureData[4].color" stroke="white" stroke-width="2"
+                            [attr.stroke-dasharray]="(structureData[4].value / 100 * 502.4) + ' 502.4'"
+                            [attr.stroke-dashoffset]="-((structureData[0].value + structureData[1].value + structureData[2].value + structureData[3].value) / 100 * 502.4)"
+                            transform="rotate(-90 100 100)"/>
+                  </svg>
+                </div>
+                <div class="pie-legend">
+                  <div *ngFor="let item of structureData" class="legend-item">
+                    <span class="legend-color" [style.background-color]="item.color"></span>
+                    <span class="legend-label">{{ item.name }}</span>
+                    <span class="legend-value">{{ item.value }}%</span>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Top 5 Commerciaux -->
+          <mat-card class="chart-card-advanced top-commerciaux-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>emoji_events</mat-icon>
+                Top 5 Commerciaux
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="top-list">
+                <div *ngFor="let commercial of topCommerciaux; let i = index" class="top-item">
+                  <div class="rank" [class]="'rank-' + (i + 1)">
+                    <span>{{ i + 1 }}</span>
+                  </div>
+                  <div class="commercial-info">
+                    <h4>{{ commercial.name }}</h4>
+                    <div class="commercial-stats">
+                      <span class="stat">
+                        <mat-icon>description</mat-icon>
+                        {{ commercial.conventions }} conventions
+                      </span>
+                      <span class="stat">
+                        <mat-icon>attach_money</mat-icon>
+                        {{ (commercial.ca / 1000) }}K DT
+                      </span>
+                    </div>
+                  </div>
+                  <div class="performance-badge" [class.excellent]="commercial.performance >= 90" 
+                       [class.good]="commercial.performance >= 80 && commercial.performance < 90">
+                    <span>{{ commercial.performance }}%</span>
+                    <small>Performance</small>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Chatbot Flottant -->
+  <div class="floating-chatbot" (click)="openChatbot()">
+    <mat-icon>smart_toy</mat-icon>
+    <div class="chatbot-tooltip">Assistant IA</div>
+  </div>
+
+  <!-- Chatbot Panel - Affiché dans la même page -->
+  <div class="chatbot-overlay" *ngIf="isChatbotOpen" (click)="closeChatbot()"></div>
+  <div class="chatbot-panel" *ngIf="isChatbotOpen" [@slideIn]>
+    <div class="chatbot-panel-header">
+      <h3>
+        <mat-icon>smart_toy</mat-icon>
+        Assistant Décisionnel Intelligent
+      </h3>
+      <button mat-icon-button (click)="closeChatbot()" class="close-chatbot-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="chatbot-panel-content">
+      <iframe 
+        src="/decideur/chatbot" 
+        class="chatbot-iframe"
+        frameborder="0">
+      </iframe>
+    </div>
+  </div>
+</div>

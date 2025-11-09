@@ -468,7 +468,7 @@ interface SystemConfig {
     .config-control {
       display: flex;
       gap: 12px;
-      align-items: end;
+      align-items: flex-end;
     }
 
     .config-field {

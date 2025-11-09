@@ -1,7 +1,24 @@
-<div class="login-container" [class.compact]="isModal">
+<div class="login-container" [class.compact]="isModal" [style.--role-gradient]="roleGradient" [style.--role-color]="roleColor">
   <!-- Section gauche - Formulaire -->
   <div class="login-form-section">
     <div class="login-form-card">
+      <!-- Bouton fermer pour modal -->
+      <button *ngIf="isModal" class="modal-close-btn" type="button" (click)="closeModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+      
+      <!-- Logo animé pour modal -->
+      <div class="modal-header" *ngIf="isModal">
+        <div class="modal-logo-animated">
+          <div class="logo-circle" [style.background]="roleGradient">
+            <mat-icon>{{ roleIcon }}</mat-icon>
+          </div>
+          <div class="logo-pulse"></div>
+        </div>
+        <h2 class="modal-title" [style.background]="roleGradient" style="-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ roleLabel }}</h2>
+        <p class="modal-subtitle">Connectez-vous pour continuer</p>
+      </div>
+
       <div class="logo-section" *ngIf="!isModal">
         <div class="logo-icon">
           <mat-icon>{{ roleIcon }}</mat-icon>
@@ -69,11 +86,15 @@
           color="primary" 
           type="submit" 
           class="login-button"
+          [style.background]="roleGradient"
           [disabled]="!loginForm.valid || isLoading"
           [class.loading]="isLoading">
-          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-          <mat-icon *ngIf="!isLoading" class="login-icon">arrow_forward</mat-icon>
-          <span>{{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}</span>
+          <span class="button-content">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+            <mat-icon *ngIf="!isLoading" class="login-icon">login</mat-icon>
+            <span class="button-text">{{ isLoading ? 'Connexion...' : 'Se connecter' }}</span>
+          </span>
+          <span class="button-shine"></span>
         </button>
       </form>
 

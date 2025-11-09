@@ -1,0 +1,98 @@
+<div class="conventions-container">
+  <div class="page-header">
+    <h1>
+      <mat-icon>description</mat-icon>
+      Gestion des Conventions
+    </h1>
+    <p>Vue d'ensemble de toutes les conventions</p>
+  </div>
+
+  <mat-card class="conventions-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>list</mat-icon>
+        Liste des Conventions
+      </mat-card-title>
+      <div class="header-actions">
+        <button mat-raised-button color="primary">
+          <mat-icon>add</mat-icon>
+          Nouvelle Convention
+        </button>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="conventions" class="conventions-table" matSort>
+          
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Référence</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="reference-badge">{{ element.reference }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="libelle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Libellé</th>
+            <td mat-cell *matCellDef="let element">{{ element.libelle }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="structure">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Structure</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip>{{ element.structure }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="gouvernorat">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Gouvernorat</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-icon>location_on</mat-icon>
+              {{ element.gouvernorat }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+            <td mat-cell *matCellDef="let element">{{ element.montant | number:'1.0-0' }} DT</td>
+          </ng-container>
+
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip [class.active]="element.statut === 'active'" [class.expired]="element.statut === 'expiree'">
+                {{ element.statut === 'active' ? 'Active' : 'Expirée' }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="echeance">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Échéance</th>
+            <td mat-cell *matCellDef="let element">{{ element.echeance | date:'dd/MM/yyyy' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button (click)="viewDetails(element)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editConvention(element)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <mat-paginator 
+        [length]="conventions.length"
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

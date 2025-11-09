@@ -1,0 +1,145 @@
+<div class="chatbot-container">
+  <!-- Header -->
+  <mat-card class="chatbot-header">
+    <mat-card-header>
+      <mat-icon class="chatbot-icon">smart_toy</mat-icon>
+      <mat-card-title>Assistant Décisionnel Intelligent</mat-card-title>
+      <mat-card-subtitle>Propulsé par Gemini Flash 1.5</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Questions suggérées - Toujours affichées -->
+  <mat-card class="suggestions-card" *ngIf="messages.length >= 1">
+    <mat-card-content>
+      <h3>💡 Questions suggérées :</h3>
+      <div class="suggestions">
+        <button 
+          *ngFor="let suggestion of suggestedQuestions"
+          mat-raised-button
+          (click)="useSuggestedQuestion(suggestion)"
+          class="suggestion-chip">
+          {{ suggestion }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Zone de conversation -->
+  <mat-card class="chat-card">
+    <mat-card-content>
+      <div class="chat-messages">
+        <div *ngFor="let message of messages" 
+             [class]="'message message-' + message.type">
+          
+          <!-- Message utilisateur -->
+          <div *ngIf="message.type === 'user'" class="user-message">
+            <div class="message-bubble">
+              <mat-icon>person</mat-icon>
+              <span>{{ message.text }}</span>
+            </div>
+            <span class="timestamp">{{ message.timestamp | date:'HH:mm' }}</span>
+          </div>
+
+          <!-- Message bot -->
+          <div *ngIf="message.type === 'bot'" class="bot-message">
+            <div class="message-bubble">
+              <mat-icon>smart_toy</mat-icon>
+              <div class="bot-content">
+                <!-- Texte de réponse -->
+                <p class="bot-text">{{ message.text }}</p>
+
+                <!-- KPI -->
+                <div *ngIf="message.kpi" class="kpi-section">
+                  <h4>📊 Indicateurs clés :</h4>
+                  <div class="kpi-grid">
+                    <div *ngFor="let key of objectKeys(message.kpi)" class="kpi-item">
+                      <span class="kpi-label">{{ key }}</span>
+                      <span class="kpi-value">{{ message.kpi[key] }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Graphique -->
+                <div *ngIf="message.graphique" class="chart-section">
+                  <h4>📈 Visualisation :</h4>
+                  
+                  <!-- Graphique en barres -->
+                  <ngx-charts-bar-vertical
+                    *ngIf="message.graphique.type === 'bar'"
+                    [view]="view"
+                    [results]="message.graphique.data"
+                    [xAxis]="showXAxis"
+                    [yAxis]="showYAxis"
+                    [legend]="showLegend"
+                    [showXAxisLabel]="showXAxisLabel"
+                    [showYAxisLabel]="showYAxisLabel"
+                    [scheme]="colorScheme"
+                    xAxisLabel="Catégories"
+                    yAxisLabel="Valeurs">
+                  </ngx-charts-bar-vertical>
+
+                  <!-- Graphique en camembert -->
+                  <ngx-charts-pie-chart
+                    *ngIf="message.graphique.type === 'pie'"
+                    [view]="view"
+                    [results]="message.graphique.data"
+                    [legend]="showLegend"
+                    [scheme]="colorScheme">
+                  </ngx-charts-pie-chart>
+
+                  <!-- Graphique en ligne -->
+                  <ngx-charts-line-chart
+                    *ngIf="message.graphique.type === 'line'"
+                    [view]="view"
+                    [results]="[{name: 'Série', series: message.graphique.data}]"
+                    [xAxis]="showXAxis"
+                    [yAxis]="showYAxis"
+                    [legend]="showLegend"
+                    [showXAxisLabel]="showXAxisLabel"
+                    [showYAxisLabel]="showYAxisLabel"
+                    [scheme]="colorScheme">
+                  </ngx-charts-line-chart>
+                </div>
+              </div>
+            </div>
+            <span class="timestamp">{{ message.timestamp | date:'HH:mm' }}</span>
+          </div>
+        </div>
+
+        <!-- Indicateur de chargement -->
+        <div *ngIf="loading" class="loading-indicator">
+          <mat-spinner diameter="30"></mat-spinner>
+          <span>L'assistant analyse vos données...</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Zone de saisie -->
+  <mat-card class="input-card">
+    <mat-card-content>
+      <div class="input-container">
+        <mat-form-field appearance="outline" class="question-input">
+          <mat-label>Posez votre question...</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="question"
+            (keyup.enter)="sendQuestion()"
+            [disabled]="loading"
+            placeholder="Ex: Combien de factures sont en retard ?">
+          <mat-icon matSuffix>help_outline</mat-icon>
+        </mat-form-field>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="sendQuestion()"
+          [disabled]="!question.trim() || loading"
+          class="send-button">
+          <mat-icon>send</mat-icon>
+          Envoyer
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

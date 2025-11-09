@@ -477,3 +477,10 @@ export class ChartDiagnosticComponent implements OnInit, AfterViewInit {
 
 
 
+
+
+
+
+
+
+

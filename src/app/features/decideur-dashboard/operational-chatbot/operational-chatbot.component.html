@@ -1,0 +1,87 @@
+<div class="operational-chatbot-container">
+  <!-- Header -->
+  <div class="chatbot-header">
+    <div class="header-content">
+      <mat-icon class="robot-icon">support_agent</mat-icon>
+      <div class="header-text">
+        <h2>Assistant Opérationnel</h2>
+        <p>Posez vos questions en langage naturel</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="chat-messages" #chatMessages>
+    <div *ngFor="let message of messages" class="message-wrapper">
+      <!-- Message utilisateur -->
+      <div *ngIf="message.type === 'user'" class="message user-message">
+        <div class="message-content">
+          <p>{{ message.text }}</p>
+        </div>
+        <span class="timestamp">{{ message.timestamp | date:'HH:mm' }}</span>
+      </div>
+
+      <!-- Message bot -->
+      <div *ngIf="message.type === 'bot'" class="message bot-message">
+        <mat-icon class="bot-avatar">support_agent</mat-icon>
+        <div class="message-content">
+          <p [innerHTML]="message.text | nl2br"></p>
+        </div>
+        <span class="timestamp">{{ message.timestamp | date:'HH:mm' }}</span>
+      </div>
+
+      <!-- Message succès -->
+      <div *ngIf="message.type === 'success'" class="message success-message">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <div class="message-content">
+          <p>{{ message.text }}</p>
+        </div>
+        <span class="timestamp">{{ message.timestamp | date:'HH:mm' }}</span>
+      </div>
+
+      <!-- Message erreur -->
+      <div *ngIf="message.type === 'error'" class="message error-message">
+        <mat-icon class="error-icon">error</mat-icon>
+        <div class="message-content">
+          <p>{{ message.text }}</p>
+        </div>
+        <span class="timestamp">{{ message.timestamp | date:'HH:mm' }}</span>
+      </div>
+    </div>
+
+    <!-- Formulaire d'action -->
+    <div *ngIf="showActionForm" class="action-form-wrapper">
+      <app-action-form
+        [action]="currentAction"
+        (formSubmit)="onActionFormSubmit($event)"
+        (formCancel)="onActionFormCancel()">
+      </app-action-form>
+    </div>
+
+    <!-- Indicateur de chargement -->
+    <div *ngIf="loading" class="loading-indicator">
+      <mat-spinner diameter="30"></mat-spinner>
+      <span>Traitement en cours...</span>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input-container">
+    <mat-form-field appearance="outline" class="message-input">
+      <mat-label>Décrivez votre besoin...</mat-label>
+      <input 
+        matInput 
+        [(ngModel)]="userMessage" 
+        (keyup.enter)="sendMessage()"
+        placeholder="Ex: Créer une convention pour...">
+      <button 
+        mat-icon-button 
+        matSuffix 
+        (click)="sendMessage()"
+        [disabled]="!userMessage.trim() || loading"
+        class="send-btn">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+</div>

@@ -102,7 +102,7 @@ $transition: all 0.3s ease;
   .search-row {
     display: flex;
     gap: 16px;
-    align-items: end;
+    align-items: flex-end;
 
     .search-field {
       flex: 1;
@@ -506,6 +506,13 @@ $transition: all 0.3s ease;
     border: 1px solid #ddd;
   }
 }
+
+
+
+
+
+
+
 
 
 

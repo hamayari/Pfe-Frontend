@@ -113,7 +113,8 @@
       <app-login 
         [selectedRole]="selectedRole || ''"
         [isModal]="true"
-        (loginSuccess)="closeLoginModal()">
+        (loginSuccess)="closeLoginModal()"
+        (modalClose)="closeLoginModal()">
       </app-login>
     </div>
   </div>

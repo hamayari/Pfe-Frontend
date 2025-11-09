@@ -31,6 +31,7 @@ import { Convention } from '../../models/convention.model';
 import { ConventionDialogComponent } from './convention-dialog/convention-dialog.component';
 import { ConventionWorkflowDialogComponent } from './convention-workflow-dialog/convention-workflow-dialog.component';
 import { ConventionHistoryDialogComponent } from './convention-history-dialog/convention-history-dialog.component';
+import { ConventionInvoicesDialogComponent } from './convention-invoices-dialog/convention-invoices-dialog.component';
 
 @Component({
   selector: 'app-convention-management',
@@ -271,6 +272,14 @@ export class ConventionManagementComponent implements OnInit {
   openHistoryDialog(convention: Convention): void {
     this.dialog.open(ConventionHistoryDialogComponent, {
       width: '800px',
+      data: { convention }
+    });
+  }
+
+  openInvoicesDialog(convention: Convention): void {
+    this.dialog.open(ConventionInvoicesDialogComponent, {
+      width: '1000px',
+      maxWidth: '95vw',
       data: { convention }
     });
   }

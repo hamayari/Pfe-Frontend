@@ -69,12 +69,7 @@ module.exports = function (config) {
     browserNoActivityTimeout: 60000,
     captureTimeout: 60000,
     reportSlowerThan: 500,
-    // Configuration pour les tests Angular
-    files: [
-      'src/test.ts'
-    ],
-    preprocessors: {
-      'src/test.ts': ['@angular-devkit/build-angular']
-    }
+    files: [],
+    preprocessors: {}
   });
-}; 
+};

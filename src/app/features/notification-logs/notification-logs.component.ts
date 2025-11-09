@@ -214,7 +214,7 @@ export class NotificationLogsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.snackBar.open(`${res.updated} notification(s) marquée(s) comme lue(s)`, 'Fermer', { duration: 3000 });
+          this.snackBar.open(`${res.count} notification(s) marquée(s) comme lue(s)`, 'Fermer', { duration: 3000 });
           this.loadNotifications();
         },
         error: () => this.snackBar.open('Erreur marquage en masse', 'Fermer', { duration: 3000 })
@@ -225,9 +225,9 @@ export class NotificationLogsComponent implements OnInit, OnDestroy {
     this.notificationService.getUnreadCount()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (c) => {
+        next: (count) => {
           // Optionally emit or integrate with a header badge service
-          console.log('Unread count:', c.unreadCount);
+          console.log('Unread count:', count);
         }
       });
   }

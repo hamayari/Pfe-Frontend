@@ -18,7 +18,7 @@ export interface Nomenclature {
   providedIn: 'root'
 })
 export class NomenclatureService {
-  private apiUrl = `${environment.apiUrl}/api/nomenclatures`;
+  private apiUrl = `${environment.apiUrl}/nomenclatures`;
   private nomenclaturesSubject = new BehaviorSubject<Nomenclature[]>([]);
 
   constructor(private http: HttpClient) {}
@@ -65,6 +65,13 @@ export class NomenclatureService {
     });
   }
 }
+
+
+
+
+
+
+
 
 
 

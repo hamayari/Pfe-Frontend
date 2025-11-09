@@ -1,0 +1,234 @@
+<div class="kpi-alerts-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>warning</mat-icon>
+        Gestion des Alertes KPI
+      </h1>
+      <p>Alertes déléguées par le Décideur</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="refresh()">
+      <mat-icon>refresh</mat-icon>
+      Rafraîchir
+    </button>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-grid">
+    <mat-card class="stat-card total">
+      <mat-icon>assessment</mat-icon>
+      <div class="stat-content">
+        <h3>{{ stats.total }}</h3>
+        <p>Total Alertes</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card pending">
+      <mat-icon>schedule</mat-icon>
+      <div class="stat-content">
+        <h3>{{ stats.pending }}</h3>
+        <p>En Attente</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card in-progress">
+      <mat-icon>hourglass_empty</mat-icon>
+      <div class="stat-content">
+        <h3>{{ stats.inProgress }}</h3>
+        <p>En Cours</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card resolved">
+      <mat-icon>check_circle</mat-icon>
+      <div class="stat-content">
+        <h3>{{ stats.resolved }}</h3>
+        <p>Résolues</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card critical">
+      <mat-icon>error</mat-icon>
+      <div class="stat-content">
+        <h3>{{ stats.critical }}</h3>
+        <p>Critiques</p>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Filtres -->
+  <mat-card class="filters-card">
+    <div class="filters-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Recherche</mat-label>
+        <input matInput [(ngModel)]="searchText" (ngModelChange)="applyFilters()" placeholder="Rechercher...">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()">
+          <mat-option value="ALL">Tous</mat-option>
+          <mat-option value="DELEGATED">Délégué</mat-option>
+          <mat-option value="NEW">Nouveau</mat-option>
+          <mat-option value="IN_PROGRESS">En Cours</mat-option>
+          <mat-option value="RESOLVED">Résolu</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Priorité</mat-label>
+        <mat-select [(ngModel)]="filterPriority" (ngModelChange)="applyFilters()">
+          <mat-option value="ALL">Toutes</mat-option>
+          <mat-option value="URGENT">Urgente</mat-option>
+          <mat-option value="CRITICAL">Critique</mat-option>
+          <mat-option value="HIGH">Haute</mat-option>
+          <mat-option value="MEDIUM">Moyenne</mat-option>
+          <mat-option value="LOW">Basse</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>KPI</mat-label>
+        <mat-select [(ngModel)]="filterKpi" (ngModelChange)="applyFilters()">
+          <mat-option value="ALL">Tous</mat-option>
+          <mat-option value="TAUX_RETARD">Taux de Retard</mat-option>
+          <mat-option value="MONTANT_IMPAYE">Montant Impayé</mat-option>
+          <mat-option value="TAUX_REGULARISATION">Taux de Régularisation</mat-option>
+          <mat-option value="DELAI_PAIEMENT">Délai de Paiement</mat-option>
+          <mat-option value="TAUX_CONVERSION">Taux de Conversion</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button (click)="resetFilters()">
+        <mat-icon>clear</mat-icon>
+        Réinitialiser
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Tableau des alertes -->
+  <mat-card class="table-card">
+    <div class="table-header">
+      <h2>Liste des Alertes</h2>
+      <span class="count-badge">{{ dataSource.data.length }} alerte(s)</span>
+    </div>
+
+    <div class="table-container" *ngIf="!isLoading">
+      <table mat-table [dataSource]="dataSource" matSort class="alerts-table">
+        
+        <!-- Colonne KPI -->
+        <ng-container matColumnDef="kpiName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>KPI</th>
+          <td mat-cell *matCellDef="let alert">
+            <div class="kpi-cell">
+              <strong>{{ alert.kpiName }}</strong>
+              <small>{{ alert.currentValue }}</small>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Colonne Sévérité -->
+        <ng-container matColumnDef="severity">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Sévérité</th>
+          <td mat-cell *matCellDef="let alert">
+            <mat-chip [color]="getSeverityColor(alert.severity)" selected>
+              {{ alert.severity }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Colonne Priorité -->
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Priorité</th>
+          <td mat-cell *matCellDef="let alert">
+            <mat-chip [color]="getPriorityColor(alert.priority)" selected>
+              {{ alert.priority }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Colonne Statut -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+          <td mat-cell *matCellDef="let alert">
+            <mat-chip [color]="getStatusColor(alert.alertStatus)" selected>
+              {{ alert.alertStatus }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Colonne Date -->
+        <ng-container matColumnDef="detectedAt">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Détecté le</th>
+          <td mat-cell *matCellDef="let alert">
+            {{ formatDate(alert.detectedAt) }}
+          </td>
+        </ng-container>
+
+        <!-- Colonne Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let alert">
+            <div class="action-buttons">
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="viewDetails(alert)"
+                matTooltip="Voir détails">
+                <mat-icon>visibility</mat-icon>
+              </button>
+
+              <button 
+                mat-icon-button 
+                color="accent" 
+                (click)="acknowledgeAlert(alert)"
+                *ngIf="alert.alertStatus === 'DELEGATED' || alert.alertStatus === 'NEW'"
+                matTooltip="Prendre en charge">
+                <mat-icon>assignment_ind</mat-icon>
+              </button>
+
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="resolveAlert(alert)"
+                *ngIf="alert.alertStatus === 'IN_PROGRESS' || alert.alertStatus === 'DELEGATED'"
+                matTooltip="Résoudre">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+
+              <button 
+                mat-icon-button 
+                (click)="archiveAlert(alert)"
+                *ngIf="alert.alertStatus === 'RESOLVED'"
+                matTooltip="Archiver">
+                <mat-icon>archive</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="alert-row"></tr>
+      </table>
+
+      <mat-paginator 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner></mat-spinner>
+      <p>Chargement des alertes...</p>
+    </div>
+
+    <!-- Aucune alerte -->
+    <div class="no-data" *ngIf="!isLoading && dataSource.data.length === 0">
+      <mat-icon>inbox</mat-icon>
+      <p>Aucune alerte à afficher</p>
+    </div>
+  </mat-card>
+</div>

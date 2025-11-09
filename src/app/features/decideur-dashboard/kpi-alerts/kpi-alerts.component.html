@@ -1,0 +1,241 @@
+<div class="kpi-alerts-container">
+  <!-- Header -->
+  <div class="alerts-header">
+    <h2>
+      <mat-icon>notifications_active</mat-icon>
+      Alertes KPI
+      <span class="alert-badge" *ngIf="alerts.length > 0">{{ alerts.length }}</span>
+    </h2>
+    <button mat-raised-button color="primary" (click)="loadAlerts(); loadDelegatedHistory()">
+      <mat-icon>refresh</mat-icon>
+      Actualiser
+    </button>
+  </div>
+
+  <!-- Onglets -->
+  <mat-tab-group [(selectedIndex)]="selectedTab">
+    <!-- Onglet Alertes Actives -->
+    <mat-tab label="Alertes Actives">
+      <div class="tab-content">
+
+  <!-- Alertes Critiques -->
+  <div class="critical-alerts" *ngIf="criticalAlerts.length > 0">
+    <h3>
+      <mat-icon class="critical-icon">local_fire_department</mat-icon>
+      Alertes Critiques ({{ criticalAlerts.length }})
+    </h3>
+    <div class="alerts-grid">
+      <mat-card *ngFor="let alert of criticalAlerts" class="alert-card critical">
+        <mat-card-header>
+          <mat-icon [color]="getSeverityColor(alert.severity)" class="alert-icon">
+            {{ getSeverityIcon(alert.severity) }}
+          </mat-icon>
+          <mat-card-title>{{ getKpiLabel(alert.kpiName) }}</mat-card-title>
+          <mat-card-subtitle>
+            <mat-chip [color]="getSeverityColor(alert.severity)" selected>
+              {{ alert.severity }}
+            </mat-chip>
+          </mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <!-- Valeur actuelle -->
+          <div class="kpi-value">
+            <span class="value">{{ alert.currentValue }}</span>
+            <span class="trend-icon" [class.danger]="alert.status === 'ANORMAL'">
+              <mat-icon>trending_up</mat-icon>
+            </span>
+          </div>
+          
+          <!-- Dimension -->
+          <div class="alert-dimension" *ngIf="alert.dimensionValue">
+            <mat-icon>location_on</mat-icon>
+            {{ alert.dimension }}: <strong>{{ alert.dimensionValue }}</strong>
+          </div>
+          
+          <!-- Message -->
+          <p class="alert-message">{{ alert.message }}</p>
+          
+          <!-- Recommandation -->
+          <div class="alert-recommendation" *ngIf="alert.recommendation">
+            <mat-icon>lightbulb</mat-icon>
+            <p>{{ alert.recommendation }}</p>
+          </div>
+          
+          <!-- Détails -->
+          <div class="alert-details">
+            <small>
+              <mat-icon>schedule</mat-icon>
+              Détecté le {{ formatDate(alert.detectedAt) }}
+            </small>
+          </div>
+        </mat-card-content>
+        
+        <mat-card-actions>
+          <button mat-raised-button color="warn" (click)="delegateToProjectManager(alert)">
+            <mat-icon>send</mat-icon>
+            Envoyer au Chef de Projet
+          </button>
+          <button mat-button (click)="viewHistory(alert)">
+            <mat-icon>history</mat-icon>
+            Historique
+          </button>
+          <button mat-raised-button color="primary" (click)="resolveAlert(alert)">
+            <mat-icon>check</mat-icon>
+            Marquer comme résolu
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Toutes les Alertes -->
+  <div class="all-alerts">
+    <h3>
+      <mat-icon>warning</mat-icon>
+      Toutes les Alertes ({{ alerts.length }})
+    </h3>
+    
+    <!-- Aucune alerte -->
+    <div class="no-alerts" *ngIf="alerts.length === 0 && !loading">
+      <mat-icon>check_circle</mat-icon>
+      <p>Aucune alerte active</p>
+      <small>Tous les KPI sont dans les normes</small>
+    </div>
+    
+    <!-- Loading -->
+    <div class="loading" *ngIf="loading">
+      <mat-icon class="spin">refresh</mat-icon>
+      <p>Chargement des alertes...</p>
+    </div>
+    
+    <!-- Liste des alertes -->
+    <div class="alerts-list" *ngIf="alerts.length > 0 && !loading">
+      <mat-card *ngFor="let alert of alerts" 
+                class="alert-card" 
+                [class.warning]="alert.severity === 'MEDIUM'"
+                [class.danger]="alert.severity === 'HIGH'">
+        <mat-card-header>
+          <mat-icon [color]="getSeverityColor(alert.severity)">
+            {{ getSeverityIcon(alert.severity) }}
+          </mat-icon>
+          <mat-card-title>{{ getKpiLabel(alert.kpiName) }}</mat-card-title>
+          <mat-card-subtitle>
+            <mat-chip [color]="getStatusColor(alert.status)" selected>
+              {{ alert.status }}
+            </mat-chip>
+          </mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="alert-info">
+            <div class="info-item">
+              <span class="label">Valeur actuelle:</span>
+              <span class="value">{{ alert.currentValue }}</span>
+            </div>
+            <div class="info-item" *ngIf="alert.thresholdValue">
+              <span class="label">Seuil:</span>
+              <span class="value">{{ alert.thresholdValue }}</span>
+            </div>
+            <div class="info-item" *ngIf="alert.dimensionValue">
+              <span class="label">{{ alert.dimension }}:</span>
+              <span class="value">{{ alert.dimensionValue }}</span>
+            </div>
+          </div>
+          
+          <p class="alert-message">{{ alert.message }}</p>
+          
+          <div class="alert-recommendation" *ngIf="alert.recommendation">
+            <mat-icon>tips_and_updates</mat-icon>
+            <small>{{ alert.recommendation }}</small>
+          </div>
+          
+          <div class="alert-footer">
+            <small>
+              <mat-icon>access_time</mat-icon>
+              {{ formatDate(alert.detectedAt) }}
+            </small>
+          </div>
+        </mat-card-content>
+        
+        <mat-card-actions>
+          <button mat-raised-button color="warn" (click)="delegateToProjectManager(alert)">
+            <mat-icon>send</mat-icon>
+            Envoyer au Chef de Projet
+          </button>
+          <button mat-button (click)="viewHistory(alert)">
+            <mat-icon>history</mat-icon>
+            Historique
+          </button>
+          <button mat-button color="primary" (click)="resolveAlert(alert)">
+            <mat-icon>done</mat-icon>
+            Résoudre
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Historique -->
+    <mat-tab label="Historique">
+      <div class="tab-content">
+        <div class="history-section">
+          <h3>
+            <mat-icon>history</mat-icon>
+            Alertes Déléguées ({{ delegatedAlerts.length }})
+          </h3>
+          
+          <!-- Aucune alerte déléguée -->
+          <div class="no-alerts" *ngIf="delegatedAlerts.length === 0 && !loading">
+            <mat-icon>inbox</mat-icon>
+            <p>Aucune alerte déléguée</p>
+            <small>Les alertes envoyées au Chef de Projet apparaîtront ici</small>
+          </div>
+          
+          <!-- Liste des alertes déléguées -->
+          <div class="alerts-list" *ngIf="delegatedAlerts.length > 0">
+            <mat-card *ngFor="let alert of delegatedAlerts" class="alert-card delegated">
+              <mat-card-header>
+                <mat-icon color="primary">send</mat-icon>
+                <mat-card-title>{{ getKpiLabel(alert.kpiName) }}</mat-card-title>
+                <mat-card-subtitle>
+                  <mat-chip color="primary" selected>
+                    Déléguée
+                  </mat-chip>
+                </mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <div class="alert-info">
+                  <div class="info-item">
+                    <span class="label">Valeur:</span>
+                    <span class="value">{{ alert.currentValue }}</span>
+                  </div>
+                  <div class="info-item" *ngIf="alert.dimensionValue">
+                    <span class="label">{{ alert.dimension }}:</span>
+                    <span class="value">{{ alert.dimensionValue }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Déléguée le:</span>
+                    <span class="value">{{ formatDelegationDate(alert) }}</span>
+                  </div>
+                </div>
+                
+                <p class="alert-message">{{ alert.message }}</p>
+                
+                <div class="alert-footer">
+                  <small>
+                    <mat-icon>access_time</mat-icon>
+                    Détectée le {{ formatDate(alert.detectedAt) }}
+                  </small>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

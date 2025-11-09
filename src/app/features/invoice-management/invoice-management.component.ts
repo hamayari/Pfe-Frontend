@@ -73,8 +73,7 @@ export class InvoiceManagementComponent implements OnInit {
   overdueAmount = 0;
 
   displayedColumns: string[] = [
-    'reference', 'client', 'convention', 'amount', 'issueDate', 'dueDate', 
-    'status', 'paymentMethod', 'actions'
+    'reference', 'convention', 'amount', 'dueDate', 'status', 'actions'
   ];
 
   filterForm: FormGroup;
@@ -82,6 +81,7 @@ export class InvoiceManagementComponent implements OnInit {
     { value: 'DRAFT', label: 'Brouillon', color: 'grey' },
     { value: 'SENT', label: 'Envoyée', color: 'blue' },
     { value: 'PAID', label: 'Payée', color: 'green' },
+    { value: 'PENDING', label: 'En attente', color: 'blue' },
     { value: 'OVERDUE', label: 'En retard', color: 'red' },
     { value: 'CANCELLED', label: 'Annulée', color: 'black' },
     { value: 'PARTIALLY_PAID', label: 'Partiellement payée', color: 'orange' }
@@ -480,6 +480,7 @@ export class InvoiceManagementComponent implements OnInit {
   getStatusColor(status: string): string {
     switch (status) {
       case 'PAID': return 'green';
+      case 'PENDING': return 'blue';
       case 'SENT': return 'blue';
       case 'OVERDUE': return 'red';
       case 'CANCELLED': return 'black';

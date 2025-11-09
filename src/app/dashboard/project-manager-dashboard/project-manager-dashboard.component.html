@@ -1,4 +1,79 @@
 <div class="dashboard-container">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon>dashboard</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Chef de Projet</span>
+      </div>
+      <button class="collapse-btn" (click)="toggleSidebar()" matTooltip="{{ sidebarCollapsed ? 'Développer' : 'Réduire' }}">
+        <mat-icon>{{ sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" [class.active]="activeSection === 'overview'" (click)="navigateToSection('overview')">
+        <mat-icon>dashboard</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Vue d'ensemble</span>
+      </a>
+      
+      <a class="nav-item" [class.active]="activeSection === 'contracts'" (click)="navigateToSection('contracts')">
+        <mat-icon>description</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Suivi des Conventions</span>
+        <span class="badge" *ngIf="!sidebarCollapsed && contractsDataSource.length > 0">{{ contractsDataSource.length }}</span>
+      </a>
+      
+      <a class="nav-item" [class.active]="activeSection === 'invoices'" (click)="navigateToSection('invoices')">
+        <mat-icon>receipt</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Suivi des Factures</span>
+        <span class="badge warning" *ngIf="!sidebarCollapsed && stats.detectedDelays > 0">{{ stats.detectedDelays }}</span>
+      </a>
+      
+      <a class="nav-item" [class.active]="activeSection === 'analytics'" (click)="navigateToSection('analytics')">
+        <mat-icon>insert_chart</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Analyses & Reporting</span>
+      </a>
+      
+      <a class="nav-item" [class.active]="activeSection === 'team'" (click)="navigateToSection('team')">
+        <mat-icon>groups</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Équipe Commerciale</span>
+      </a>
+      
+      <a class="nav-item" [class.active]="activeSection === 'kpi-alerts'" (click)="navigateToSection('kpi-alerts')">
+        <mat-icon>notifications_active</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Gestion Alertes KPI</span>
+        <span class="badge danger" *ngIf="!sidebarCollapsed && notificationCount > 0">{{ notificationCount }}</span>
+      </a>
+      
+      <a class="nav-item" [class.active]="activeSection === 'alerts'" (click)="navigateToSection('alerts')">
+        <mat-icon>notifications</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Alertes & Notifications</span>
+        <span class="badge danger" *ngIf="!sidebarCollapsed && stats.pendingAlerts > 0">{{ stats.pendingAlerts }}</span>
+      </a>
+      
+      <a class="nav-item" [class.active]="activeSection === 'gantt'" (click)="navigateToSection('gantt')">
+        <mat-icon>view_timeline</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Planification Gantt</span>
+      </a>
+      
+      <div class="nav-divider" *ngIf="!sidebarCollapsed"></div>
+      
+      <a class="nav-item" (click)="goToProfile()">
+        <mat-icon>person</mat-icon>
+        <span *ngIf="!sidebarCollapsed">Mon Profil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer" *ngIf="!sidebarCollapsed">
+      <div class="connection-status" [class.connected]="isWebSocketConnected">
+        <mat-icon>{{ isWebSocketConnected ? 'wifi' : 'wifi_off' }}</mat-icon>
+        <span>{{ isWebSocketConnected ? 'Connecté' : 'Déconnecté' }}</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
   <!-- Header Professionnel (même que admin) -->
   <header class="dashboard-header">
     <div class="header-left">
@@ -25,10 +100,11 @@
     <div class="header-right">
       <!-- Notifications -->
       <div class="notification-container">
-        <button class="header-icon-btn" (click)="toggleNotifications()" [class.has-notifications]="hasNotifications" title="Notifications">
-          <i class="material-icons">notifications</i>
-          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
-        </button>
+        <app-notification-panel 
+          [autoRefresh]="true"
+          [refreshInterval]="30000"
+          (notificationClicked)="onNotificationClicked($event)">
+        </app-notification-panel>
       </div>
       
       <!-- Messages -->
@@ -78,108 +154,776 @@
     </div>
   </header>
 
-  <!-- KPI Cards -->
-  <div class="stats-grid">
-    <mat-card class="stat-card kpi-ok">
-      <mat-card-header>
-        <div mat-card-avatar><mat-icon>check_circle_outline</mat-icon></div>
-        <mat-card-title>15</mat-card-title>
-        <mat-card-subtitle>Conventions OK</mat-card-subtitle>
-      </mat-card-header>
-    </mat-card>
-    <mat-card class="stat-card kpi-vigilance">
-      <mat-card-header>
-        <div mat-card-avatar><mat-icon>warning_amber</mat-icon></div>
-        <mat-card-title>{{ stats.conventionsAtRisk }}</mat-card-title>
-        <mat-card-subtitle>Conventions à Risque</mat-card-subtitle>
-      </mat-card-header>
-    </mat-card>
-    <mat-card class="stat-card kpi-problem">
-      <mat-card-header>
-        <div mat-card-avatar><mat-icon>highlight_off</mat-icon></div>
-        <mat-card-title>{{ stats.detectedDelays }}</mat-card-title>
-        <mat-card-subtitle>Retards Détectés</mat-card-subtitle>
-      </mat-card-header>
-    </mat-card>
+  <!-- Boutons d'accès rapide - Chef de Projet (Consultation uniquement) -->
+  <div class="quick-actions-bar">
+    <button mat-raised-button color="primary" (click)="navigateToSection('contracts')">
+      <mat-icon>visibility</mat-icon>
+      Consulter Conventions
+    </button>
+    <button mat-raised-button (click)="navigateToSection('invoices')">
+      <mat-icon>receipt</mat-icon>
+      Consulter Factures
+    </button>
+    <button mat-raised-button (click)="navigateToSection('analytics')">
+      <mat-icon>insert_chart</mat-icon>
+      Analyses & Rapports
+    </button>
+    <button mat-raised-button (click)="navigateToSection('team')">
+      <mat-icon>groups</mat-icon>
+      Contacter Équipe
+    </button>
+    <button mat-raised-button color="accent" (click)="exportAllData()">
+      <mat-icon>download</mat-icon>
+      Export Rapport
+    </button>
   </div>
 
-  <!-- Timeline de sprint -->
-  <mat-card class="timeline-card">
+  <!-- Bannière de dernière mise à jour - Discrète et professionnelle -->
+  <div class="last-update-banner">
+    <mat-icon class="update-icon">schedule</mat-icon>
+    <span class="update-text">Dernière mise à jour : {{ lastUpdate | date:'dd/MM/yyyy HH:mm' }}</span>
+    <span class="auto-refresh-indicator" *ngIf="!isRefreshing">
+      <mat-icon class="sync-icon">sync</mat-icon>
+      <span class="sync-text">Actualisation automatique</span>
+    </span>
+    <mat-spinner *ngIf="isRefreshing" diameter="20" class="refresh-spinner"></mat-spinner>
+  </div>
+
+  <!-- KPI Cards - Vue d'ensemble -->
+  <div class="kpi-section" id="overview">
+    <h2 class="section-title">
+      <mat-icon>dashboard</mat-icon>
+      Vue d'ensemble - Indicateurs Clés
+    </h2>
+    
+    <div class="kpi-grid">
+      <!-- Total Conventions -->
+      <mat-card class="kpi-card" (click)="navigateToSection('contracts')">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <mat-icon>description</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpiData.totalConventions }}</div>
+          <div class="kpi-label">Conventions Actives</div>
+          <div class="kpi-sublabel">{{ kpiData.expiredConventions }} expirées</div>
+        </div>
+        <mat-icon class="kpi-arrow">arrow_forward</mat-icon>
+      </mat-card>
+
+      <!-- Total Factures -->
+      <mat-card class="kpi-card" (click)="navigateToSection('invoices')">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpiData.totalInvoicesAmount | number:'1.0-0' }} TND</div>
+          <div class="kpi-label">Total Factures Émises</div>
+          <div class="kpi-sublabel">{{ kpiData.totalInvoices }} factures</div>
+        </div>
+        <mat-icon class="kpi-arrow">arrow_forward</mat-icon>
+      </mat-card>
+
+      <!-- Factures en retard -->
+      <mat-card class="kpi-card alert" (click)="showOverdueInvoices()">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpiData.overdueInvoices }}</div>
+          <div class="kpi-label">Factures en Retard</div>
+          <div class="kpi-sublabel">{{ kpiData.overduePercentage }}% du total</div>
+        </div>
+        <mat-icon class="kpi-arrow">arrow_forward</mat-icon>
+      </mat-card>
+
+      <!-- Échéances proches -->
+      <mat-card class="kpi-card warning" (click)="showUpcomingDeadlines()">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+          <mat-icon>event</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpiData.upcomingDeadlines }}</div>
+          <div class="kpi-label">Échéances Proches</div>
+          <div class="kpi-sublabel">Dans les 30 jours</div>
+        </div>
+        <mat-icon class="kpi-arrow">arrow_forward</mat-icon>
+      </mat-card>
+
+      <!-- Performance commerciale -->
+      <mat-card class="kpi-card" (click)="navigateToSection('team')">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpiData.teamPerformance }}%</div>
+          <div class="kpi-label">Performance Équipe</div>
+          <div class="kpi-sublabel">Taux de suivi</div>
+        </div>
+        <mat-icon class="kpi-arrow">arrow_forward</mat-icon>
+      </mat-card>
+
+      <!-- Taux de régularisation -->
+      <mat-card class="kpi-card success">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpiData.regularizationRate }}%</div>
+          <div class="kpi-label">Taux de Régularisation</div>
+          <div class="kpi-sublabel">Factures réglées après rappel</div>
+        </div>
+        <mat-icon class="kpi-arrow">arrow_forward</mat-icon>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Mini-carte Performance par Région -->
+  <div class="region-performance-section">
+    <h2 class="section-title">
+      <mat-icon>map</mat-icon>
+      Performance par Gouvernorat
+    </h2>
+    
+    <div class="region-cards-grid">
+      <mat-card *ngFor="let region of regionPerformance" class="region-card" [class.top-performer]="region.isTopPerformer">
+        <mat-card-content>
+          <div class="region-header">
+            <div class="region-name">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ region.name }}</span>
+            </div>
+            <mat-chip *ngIf="region.isTopPerformer" class="top-badge">
+              <mat-icon>star</mat-icon>
+              Top
+            </mat-chip>
+          </div>
+
+          <div class="region-stats">
+            <div class="stat-item">
+              <div class="stat-value">{{ region.conventions }}</div>
+              <div class="stat-label">Conventions</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ region.amount | number:'1.0-0' }}€</div>
+              <div class="stat-label">CA Total</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ region.paymentRate }}%</div>
+              <div class="stat-label">Taux paiement</div>
+            </div>
+          </div>
+
+          <div class="region-progress">
+            <mat-progress-bar mode="determinate" [value]="region.paymentRate" 
+              [color]="region.paymentRate >= 80 ? 'primary' : region.paymentRate >= 60 ? 'accent' : 'warn'">
+            </mat-progress-bar>
+          </div>
+
+          <div class="region-footer">
+            <span class="commercial-count">
+              <mat-icon>person</mat-icon>
+              {{ region.commercials }} commerciaux
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Section Graphiques Analytiques -->
+  <div class="charts-section" id="analytics">
+    <h2 class="section-title">
+      <mat-icon>insert_chart</mat-icon>
+      Analyses & Statistiques
+    </h2>
+    
+    <div class="charts-grid">
+      <!-- Graphique d'évolution -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>show_chart</mat-icon>
+            Évolution Mensuelle
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas id="evolutionChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Graphique de performance -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>bar_chart</mat-icon>
+            Performance Équipe
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas id="performanceChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Graphique de répartition -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>pie_chart</mat-icon>
+            Répartition Factures
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Indicateurs Calculés Automatiquement -->
+    <div class="calculated-indicators">
+      <h3 class="indicators-title">
+        <mat-icon>calculate</mat-icon>
+        Indicateurs Calculés Automatiquement
+      </h3>
+      
+      <div class="indicators-grid">
+        <mat-card class="indicator-card">
+          <mat-icon class="indicator-icon">trending_up</mat-icon>
+          <div class="indicator-content">
+            <div class="indicator-value">{{ calculatedIndicators.commercialEfficiency }}%</div>
+            <div class="indicator-label">Taux d'Efficacité Commerciale</div>
+            <div class="indicator-sublabel">Conventions signées / Propositions</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="indicator-card">
+          <mat-icon class="indicator-icon">schedule</mat-icon>
+          <div class="indicator-content">
+            <div class="indicator-value">{{ calculatedIndicators.avgPaymentDelay }} jours</div>
+            <div class="indicator-label">Délai Moyen de Paiement</div>
+            <div class="indicator-sublabel">Temps moyen entre émission et paiement</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="indicator-card">
+          <mat-icon class="indicator-icon">show_chart</mat-icon>
+          <div class="indicator-content">
+            <div class="indicator-value">+{{ calculatedIndicators.conventionGrowthRate }}%</div>
+            <div class="indicator-label">Taux d'Évolution Conventions</div>
+            <div class="indicator-sublabel">Croissance par rapport au mois dernier</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="indicator-card">
+          <mat-icon class="indicator-icon">pie_chart</mat-icon>
+          <div class="indicator-content">
+            <div class="indicator-value">{{ calculatedIndicators.invoicePaymentRatio }}%</div>
+            <div class="indicator-label">Ratio Factures Payées / Émises</div>
+            <div class="indicator-sublabel">Taux de recouvrement</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="indicator-card">
+          <mat-icon class="indicator-icon">warning</mat-icon>
+          <div class="indicator-content">
+            <div class="indicator-value">{{ calculatedIndicators.avgDelayIndex }} jours</div>
+            <div class="indicator-label">Indice de Retard Moyen</div>
+            <div class="indicator-sublabel">Retard moyen des factures impayées</div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suivi des Conventions PROFESSIONNEL -->
+  <mat-card class="contracts-overview-card" id="contracts">
     <mat-card-header>
-      <mat-card-title>Suivi du Sprint</mat-card-title>
+      <mat-card-title>
+        <mat-icon>description</mat-icon>
+        Suivi des Conventions ({{ contractsDataSource.length }})
+      </mat-card-title>
+      <div class="header-actions">
+        <button mat-raised-button color="accent" (click)="exportContracts('excel')">
+          <mat-icon>table_chart</mat-icon>
+          Excel
+        </button>
+        <button mat-raised-button color="warn" (click)="exportContracts('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+      </div>
     </mat-card-header>
+
+    <!-- Filtres Avancés -->
+    <div class="filters-section">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Rechercher</mat-label>
+        <input matInput [(ngModel)]="contractSearch" (keyup)="applyContractFilters()" placeholder="Référence, client...">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="contractStatusFilter" (selectionChange)="applyContractFilters()">
+          <mat-option value="">Tous</mat-option>
+          <mat-option value="ACTIVE">Actif</mat-option>
+          <mat-option value="PENDING">En attente</mat-option>
+          <mat-option value="EXPIRED">Expiré</mat-option>
+          <mat-option value="COMPLETED">Terminé</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Date début</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="contractStartDate" (dateChange)="applyContractFilters()">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Date fin</mat-label>
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="contractEndDate" (dateChange)="applyContractFilters()">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
     <mat-card-content>
-      <ul>
-        <li *ngFor="let step of timeline">
-          <span [ngClass]="step.status">{{ step.label }} ({{ step.date }})</span>
-        </li>
-      </ul>
+      <div class="table-container">
+        <table mat-table [dataSource]="contractsTable" matSort (matSortChange)="sortContracts($event)" class="contracts-table">
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Référence</th>
+            <td mat-cell *matCellDef="let contract">
+              <strong>{{ contract.reference }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let contract">{{ contract.client }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="governorate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Gouvernorat</th>
+            <td mat-cell *matCellDef="let contract">
+              <mat-chip class="governorate-chip">
+                <mat-icon>location_on</mat-icon>
+                {{ contract.governorate }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="commercial">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Commercial</th>
+            <td mat-cell *matCellDef="let contract">
+              <div class="commercial-cell">
+                <mat-icon>person</mat-icon>
+                {{ contract.commercial }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+            <td mat-cell *matCellDef="let contract">
+              <strong class="amount-value">{{ contract.amount | number:'1.0-0' }} €</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+            <td mat-cell *matCellDef="let contract">
+              <mat-chip [class]="'status-chip ' + contract.status?.toLowerCase()">
+                {{ getStatusLabel(contract.status) }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="progress">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Progression</th>
+            <td mat-cell *matCellDef="let contract">
+              <div class="progress-container">
+                <mat-progress-bar mode="determinate" [value]="contract.progress || 0"></mat-progress-bar>
+                <span class="progress-text">{{ contract.progress || 0 }}%</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="startDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Début</th>
+            <td mat-cell *matCellDef="let contract">{{ contract.startDate | date:'dd/MM/yyyy' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Échéance</th>
+            <td mat-cell *matCellDef="let contract">
+              <span [class.text-danger]="isContractExpiringSoon(contract.endDate)">
+                {{ contract.endDate | date:'dd/MM/yyyy' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let contract">
+              <button mat-icon-button [matMenuTriggerFor]="contractMenu" matTooltip="Actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #contractMenu="matMenu">
+                <button mat-menu-item (click)="viewContractDetails(contract)">
+                  <mat-icon>visibility</mat-icon>
+                  Consulter Détails
+                </button>
+                <button mat-menu-item (click)="contactCommercialForContract(contract)">
+                  <mat-icon>contact_support</mat-icon>
+                  Contacter Commercial
+                </button>
+                <button mat-menu-item (click)="assignTeam(contract)">
+                  <mat-icon>group_add</mat-icon>
+                  Assigner équipe
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteContract(contract)" class="text-danger">
+                  <mat-icon>delete</mat-icon>
+                  Supprimer
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="contractColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: contractColumns;" class="table-row"></tr>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator #contractsPaginator [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 50]" 
+        showFirstLastButtons></mat-paginator>
     </mat-card-content>
   </mat-card>
 
-  <!-- Logs d'activité -->
-  <mat-card class="logs-card">
+  <!-- Suivi des Factures AMÉLIORÉ -->
+  <mat-card class="invoices-tracking-card">
     <mat-card-header>
-      <mat-card-title>Logs d'activité</mat-card-title>
+      <mat-card-title>
+        <mat-icon>receipt</mat-icon>
+        Suivi des Factures
+      </mat-card-title>
+      <div class="header-actions">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filtrer par statut</mat-label>
+          <mat-select [(ngModel)]="invoiceFilter" (selectionChange)="filterInvoices()">
+            <mat-option value="all">Toutes</mat-option>
+            <mat-option value="PAID">Payées</mat-option>
+            <mat-option value="PENDING">En attente</mat-option>
+            <mat-option value="OVERDUE">En retard</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </mat-card-header>
     <mat-card-content>
-      <ul>
-        <li *ngFor="let log of logs">{{ log }}</li>
-      </ul>
+      <table mat-table [dataSource]="invoicesTable" class="invoices-table">
+        <ng-container matColumnDef="invoiceNumber">
+          <th mat-header-cell *matHeaderCellDef>N° Facture</th>
+          <td mat-cell *matCellDef="let invoice">{{ invoice.invoiceNumber }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="contract">
+          <th mat-header-cell *matHeaderCellDef>Contrat</th>
+          <td mat-cell *matCellDef="let invoice">{{ invoice.contractRef }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Montant</th>
+          <td mat-cell *matCellDef="let invoice">{{ invoice.amount | number:'1.0-0' }} TND</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <td mat-cell *matCellDef="let invoice">
+            <span 
+              [style.background-color]="invoice.status === 'PAID' ? '#d4edda' : invoice.status === 'PENDING' ? '#d1ecf1' : invoice.status === 'OVERDUE' ? '#f8d7da' : '#e2e3e5'"
+              [style.color]="invoice.status === 'PAID' ? '#155724' : invoice.status === 'PENDING' ? '#0c5460' : invoice.status === 'OVERDUE' ? '#721c24' : '#383d41'"
+              style="display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              {{ invoice.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dueDate">
+          <th mat-header-cell *matHeaderCellDef>Échéance</th>
+          <td mat-cell *matCellDef="let invoice">{{ invoice.dueDate | date:'dd/MM/yyyy' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let invoice">
+            <button mat-icon-button [matMenuTriggerFor]="invoiceMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #invoiceMenu="matMenu">
+              <button mat-menu-item (click)="viewInvoiceDetails(invoice)">
+                <mat-icon>visibility</mat-icon>
+                Voir détails
+              </button>
+              <button mat-menu-item (click)="sendReminderForInvoice(invoice)">
+                <mat-icon>send</mat-icon>
+                Envoyer rappel
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="invoiceColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: invoiceColumns;"></tr>
+      </table>
+      
+      <!-- Pagination -->
+      <mat-paginator #invoicesPaginator [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 50]" 
+        showFirstLastButtons></mat-paginator>
     </mat-card-content>
   </mat-card>
 
-  <!-- Messagerie interne -->
-  <mat-card class="messages-card">
+  <!-- Section Équipe Commerciale & Collaboration -->
+  <mat-card class="team-section" id="team">
     <mat-card-header>
-      <mat-card-title>Messagerie Interne</mat-card-title>
+      <mat-card-title>
+        <mat-icon>groups</mat-icon>
+        Équipe Commerciale & Collaboration
+      </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="messages-list">
-        <div *ngFor="let msg of messages">
-          <b>{{ msg.from }}</b> : {{ msg.content }} <small>({{ msg.date | date:'short' }})</small>
+      <div class="team-grid">
+        <div *ngFor="let member of teamMembers" class="team-member-card" [class]="member.status">
+          <!-- En-tête membre -->
+          <div class="member-header">
+            <div class="member-avatar">
+              <mat-icon>person</mat-icon>
+              <span class="status-badge" [class]="member.status"></span>
+            </div>
+            <div class="member-basic-info">
+              <div class="member-name">{{ member.name }}</div>
+              <div class="member-role">{{ member.role }}</div>
+              <div class="member-status-text">
+                <mat-icon>circle</mat-icon>
+                {{ getStatusText(member.status) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistiques réelles -->
+          <div class="member-stats">
+            <div class="stat-row">
+              <div class="stat-item">
+                <mat-icon class="stat-icon conventions">description</mat-icon>
+                <div class="stat-content">
+                  <div class="stat-value">{{ member.assignedConventions || 0 }}</div>
+                  <div class="stat-label">Conventions</div>
+                  <div class="stat-detail">{{ member.activeConventions || 0 }} actives</div>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <mat-icon class="stat-icon invoices">receipt</mat-icon>
+                <div class="stat-content">
+                  <div class="stat-value">{{ member.totalInvoices || 0 }}</div>
+                  <div class="stat-label">Factures</div>
+                  <div class="stat-detail" [class.warning]="(member.overdueInvoices || 0) > 0">
+                    {{ member.overdueInvoices || 0 }} en retard
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-item">
+                <mat-icon class="stat-icon payment">payments</mat-icon>
+                <div class="stat-content">
+                  <div class="stat-value">{{ member.paymentRate || 0 | number:'1.0-0' }}%</div>
+                  <div class="stat-label">Taux de paiement</div>
+                  <div class="stat-detail">{{ member.paidInvoices || 0 }}/{{ member.totalInvoices || 0 }} payées</div>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <mat-icon class="stat-icon performance">trending_up</mat-icon>
+                <div class="stat-content">
+                  <div class="stat-value" [class.good]="(member.performanceScore || 0) >= 70" 
+                       [class.medium]="(member.performanceScore || 0) >= 50 && (member.performanceScore || 0) < 70"
+                       [class.low]="(member.performanceScore || 0) < 50">
+                    {{ member.performanceScore || 0 | number:'1.0-0' }}%
+                  </div>
+                  <div class="stat-label">Performance</div>
+                  <div class="stat-detail">Score global</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tâche en cours -->
+          <div class="member-current-task" *ngIf="member.currentTask">
+            <mat-icon>work_outline</mat-icon>
+            <span>{{ member.currentTask }}</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="member-actions">
+            <button mat-raised-button color="primary" (click)="contactCommercial(member.id)">
+              <mat-icon>chat</mat-icon>
+              Contacter
+            </button>
+            <button mat-button (click)="viewMemberDetails(member.id)">
+              <mat-icon>visibility</mat-icon>
+              Détails
+            </button>
+          </div>
+
+          <!-- Dernière activité -->
+          <div class="member-footer">
+            <mat-icon>schedule</mat-icon>
+            <span>Dernière activité: {{ member.lastActivity | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
         </div>
       </div>
-      <div class="message-input">
-        <input [(ngModel)]="newMessage" placeholder="Votre message..." />
-        <button mat-raised-button color="primary" (click)="sendMessage()">Envoyer</button>
-      </div>
     </mat-card-content>
   </mat-card>
 
-  <!-- Alerts Section -->
-  <div class="alerts-section">
-    <h3>Alertes</h3>
-    <ul>
-      <li *ngFor="let alert of alerts" [ngClass]="alert.type">
-        {{ alert.message }} ({{ alert.timestamp | date:'short' }})
-      </li>
-    </ul>
+  <!-- Gantt Chart -->
+  <app-gantt-chart 
+    [tasks]="ganttTasks" 
+    [title]="'Planification des Tâches - Sprint en cours'"
+    id="gantt">
+  </app-gantt-chart>
+
+  <!-- Section Gestion Alertes KPI -->
+  <div id="kpi-alerts" class="section-container">
+    <app-kpi-alerts-section [userRole]="'CHEF_PROJET'"></app-kpi-alerts-section>
   </div>
 
-  <!-- Reminder Section -->
-  <div class="reminder-section">
-    <h3>Envoyer un rappel à un commercial</h3>
-    <form (ngSubmit)="sendReminder()">
-      <label>À :
-        <select [(ngModel)]="reminderForm.to" name="to" required>
-          <option *ngFor="let team of teams" [value]="team">{{ team }}</option>
-        </select>
-      </label>
-      <label>Message :
-        <input [(ngModel)]="reminderForm.message" name="message" required />
-      </label>
-      <button type="submit">Envoyer</button>
-    </form>
-    <div *ngIf="reminderMessage" class="reminder-message">{{ reminderMessage }}</div>
-    <h4>Rappels envoyés</h4>
-    <ul>
-      <li *ngFor="let r of reminders">
-        {{ r.date | date:'short' }} - {{ r.to }} : {{ r.message }}
-      </li>
-    </ul>
-  </div>
+  <!-- Section Alertes & Notifications PROFESSIONNELLE -->
+  <mat-card class="alerts-section-pro" id="alerts">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>notifications_active</mat-icon>
+        Alertes & Notifications ({{ getUnreadAlertsCount() }})
+      </mat-card-title>
+      <div class="header-actions">
+        <mat-button-toggle-group [(ngModel)]="alertFilter" (change)="filterAlerts()">
+          <mat-button-toggle value="all">Toutes</mat-button-toggle>
+          <mat-button-toggle value="critical">Critiques</mat-button-toggle>
+          <mat-button-toggle value="warning">Avertissements</mat-button-toggle>
+          <mat-button-toggle value="info">Infos</mat-button-toggle>
+        </mat-button-toggle-group>
+        <button mat-raised-button color="primary" (click)="markAllAlertsAsRead()" *ngIf="getUnreadAlertsCount() > 0">
+          <mat-icon>done_all</mat-icon>
+          Tout marquer comme lu
+        </button>
+      </div>
+    </mat-card-header>
 
-  <!-- existing content -->
-  <p>project-manager-dashboard works!</p>
+    <mat-card-content>
+      <div class="alerts-stats">
+        <div class="stat-card critical">
+          <mat-icon>error</mat-icon>
+          <div class="stat-info">
+            <div class="stat-value">{{ getAlertsByType('critical').length }}</div>
+            <div class="stat-label">Critiques</div>
+          </div>
+        </div>
+        <div class="stat-card warning">
+          <mat-icon>warning</mat-icon>
+          <div class="stat-info">
+            <div class="stat-value">{{ getAlertsByType('warning').length }}</div>
+            <div class="stat-label">Avertissements</div>
+          </div>
+        </div>
+        <div class="stat-card info">
+          <mat-icon>info</mat-icon>
+          <div class="stat-info">
+            <div class="stat-value">{{ getAlertsByType('info').length }}</div>
+            <div class="stat-label">Informations</div>
+          </div>
+        </div>
+        <div class="stat-card success">
+          <mat-icon>check_circle</mat-icon>
+          <div class="stat-info">
+            <div class="stat-value">{{ getReadAlertsCount() }}</div>
+            <div class="stat-label">Traitées</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alerts-container" *ngIf="filteredAlerts.length > 0; else noAlerts">
+        <div *ngFor="let alert of filteredAlerts" class="alert-item-pro" 
+             [class.critical]="alert.type === 'critical'"
+             [class.warning]="alert.type === 'warning'"
+             [class.info]="alert.type === 'info'"
+             [class.acknowledged]="alert.acknowledged">
+          
+          <div class="alert-priority-bar" [class]="alert.type"></div>
+          
+          <div class="alert-icon-wrapper">
+            <mat-icon class="alert-icon">
+              {{ alert.type === 'critical' ? 'error' : alert.type === 'warning' ? 'warning' : 'info' }}
+            </mat-icon>
+          </div>
+
+          <div class="alert-content-wrapper">
+            <div class="alert-header">
+              <span class="alert-type-badge" [class]="alert.type">
+                {{ alert.type === 'critical' ? 'CRITIQUE' : alert.type === 'warning' ? 'AVERTISSEMENT' : 'INFO' }}
+              </span>
+              <span class="alert-timestamp">
+                <mat-icon>schedule</mat-icon>
+                {{ alert.timestamp | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            </div>
+            
+            <div class="alert-message">{{ alert.message }}</div>
+            
+            <div class="alert-details" *ngIf="alert.details">
+              <mat-icon>description</mat-icon>
+              <span>{{ alert.details }}</span>
+            </div>
+          </div>
+
+          <div class="alert-actions">
+            <button mat-icon-button (click)="acknowledgeAlert(alert.id)" 
+                    *ngIf="!alert.acknowledged" 
+                    matTooltip="Marquer comme lu"
+                    color="primary">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            <button mat-icon-button [matMenuTriggerFor]="alertMenu" matTooltip="Plus d'actions">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #alertMenu="matMenu">
+              <button mat-menu-item (click)="viewAlertDetails(alert)">
+                <mat-icon>visibility</mat-icon>
+                Voir détails
+              </button>
+              <button mat-menu-item (click)="dismissAlert(alert.id)">
+                <mat-icon>delete</mat-icon>
+                Supprimer
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noAlerts>
+        <div class="empty-state">
+          <mat-icon>notifications_off</mat-icon>
+          <p>Aucune alerte {{ alertFilter !== 'all' ? 'de ce type' : '' }} pour le moment</p>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  </div>
 </div>

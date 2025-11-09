@@ -197,6 +197,38 @@ export class WebsocketService implements OnDestroy {
     return this.isConnected;
   }
 
+  /**
+   * S'abonner à un topic WebSocket personnalisé
+   */
+  subscribe(destination: string, callback: (message: any) => void): StompSubscription | null {
+    if (!this.isConnected) {
+      console.warn('WebSocket not connected, subscription will be delayed');
+      // Attendre la connexion puis s'abonner
+      this.connectionStatus$.subscribe(connected => {
+        if (connected) {
+          this.subscribeToTopic(destination, (message) => {
+            try {
+              const data = JSON.parse(message.body);
+              callback(data);
+            } catch (e) {
+              callback(message.body);
+            }
+          });
+        }
+      });
+      return null;
+    }
+    
+    return this.subscribeToTopic(destination, (message) => {
+      try {
+        const data = JSON.parse(message.body);
+        callback(data);
+      } catch (e) {
+        callback(message.body);
+      }
+    });
+  }
+
   disconnect(): void {
     if (this.client) {
       this.client.deactivate();

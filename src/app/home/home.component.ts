@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -111,11 +111,23 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    // Initialisation du composant
+    // Vérifier si un rôle est passé en paramètre pour ouvrir automatiquement le modal
+    this.route.queryParams.subscribe(params => {
+      const openLogin = params['openLogin'];
+      const role = params['role'];
+      
+      if (openLogin === 'true' && role) {
+        console.log('🔐 Ouverture automatique du modal pour le rôle:', role);
+        setTimeout(() => {
+          this.openLoginModal(role);
+        }, 500);
+      }
+    });
   }
 
   // Méthode pour ouvrir le modal de connexion avec le rôle sélectionné

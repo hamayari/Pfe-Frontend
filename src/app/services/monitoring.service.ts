@@ -61,6 +61,8 @@ export interface MonitoringAlert {
   metric?: string;
   value?: number;
   threshold?: number;
+  source?: string;
+  severity?: string;
 }
 
 export interface PerformanceMetrics {

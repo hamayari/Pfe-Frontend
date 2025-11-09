@@ -1,5 +1,5 @@
 // Types pour les rôles et statuts
-export type UserRole = 'ROLE_SUPER_ADMIN' | 'ROLE_ADMIN' | 'ROLE_COMMERCIAL' | 'ROLE_CHEF_PROJET' | 'ROLE_DECIDEUR' | 'ROLE_DECISION_MAKER';
+export type UserRole = 'ROLE_SUPER_ADMIN' | 'ROLE_ADMIN' | 'ROLE_COMMERCIAL' | 'ROLE_PROJECT_MANAGER' | 'ROLE_DECISION_MAKER' | 'ROLE_USER';
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED';
 
 // Interface principale pour l'utilisateur - Simplifiée et cohérente avec le backend
@@ -135,20 +135,20 @@ export const USER_ROLES: Record<UserRole, { name: string; description: string; c
     description: 'Gestion des conventions et factures',
     color: '#2196f3'
   },
-  ROLE_CHEF_PROJET: {
+  ROLE_PROJECT_MANAGER: {
     name: 'Chef de Projet',
     description: 'Gestion des projets et équipes',
     color: '#4caf50'
-  },
-  ROLE_DECIDEUR: {
-    name: 'Décideur',
-    description: 'Consultation des rapports et tableaux de bord',
-    color: '#ff9800'
   },
   ROLE_DECISION_MAKER: {
     name: 'Décideur',
     description: 'Consultation des rapports et tableaux de bord',
     color: '#ff9800'
+  },
+  ROLE_USER: {
+    name: 'Utilisateur',
+    description: 'Accès de base au système',
+    color: '#9e9e9e'
   }
 };
 

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 // AdminDashboardService supprimé - nous utilisons uniquement les vraies données
@@ -94,6 +96,8 @@ interface Convention {
     FormsModule,
     ReactiveFormsModule,
     MatDialogModule,
+    MatIconModule,
+    MatButtonModule,
     NotificationHistoryComponent,
     // FooterComponent,
   ],
@@ -448,6 +452,15 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
     }, 500);
   }
 
+  /**
+   * Helper method pour récupérer l'utilisateur connecté
+   * Utilisé pour remplir les champs createdBy et lastModifiedBy
+   */
+  private getCurrentUsername(): string {
+    const currentUser = this.authService.currentUserValue;
+    return currentUser?.username || 'system';
+  }
+
   // Initialisation des graphiques Chart.js
   private initializeCharts(): void {
     try {
@@ -777,7 +790,8 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
       email: this.userForm.email,
       name: this.userForm.name,
       phoneNumber: this.userForm.phoneNumber,
-      role: this.userForm.role // Envoyer le rôle comme string, le backend le convertira
+      country: this.userForm.country || 'TN',  // ✅ AJOUTÉ
+      roles: [this.userForm.role] // Envoyer le rôle comme tableau (le backend attend roles: [])
     };
 
     // Ajouter le mot de passe seulement pour la création
@@ -894,8 +908,8 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
     // Remplir les champs createdBy et lastModifiedBy avec l'utilisateur actuel
     const structureData = {
       ...this.structureForm,
-      createdBy: 'admin', // Utilisateur par défaut
-      lastModifiedBy: 'admin'
+      createdBy: this.getCurrentUsername(),
+      lastModifiedBy: this.getCurrentUsername()
     };
     
     console.log('📤 Données structure à envoyer:', structureData);
@@ -974,8 +988,8 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
     // Remplir les champs createdBy et lastModifiedBy avec l'utilisateur actuel
     const applicationData = {
       ...this.applicationForm,
-      createdBy: 'admin', // Utilisateur par défaut
-      lastModifiedBy: 'admin'
+      createdBy: this.getCurrentUsername(),
+      lastModifiedBy: this.getCurrentUsername()
     };
     
     console.log('📤 Données à envoyer:', applicationData);
@@ -1063,26 +1077,54 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
   // Gestion des utilisateurs
   editUser(user: User): void {
     console.log('✏️ Modifier utilisateur:', user);
+    console.log('📋 Données utilisateur complètes:', JSON.stringify(user, null, 2));
     
     // Activer le mode édition
     this.isEditMode = true;
     this.editingUserId = user.id;
     
+    // Extraire le rôle correctement
+    let userRole = '';
+    if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+      // Si roles est un tableau d'objets avec name ou un tableau de strings
+      const firstRole = user.roles[0];
+      if (typeof firstRole === 'object' && firstRole !== null && 'name' in firstRole) {
+        userRole = (firstRole as any).name;
+      } else {
+        userRole = String(firstRole);
+      }
+    } else if (user.role) {
+      // Si role est une propriété directe
+      userRole = user.role;
+    }
+    
+    console.log('🔍 Rôle extrait:', userRole);
+    console.log('📱 Téléphone de l\'utilisateur:', user.phoneNumber);
+    console.log('🌍 Pays de l\'utilisateur:', user.country);
+    
     // Pré-remplir le formulaire avec les données de l'utilisateur
     this.userForm = {
-      name: user.username || user.name || '',
-      email: user.email,
-      phoneNumber: user.phoneNumber || '',
+      name: user.name || user.username || '',
+      email: user.email || '',
+      phoneNumber: user.phoneNumber || (user as any).phone || '',
       country: user.country || 'TN',
-      role: user.roles?.[0] || user.role || '',
-      password: '' // Ne pas pré-remplir le mot de passe
+      role: userRole,
+      password: '' // Ne pas pré-remplir le mot de passe pour la sécurité
     };
+    
+    console.log('📝 Formulaire pré-rempli:', this.userForm);
+    console.log('📝 Téléphone dans le formulaire:', this.userForm.phoneNumber);
     
     // Ouvrir la modal en mode édition
     this.showUserModal = true;
-    this.cdr.detectChanges();
     
-    this.showSuccessAlert(`Modification de l'utilisateur ${user.name} - Remplissez les champs à modifier`);
+    // Forcer la détection des changements pour mettre à jour le formulaire
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      console.log('🔄 Formulaire rafraîchi');
+    }, 100);
+    
+    this.showSuccessAlert(`Modification de l'utilisateur ${user.name || user.username} - Modifiez les champs nécessaires`);
   }
 
   viewUser(user: User): void {
@@ -1333,10 +1375,7 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
 
   // Messages
   toggleMessages(): void {
-    console.log('🔔 Clic sur icône message détecté');
-    
-    // Test direct de redirection vers la route messaging
-    console.log('Redirection vers /messaging');
+    console.log('🔔 Clic sur icône message - Navigation vers /messaging');
     this.router.navigate(['/messaging']);
   }
 
@@ -1356,8 +1395,9 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
   }
 
   goToProfile(): void {
-    this.currentSection = 'profile';
+    console.log('Navigation vers le profil');
     this.closeUserMenu();
+    this.router.navigate(['/profile']);
   }
 
   logout(): void {
@@ -1920,12 +1960,17 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
         this.recentUsers = users.map(user => {
           console.log('🔍 User data:', user);
           console.log('🔍 User roles:', user.roles);
+          console.log('🔍 User phoneNumber:', user.phoneNumber);
           
           return {
             id: user.id,
             name: user.name || user.username,
+            username: user.username,
             email: user.email,
+            phoneNumber: user.phoneNumber,  // ✅ AJOUTÉ
+            country: user.country,           // ✅ AJOUTÉ
             role: this.getUserRole(user),
+            roles: user.roles,               // ✅ AJOUTÉ (pour le pré-remplissage)
             status: user.enabled ? 'active' : 'inactive',
             lastLogin: user.lastLogin ? new Date(user.lastLogin) : new Date(),
             createdAt: user.createdAt ? new Date(user.createdAt) : new Date(),
@@ -2454,55 +2499,37 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
 
   // Méthodes pour gérer les pays et numéros de téléphone
   loadCountries(): void {
-    // Charger les pays depuis l'API REST Countries avec gestion d'erreur améliorée
-    fetch('https://restcountries.com/v3.1/all', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    })
-      .then(response => {
-        if (!response.ok) {
-          console.warn(`API Countries indisponible (${response.status}), utilisation de la liste de fallback`);
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Vérifier que data est un tableau
-        if (Array.isArray(data)) {
-          this.countries = data
-            .filter((country: any) => country.cca2 && country.name && country.flag)
-            .sort((a: any, b: any) => a.name.common.localeCompare(b.name.common));
-        } else {
-          throw new Error('API returned non-array data');
-        }
-        
-        // Sélectionner la Tunisie par défaut
-        this.selectedCountry = this.countries.find(c => c.cca2 === 'TN');
-        if (this.selectedCountry) {
-          this.userForm.country = 'TN';
-        }
-      })
-      .catch(error => {
-        console.error('Erreur lors du chargement des pays:', error);
-        // Pays par défaut en cas d'erreur
-        this.countries = [
-          { cca2: 'TN', name: { common: 'Tunisia' }, flag: '🇹🇳' },
-          { cca2: 'FR', name: { common: 'France' }, flag: '🇫🇷' },
-          { cca2: 'DZ', name: { common: 'Algeria' }, flag: '🇩🇿' },
-          { cca2: 'MA', name: { common: 'Morocco' }, flag: '🇲🇦' },
-          { cca2: 'LY', name: { common: 'Libya' }, flag: '🇱🇾' },
-          { cca2: 'EG', name: { common: 'Egypt' }, flag: '🇪🇬' },
-          { cca2: 'US', name: { common: 'United States' }, flag: '🇺🇸' },
-          { cca2: 'GB', name: { common: 'United Kingdom' }, flag: '🇬🇧' },
-          { cca2: 'DE', name: { common: 'Germany' }, flag: '🇩🇪' },
-          { cca2: 'IT', name: { common: 'Italy' }, flag: '🇮🇹' },
-          { cca2: 'ES', name: { common: 'Spain' }, flag: '🇪🇸' },
-          { cca2: 'CA', name: { common: 'Canada' }, flag: '🇨🇦' }
-        ];
-      });
+    // Utiliser directement la liste de fallback au lieu de l'API externe
+    // L'API restcountries.com est souvent instable et retourne des erreurs 400
+    console.log('📍 Chargement de la liste des pays (fallback local)');
+    
+    this.countries = [
+      { cca2: 'TN', name: { common: 'Tunisie' }, flag: '🇹🇳', idd: { root: '+216', suffixes: [''] } },
+      { cca2: 'FR', name: { common: 'France' }, flag: '🇫🇷', idd: { root: '+33', suffixes: [''] } },
+      { cca2: 'DZ', name: { common: 'Algérie' }, flag: '🇩🇿', idd: { root: '+213', suffixes: [''] } },
+      { cca2: 'MA', name: { common: 'Maroc' }, flag: '🇲🇦', idd: { root: '+212', suffixes: [''] } },
+      { cca2: 'LY', name: { common: 'Libye' }, flag: '🇱🇾', idd: { root: '+218', suffixes: [''] } },
+      { cca2: 'EG', name: { common: 'Égypte' }, flag: '🇪🇬', idd: { root: '+20', suffixes: [''] } },
+      { cca2: 'US', name: { common: 'États-Unis' }, flag: '🇺🇸', idd: { root: '+1', suffixes: [''] } },
+      { cca2: 'GB', name: { common: 'Royaume-Uni' }, flag: '🇬🇧', idd: { root: '+44', suffixes: [''] } },
+      { cca2: 'DE', name: { common: 'Allemagne' }, flag: '🇩🇪', idd: { root: '+49', suffixes: [''] } },
+      { cca2: 'IT', name: { common: 'Italie' }, flag: '🇮🇹', idd: { root: '+39', suffixes: [''] } },
+      { cca2: 'ES', name: { common: 'Espagne' }, flag: '🇪🇸', idd: { root: '+34', suffixes: [''] } },
+      { cca2: 'CA', name: { common: 'Canada' }, flag: '🇨🇦', idd: { root: '+1', suffixes: [''] } },
+      { cca2: 'BE', name: { common: 'Belgique' }, flag: '🇧🇪', idd: { root: '+32', suffixes: [''] } },
+      { cca2: 'CH', name: { common: 'Suisse' }, flag: '🇨🇭', idd: { root: '+41', suffixes: [''] } },
+      { cca2: 'SA', name: { common: 'Arabie Saoudite' }, flag: '🇸🇦', idd: { root: '+966', suffixes: [''] } },
+      { cca2: 'AE', name: { common: 'Émirats Arabes Unis' }, flag: '🇦🇪', idd: { root: '+971', suffixes: [''] } },
+      { cca2: 'QA', name: { common: 'Qatar' }, flag: '🇶🇦', idd: { root: '+974', suffixes: [''] } }
+    ];
+    
+    // Sélectionner la Tunisie par défaut
+    this.selectedCountry = this.countries.find(c => c.cca2 === 'TN');
+    if (this.selectedCountry) {
+      this.userForm.country = 'TN';
+    }
+    
+    console.log('✅ Liste des pays chargée:', this.countries.length, 'pays disponibles');
   }
 
   onCountryChange(event: any): void {
@@ -3241,8 +3268,8 @@ L'équipe GestionPro`
     // Remplir les champs createdBy et lastModifiedBy avec l'utilisateur actuel
     const zoneData = {
       ...this.zoneForm,
-      createdBy: 'admin', // Utilisateur par défaut
-      lastModifiedBy: 'admin'
+      createdBy: this.getCurrentUsername(),
+      lastModifiedBy: this.getCurrentUsername()
     };
 
     console.log('📤 Données zone à envoyer:', zoneData);
@@ -3412,11 +3439,22 @@ L'équipe GestionPro`
 
   isCurrentUserSuperAdmin(): boolean {
     if (!this.currentUser) return false;
-    
+
     if (this.currentUser.roles) {
       return this.currentUser.roles.includes('ROLE_SUPER_ADMIN');
     }
-    
+
     return this.currentUser.role === 'ROLE_SUPER_ADMIN';
+  }
+
+  // ==================== CHATBOT OPÉRATIONNEL ====================
+  isOperationalChatbotOpen = false;
+
+  openOperationalChatbot() {
+    this.isOperationalChatbotOpen = true;
+  }
+
+  closeOperationalChatbot() {
+    this.isOperationalChatbotOpen = false;
   }
 }

@@ -1,0 +1,34 @@
+<!-- Bouton Flottant -->
+<div class="floating-operational-chatbot" 
+     (click)="openChatbot()"
+     [style.background-color]="getChatbotColor()">
+  <mat-icon>{{ getChatbotIcon() }}</mat-icon>
+  <div class="chatbot-tooltip">{{ getChatbotTitle() }}</div>
+</div>
+
+<!-- Overlay -->
+<div class="chatbot-overlay" 
+     *ngIf="isChatbotOpen" 
+     (click)="closeChatbot()"></div>
+
+<!-- Panel Chatbot -->
+<div class="chatbot-panel" 
+     *ngIf="isChatbotOpen" 
+     [@slideIn]>
+  <div class="chatbot-panel-header" [style.background-color]="getChatbotColor()">
+    <h3>
+      <mat-icon>{{ getChatbotIcon() }}</mat-icon>
+      {{ getChatbotTitle() }}
+    </h3>
+    <button mat-icon-button (click)="closeChatbot()" class="close-chatbot-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="chatbot-panel-content">
+    <iframe 
+      src="/decideur/operational-chatbot" 
+      class="chatbot-iframe"
+      frameborder="0">
+    </iframe>
+  </div>
+</div>

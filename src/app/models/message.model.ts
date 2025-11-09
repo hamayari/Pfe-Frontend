@@ -20,6 +20,12 @@ export interface Message {
   fileSize?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  // Réponse à un message
+  replyTo?: {
+    messageId: string;
+    senderName: string;
+    content: string;
+  };
 }
 
 export interface Conversation {

@@ -63,7 +63,7 @@ export interface InvoiceNotifications {
   providedIn: 'root'
 })
 export class InvoiceService {
-  private apiUrl = `${environment.apiUrl}/api/invoices`;
+  private apiUrl = `${environment.apiUrl}/invoices`;
   private invoicesSubject = new BehaviorSubject<Invoice[]>([]);
   private statsSubject = new BehaviorSubject<InvoiceStats | null>(null);
 

@@ -10,6 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserService } from '../../../services/user.service';
 import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.model';
 
@@ -27,16 +30,24 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
     MatIconModule,
     MatCardModule,
     MatDividerModule,
-    MatChipsModule
+    MatChipsModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule
   ],
   template: `
     <div class="dialog-container">
       <div class="dialog-header">
-        <h2 mat-dialog-title>
-          <mat-icon>person_add</mat-icon>
-          Ajouter un nouvel utilisateur
-        </h2>
-        <button mat-icon-button (click)="onCancel()" class="close-btn">
+        <div class="header-content">
+          <div class="header-icon-wrapper">
+            <mat-icon class="header-icon">person_add</mat-icon>
+          </div>
+          <div class="header-text">
+            <h2 mat-dialog-title>Ajouter un nouvel utilisateur</h2>
+            <p class="header-subtitle">Créez un nouveau compte utilisateur avec des rôles et permissions</p>
+          </div>
+        </div>
+        <button mat-icon-button (click)="onCancel()" class="close-btn" matTooltip="Fermer">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -44,12 +55,17 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       <mat-dialog-content class="dialog-content">
         <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
           <div class="form-section">
-            <h3>Informations de base</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">account_circle</mat-icon>
+              <h3>Informations de base</h3>
+            </div>
             
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Nom d'utilisateur *</mat-label>
-                <input matInput formControlName="username" placeholder="Entrez le nom d'utilisateur">
+                <mat-icon matPrefix class="field-icon">person</mat-icon>
+                <input matInput formControlName="username" placeholder="Entrez le nom d'utilisateur" matTooltip="Identifiant unique de l'utilisateur">
+                <mat-hint>Min. 3 caractères</mat-hint>
                 <mat-error *ngIf="userForm.get('username')?.hasError('required')">
                   Le nom d'utilisateur est requis
                 </mat-error>
@@ -60,7 +76,9 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
 
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Email *</mat-label>
-                <input matInput formControlName="email" type="email" placeholder="exemple@email.com">
+                <mat-icon matPrefix class="field-icon">email</mat-icon>
+                <input matInput formControlName="email" type="email" placeholder="exemple@email.com" matTooltip="Adresse email professionnelle">
+                <mat-hint>Format: nom@domaine.com</mat-hint>
                 <mat-error *ngIf="userForm.get('email')?.hasError('required')">
                   L'email est requis
                 </mat-error>
@@ -73,31 +91,38 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Prénom</mat-label>
+                <mat-icon matPrefix class="field-icon">badge</mat-icon>
                 <input matInput formControlName="firstName" placeholder="Prénom">
+                <mat-hint>Optionnel</mat-hint>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Nom</mat-label>
+                <mat-icon matPrefix class="field-icon">badge</mat-icon>
                 <input matInput formControlName="lastName" placeholder="Nom">
+                <mat-hint>Optionnel</mat-hint>
               </mat-form-field>
             </div>
 
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Numéro de téléphone</mat-label>
+                <mat-icon matPrefix class="field-icon">phone</mat-icon>
                 <input matInput 
                        formControlName="phoneNumber" 
                        type="tel" 
                        placeholder="+216 XX XXX XXX"
-                       (input)="onPhoneNumberChange($event)">
-                <mat-hint>Format international requis (ex: +216 XX XXX XXX)</mat-hint>
+                       (input)="onPhoneNumberChange($event)"
+                       matTooltip="Numéro au format international">
+                <mat-hint>Format: +216 XX XXX XXX</mat-hint>
                 <mat-error *ngIf="userForm.get('phoneNumber')?.hasError('pattern')">
-                  Format invalide. Utilisez le format international (+216 XX XXX XXX)
+                  Format invalide. Utilisez le format international
                 </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Pays</mat-label>
+                <mat-icon matPrefix class="field-icon">flag</mat-icon>
                 <mat-select formControlName="country" (selectionChange)="onCountryChange($event)">
                   <mat-option *ngFor="let country of countries" [value]="country.cca2">
                     <span class="country-option">
@@ -107,7 +132,7 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
                     </span>
                   </mat-option>
                 </mat-select>
-                <mat-hint>Sélectionnez le pays pour le format de numéro</mat-hint>
+                <mat-hint>Sélectionnez le pays</mat-hint>
               </mat-form-field>
             </div>
           </div>
@@ -115,25 +140,39 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
           <mat-divider></mat-divider>
 
           <div class="form-section">
-            <h3>Rôles et accès</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">admin_panel_settings</mat-icon>
+              <h3>Rôles et accès</h3>
+            </div>
             
             <div class="form-row">
-              <mat-form-field appearance="outline" class="form-field">
+              <mat-form-field appearance="outline" class="form-field full-width">
                 <mat-label>Rôles *</mat-label>
-                <mat-select formControlName="roles" multiple>
+                <mat-icon matPrefix class="field-icon">verified_user</mat-icon>
+                <mat-select formControlName="roles" multiple matTooltip="Sélectionnez un ou plusieurs rôles">
                   <mat-option *ngFor="let role of getRoleOptions()" [value]="role.value">
-                    {{ role.label }}
+                    <div class="role-option">
+                      <span class="role-name">{{ role.label }}</span>
+                      <span class="role-desc">{{ role.description }}</span>
+                    </div>
                   </mat-option>
                 </mat-select>
+                <mat-hint>Sélectionnez au moins un rôle</mat-hint>
                 <mat-error *ngIf="userForm.get('roles')?.hasError('required')">
                   Au moins un rôle doit être sélectionné
                 </mat-error>
               </mat-form-field>
+            </div>
 
-              <div class="form-field checkbox-field">
+            <div class="form-row">
+              <div class="form-field checkbox-field enhanced">
+                <mat-icon class="checkbox-icon">power_settings_new</mat-icon>
                 <label>
                   <input type="checkbox" formControlName="enabled">
-                  Compte activé
+                  <span class="checkbox-label">
+                    <strong>Compte activé</strong>
+                    <small>L'utilisateur pourra se connecter immédiatement</small>
+                  </span>
                 </label>
               </div>
             </div>
@@ -142,12 +181,17 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
           <mat-divider></mat-divider>
 
           <div class="form-section">
-            <h3>Sécurité</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">lock</mat-icon>
+              <h3>Sécurité</h3>
+            </div>
             
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Mot de passe *</mat-label>
-                <input matInput formControlName="password" type="password" placeholder="Mot de passe">
+                <mat-icon matPrefix class="field-icon">vpn_key</mat-icon>
+                <input matInput formControlName="password" type="password" placeholder="••••••••" matTooltip="Minimum 6 caractères">
+                <mat-hint>Min. 6 caractères</mat-hint>
                 <mat-error *ngIf="userForm.get('password')?.hasError('required')">
                   Le mot de passe est requis
                 </mat-error>
@@ -158,7 +202,9 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
 
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Confirmer le mot de passe *</mat-label>
-                <input matInput formControlName="confirmPassword" type="password" placeholder="Confirmer le mot de passe">
+                <mat-icon matPrefix class="field-icon">check_circle</mat-icon>
+                <input matInput formControlName="confirmPassword" type="password" placeholder="••••••••" matTooltip="Ressaisissez le mot de passe">
+                <mat-hint>Doit correspondre au mot de passe</mat-hint>
                 <mat-error *ngIf="userForm.get('confirmPassword')?.hasError('required')">
                   La confirmation du mot de passe est requise
                 </mat-error>
@@ -169,10 +215,14 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
             </div>
 
             <div class="form-row">
-              <div class="form-field checkbox-field">
+              <div class="form-field checkbox-field enhanced">
+                <mat-icon class="checkbox-icon">mail_outline</mat-icon>
                 <label>
                   <input type="checkbox" formControlName="sendWelcomeEmail">
-                  Envoyer un email de bienvenue
+                  <span class="checkbox-label">
+                    <strong>Envoyer un email de bienvenue</strong>
+                    <small>L'utilisateur recevra ses identifiants par email</small>
+                  </span>
                 </label>
               </div>
             </div>
@@ -181,7 +231,7 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       </mat-dialog-content>
 
       <mat-dialog-actions class="dialog-actions">
-        <button mat-button (click)="onCancel()" class="cancel-btn">
+        <button mat-stroked-button (click)="onCancel()" class="cancel-btn" matTooltip="Annuler et fermer">
           <mat-icon>cancel</mat-icon>
           Annuler
         </button>
@@ -189,9 +239,11 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
                 color="primary" 
                 (click)="onSubmit()" 
                 [disabled]="userForm.invalid || isSubmitting"
-                class="submit-btn">
-          <mat-icon>save</mat-icon>
-          {{ isSubmitting ? 'Création...' : 'Créer l\'utilisateur' }}
+                class="submit-btn"
+                matTooltip="Créer le nouvel utilisateur">
+          <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+          <mat-spinner *ngIf="isSubmitting" diameter="20" class="spinner"></mat-spinner>
+          {{ isSubmitting ? 'Création en cours...' : 'Créer l\'utilisateur' }}
         </button>
       </mat-dialog-actions>
     </div>
@@ -215,12 +267,13 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 32px;
+      padding: 28px 36px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border-radius: 16px 16px 0 0;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
     }
 
     .dialog-header::before {
@@ -234,21 +287,44 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       pointer-events: none;
     }
 
-    .dialog-header h2 {
-      margin: 0;
+    .header-content {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 22px;
-      font-weight: 600;
+      gap: 20px;
       position: relative;
       z-index: 1;
     }
 
-    .dialog-header mat-icon {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
+    .header-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .header-text h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      margin: 4px 0 0 0;
+      font-size: 13px;
+      opacity: 0.9;
+      font-weight: 400;
     }
 
     .close-btn {
@@ -306,24 +382,34 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       margin-bottom: 0;
     }
 
-    .form-section h3 {
-      margin: 0 0 20px 0;
-      color: #1a1a1a;
-      font-weight: 600;
-      font-size: 18px;
+    .section-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
       border-bottom: 2px solid #f0f0f0;
     }
 
-    .form-section h3::before {
-      content: '';
-      width: 4px;
-      height: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 2px;
+    .section-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 28px;
+      color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      border-radius: 8px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .section-header h3 {
+      margin: 0;
+      color: #1a1a1a;
+      font-weight: 600;
+      font-size: 18px;
+      flex: 1;
     }
 
     .form-row {
@@ -373,6 +459,25 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       background: #f8f9fa;
       border-radius: 8px;
       border: 1px solid #e1e5e9;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-field:hover {
+      background: #f0f2f5;
+      border-color: #667eea;
+    }
+
+    .checkbox-field.enhanced {
+      padding: 18px;
+      gap: 14px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+
+    .checkbox-icon {
+      color: #667eea;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
 
     .checkbox-field label {
@@ -386,10 +491,28 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       width: 100%;
     }
 
+    .checkbox-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .checkbox-label strong {
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+
+    .checkbox-label small {
+      font-size: 12px;
+      color: #6c757d;
+      font-weight: 400;
+    }
+
     .checkbox-field input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       accent-color: #667eea;
+      cursor: pointer;
     }
 
     .dialog-actions {
@@ -588,6 +711,52 @@ import { CreateUserRequest, UserRole, USER_ROLES } from '../../../models/user.mo
       color: #6c757d;
       font-size: 12px;
       font-weight: 400;
+    }
+
+    /* Field icons */
+    .field-icon {
+      color: #667eea;
+      margin-right: 8px;
+      font-size: 20px;
+    }
+
+    /* Full width field */
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Role option styling */
+    .role-option {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 4px 0;
+    }
+
+    .role-name {
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+
+    .role-desc {
+      font-size: 12px;
+      color: #6c757d;
+    }
+
+    /* Spinner in button */
+    .spinner {
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .spinner ::ng-deep circle {
+      stroke: white;
+    }
+
+    /* Enhanced hints */
+    ::ng-deep .mat-mdc-form-field-hint {
+      color: #6c757d;
+      font-size: 12px;
     }
   `]
 })

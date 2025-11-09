@@ -38,3 +38,10 @@ export class RecuPdfComponent implements OnInit {
 
 
 
+
+
+
+
+
+
+

@@ -1,0 +1,221 @@
+<div class="alert-config-container">
+  <div class="header">
+    <h1>
+      <mat-icon>notifications_active</mat-icon>
+      Configuration des Alertes
+    </h1>
+    <p class="subtitle">Configurez les paramètres d'alerte pour les conventions</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Chargement de la configuration...</p>
+  </div>
+
+  <!-- Configuration Form -->
+  <form [formGroup]="configForm" *ngIf="!isLoading" class="config-form">
+    
+    <!-- Alert Thresholds Section -->
+    <mat-card class="config-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>schedule</mat-icon>
+          Seuils d'Alerte
+        </mat-card-title>
+        <mat-card-subtitle>
+          Définissez les seuils en jours avant l'échéance des conventions
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="threshold-grid">
+          <div class="threshold-item">
+            <mat-slide-toggle formControlName="alert30DaysEnabled" color="primary">
+              Alerte à 30 jours
+            </mat-slide-toggle>
+            <mat-form-field appearance="outline" class="threshold-input">
+              <mat-label>Jours</mat-label>
+              <input matInput type="number" formControlName="alertThreshold30Days" min="1">
+              <span matSuffix>jours</span>
+            </mat-form-field>
+          </div>
+
+          <div class="threshold-item">
+            <mat-slide-toggle formControlName="alert15DaysEnabled" color="primary">
+              Alerte à 15 jours
+            </mat-slide-toggle>
+            <mat-form-field appearance="outline" class="threshold-input">
+              <mat-label>Jours</mat-label>
+              <input matInput type="number" formControlName="alertThreshold15Days" min="1">
+              <span matSuffix>jours</span>
+            </mat-form-field>
+          </div>
+
+          <div class="threshold-item">
+            <mat-slide-toggle formControlName="alert7DaysEnabled" color="primary">
+              Alerte à 7 jours
+            </mat-slide-toggle>
+            <mat-form-field appearance="outline" class="threshold-input">
+              <mat-label>Jours</mat-label>
+              <input matInput type="number" formControlName="alertThreshold7Days" min="1">
+              <span matSuffix>jours</span>
+            </mat-form-field>
+          </div>
+
+          <div class="threshold-item">
+            <mat-slide-toggle formControlName="alert1DayEnabled" color="primary">
+              Alerte à 1 jour
+            </mat-slide-toggle>
+            <mat-form-field appearance="outline" class="threshold-input">
+              <mat-label>Jours</mat-label>
+              <input matInput type="number" formControlName="alertThreshold1Day" min="1">
+              <span matSuffix>jours</span>
+            </mat-form-field>
+          </div>
+
+          <div class="threshold-item">
+            <mat-slide-toggle formControlName="alertSameDayEnabled" color="primary">
+              Alerte le jour même
+            </mat-slide-toggle>
+            <span class="helper-text">Envoyer une alerte le jour de l'échéance</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Scheduler Configuration -->
+    <mat-card class="config-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>access_time</mat-icon>
+          Planification
+        </mat-card-title>
+        <mat-card-subtitle>
+          Configurez l'heure d'exécution quotidienne des alertes
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="scheduler-config">
+          <mat-form-field appearance="outline" class="time-input">
+            <mat-label>Heure</mat-label>
+            <input matInput type="number" formControlName="schedulerHour" min="0" max="23">
+            <span matSuffix>h</span>
+          </mat-form-field>
+
+          <span class="time-separator">:</span>
+
+          <mat-form-field appearance="outline" class="time-input">
+            <mat-label>Minutes</mat-label>
+            <input matInput type="number" formControlName="schedulerMinute" min="0" max="59">
+            <span matSuffix>min</span>
+          </mat-form-field>
+
+          <div class="cron-display">
+            <mat-icon matTooltip="Expression Cron">code</mat-icon>
+            <code>{{ getCronExpression() }}</code>
+          </div>
+        </div>
+        <p class="helper-text">
+          Les alertes seront envoyées tous les jours à {{ configForm.get('schedulerHour')?.value }}:{{ configForm.get('schedulerMinute')?.value | number:'2.0' }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Notification Channels -->
+    <mat-card class="config-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>send</mat-icon>
+          Canaux de Notification
+        </mat-card-title>
+        <mat-card-subtitle>
+          Choisissez les canaux de notification à utiliser
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="channels-grid">
+          <mat-slide-toggle formControlName="emailNotificationsEnabled" color="primary">
+            <mat-icon>email</mat-icon>
+            Email
+          </mat-slide-toggle>
+
+          <mat-slide-toggle formControlName="websocketNotificationsEnabled" color="primary">
+            <mat-icon>notifications</mat-icon>
+            Notifications en temps réel (WebSocket)
+          </mat-slide-toggle>
+
+          <mat-slide-toggle formControlName="smsNotificationsEnabled" color="primary">
+            <mat-icon>sms</mat-icon>
+            SMS
+          </mat-slide-toggle>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recipients Configuration -->
+    <mat-card class="config-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>people</mat-icon>
+          Destinataires
+        </mat-card-title>
+        <mat-card-subtitle>
+          Définissez qui doit recevoir les alertes
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="recipients-grid">
+          <mat-slide-toggle formControlName="notifyCreator" color="primary">
+            <mat-icon>person</mat-icon>
+            Créateur de la convention
+          </mat-slide-toggle>
+
+          <mat-slide-toggle formControlName="notifyCommercial" color="primary">
+            <mat-icon>business_center</mat-icon>
+            Commercial responsable
+          </mat-slide-toggle>
+
+          <mat-slide-toggle formControlName="notifyProjectManager" color="primary">
+            <mat-icon>engineering</mat-icon>
+            Chef de projet
+          </mat-slide-toggle>
+
+          <mat-slide-toggle formControlName="notifyAdmins" color="primary">
+            <mat-icon>admin_panel_settings</mat-icon>
+            Administrateurs
+          </mat-slide-toggle>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button mat-button 
+              type="button" 
+              (click)="resetConfiguration()"
+              [disabled]="isSaving || isLoading">
+        <mat-icon>refresh</mat-icon>
+        Réinitialiser
+      </button>
+
+      <button mat-stroked-button 
+              color="accent"
+              type="button" 
+              (click)="testAlert()"
+              [disabled]="isSaving || isLoading">
+        <mat-icon>bug_report</mat-icon>
+        Tester l'alerte
+      </button>
+
+      <button mat-raised-button 
+              color="primary"
+              type="button" 
+              (click)="saveConfiguration()"
+              [disabled]="configForm.invalid || isSaving || isLoading">
+        <mat-icon>save</mat-icon>
+        <span *ngIf="!isSaving">Enregistrer</span>
+        <span *ngIf="isSaving">Enregistrement...</span>
+      </button>
+    </div>
+  </form>
+</div>

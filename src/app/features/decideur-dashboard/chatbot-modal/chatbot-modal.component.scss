@@ -1,0 +1,855 @@
+// ============================================
+// 🎨 CHATBOT MODAL - DESIGN ULTRA-MODERNE GLASSMORPHISM
+// ============================================
+
+.chatbot-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  padding: 16px;
+  font-family: 'Inter', 'Poppins', 'Roboto', -apple-system, sans-serif;
+  overflow: hidden;
+  min-height: 0;
+}
+
+// Header avec Glassmorphism (affiché seulement en mode modal)
+.chatbot-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.5rem;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  
+  // Quand le header n'est pas affiché (mode panel), ajuster les marges
+  &:not(:first-child) {
+    margin-top: 0;
+  }
+
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+  }
+
+  .chatbot-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    margin-right: 16px;
+    color: #6a11cb;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  mat-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+
+  mat-card-subtitle {
+    color: #6a11cb;
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &::before {
+      content: '✨';
+      font-size: 14px;
+    }
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #666;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      color: #6a11cb;
+      background: rgba(106, 17, 203, 0.1);
+      transform: rotate(90deg);
+    }
+  }
+}
+
+// Questions suggérées - Style moderne avec cartes
+.suggestions-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.5rem;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  
+  // Quand c'est le premier élément (pas de header), ajuster la marge
+  &:first-child {
+    margin-top: 0;
+  }
+
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a2e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .suggestion-chip {
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: white;
+      color: #333;
+      border: 1.5px solid #e8e8e8;
+      padding: 12px 20px;
+      border-radius: 1rem;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        transition: width 0.3s ease;
+        z-index: -1;
+      }
+      
+      &:hover {
+        color: white;
+        border-color: #6a11cb;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(106, 17, 203, 0.3);
+
+        &::before {
+          width: 100%;
+        }
+      }
+
+      &:active {
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Zone de conversation - Glassmorphism
+.chat-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.5rem;
+  margin-bottom: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  mat-card-content {
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: linear-gradient(to bottom, #fafbfc 0%, #f5f7fa 100%);
+  min-height: 0;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border-radius: 10px;
+    
+    &:hover {
+      background: linear-gradient(135deg, #5a0fbb 0%, #1565ec 100%);
+    }
+  }
+}
+
+// Welcome Message
+.welcome-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #495057;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #667eea;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 12px 0;
+    color: #6c757d;
+  }
+
+  .welcome-hint {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+    font-size: 13px;
+    color: #495057;
+    margin-top: 16px;
+  }
+
+  ul {
+    text-align: left;
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 8px 0;
+      font-size: 14px;
+      color: #495057;
+    }
+  }
+}
+
+// Messages - Style moderne
+.message {
+  display: flex;
+  flex-direction: column;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Message utilisateur
+.user-message {
+  align-self: flex-end;
+  max-width: 75%;
+
+  .message-bubble {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 1.2rem 1.2rem 0.3rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(106, 17, 203, 0.25);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      opacity: 0.9;
+    }
+
+    span {
+      flex: 1;
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+  }
+
+  .timestamp {
+    font-size: 11px;
+    color: #999;
+    margin-top: 6px;
+    text-align: right;
+    padding-right: 4px;
+  }
+}
+
+// Message bot
+.bot-message {
+  align-self: flex-start;
+  max-width: 90%;
+
+  .message-bubble {
+    background: white;
+    padding: 16px 22px;
+    border-radius: 1.2rem 1.2rem 1.2rem 0.3rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      color: #6a11cb;
+      margin-bottom: 8px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+
+  .bot-content {
+    .bot-text {
+      margin: 0 0 12px 0;
+      color: #1a1a2e;
+      line-height: 1.7;
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
+
+  .timestamp {
+    font-size: 11px;
+    color: #999;
+    margin-top: 6px;
+    padding-left: 4px;
+  }
+}
+
+// KPI Section - Design moderne
+.kpi-section {
+  margin-top: 16px;
+  padding: 18px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  border-radius: 1rem;
+  border: 1.5px solid rgba(106, 17, 203, 0.15);
+  box-shadow: 0 2px 8px rgba(106, 17, 203, 0.08);
+
+  h4 {
+    margin: 0 0 16px 0;
+    color: #6a11cb;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+  }
+
+  .kpi-item {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    background: white;
+    border-radius: 0.8rem;
+    border-left: 4px solid #6a11cb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1a1a2e;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+}
+
+// Chart Section - Design moderne
+.chart-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 1rem;
+  border: 1.5px solid rgba(106, 17, 203, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  overflow-x: auto;
+
+  h4 {
+    margin: 0 0 18px 0;
+    color: #6a11cb;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  ngx-charts-bar-vertical,
+  ngx-charts-pie-chart,
+  ngx-charts-line-chart {
+    margin: 0 auto;
+    animation: fadeIn 0.6s ease;
+    display: block !important;
+    width: 100% !important;
+    height: 400px !important;
+    min-height: 400px !important;
+    
+    // Forcer l'affichage des éléments SVG
+    svg {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+
+  // Scrollbar horizontal pour les grands graphiques
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #6a11cb;
+    border-radius: 10px;
+  }
+}
+
+// Tableau Section - Design moderne
+.tableau-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 1rem;
+  border: 1.5px solid rgba(106, 17, 203, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  overflow-x: auto;
+
+  h4 {
+    margin: 0 0 18px 0;
+    color: #6a11cb;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tableau-container {
+    overflow-x: auto;
+    border-radius: 0.8rem;
+    border: 1px solid #e8e8e8;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: white;
+
+    thead {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+
+      th {
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+
+        &:first-child {
+          border-top-left-radius: 0.8rem;
+        }
+
+        &:last-child {
+          border-top-right-radius: 0.8rem;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:hover {
+          background: #f8f9ff;
+          transform: scale(1.01);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 12px 16px;
+          color: #333;
+          font-weight: 400;
+
+          &:first-child {
+            font-weight: 600;
+            color: #6a11cb;
+          }
+        }
+      }
+    }
+  }
+
+  // Scrollbar horizontal
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #6a11cb;
+    border-radius: 10px;
+  }
+}
+
+// Indicateur de chargement - Style moderne
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 1rem;
+  align-self: flex-start;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(106, 17, 203, 0.1);
+
+  mat-spinner {
+    flex-shrink: 0;
+  }
+
+  span {
+    color: #6a11cb;
+    font-style: italic;
+    font-weight: 500;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+// Zone de saisie - Design ultra-moderne
+.input-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+
+  .input-container {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px 20px;
+  }
+
+  .question-input {
+    flex: 1;
+    
+    ::ng-deep .mat-mdc-form-field-wrapper {
+      padding-bottom: 0;
+    }
+
+    ::ng-deep .mat-mdc-text-field-wrapper {
+      border-radius: 1rem;
+      background: white;
+      border: 1.5px solid #e8e8e8;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: #6a11cb;
+      }
+    }
+
+    ::ng-deep .mat-mdc-form-field-focus-overlay {
+      background: rgba(106, 17, 203, 0.05);
+    }
+
+    ::ng-deep .mat-mdc-form-field-infix {
+      padding: 14px 0;
+    }
+
+    ::ng-deep input {
+      font-size: 14px;
+      color: #1a1a2e;
+      font-weight: 400;
+    }
+
+    ::ng-deep .mat-mdc-form-field-label {
+      color: #999;
+    }
+  }
+
+  .send-button {
+    height: 56px;
+    min-width: 56px;
+    padding: 0 28px;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    font-weight: 600;
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(106, 17, 203, 0.3);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(106, 17, 203, 0.4);
+
+      &::before {
+        width: 300px;
+        height: 300px;
+      }
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #e9ecef;
+      color: #999;
+      box-shadow: none;
+    }
+
+    mat-icon {
+      margin-right: 6px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// ============================================
+// 🎬 ANIMATIONS ULTRA-MODERNES
+// ============================================
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// ============================================
+// 📱 RESPONSIVE DESIGN
+// ============================================
+
+@media (max-width: 768px) {
+  .chatbot-container {
+    padding: 12px;
+  }
+
+  .chatbot-header {
+    padding: 18px 20px;
+    margin-bottom: 12px;
+
+    .chatbot-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    mat-card-title {
+      font-size: 18px;
+    }
+
+    mat-card-subtitle {
+      font-size: 12px;
+    }
+  }
+
+  .suggestions-card {
+    padding: 18px;
+    margin-bottom: 12px;
+
+    h3 {
+      font-size: 15px;
+    }
+
+    .suggestions {
+      gap: 8px;
+
+      .suggestion-chip {
+        padding: 10px 16px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .chat-card {
+    margin-bottom: 12px;
+  }
+
+  .chat-messages {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .user-message,
+  .bot-message {
+    max-width: 90%;
+  }
+
+  .input-card {
+    .input-container {
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 10px;
+
+      .send-button {
+        width: 100%;
+        height: 48px;
+      }
+    }
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

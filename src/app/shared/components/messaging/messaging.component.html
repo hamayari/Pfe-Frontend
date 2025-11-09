@@ -70,12 +70,6 @@
             <div class="message-content">
               <div class="message-bubble pinned">
                 <div class="message-text">{{ message.content }}</div>
-                <div class="message-reactions">
-                  <div *ngFor="let reaction of message.reactions" class="reaction-group">
-                    <span class="reaction-emoji">{{ reaction.emoji }}</span>
-                    <span class="reaction-count">{{ reaction.count }}</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -121,14 +115,6 @@
             >
               <div class="message-text">{{ message.content }}</div>
               
-              <!-- Réactions -->
-              <div class="message-reactions" *ngIf="message.reactions && message.reactions.length > 0">
-                <div *ngFor="let reaction of message.reactions" class="reaction-group">
-                  <span class="reaction-emoji">{{ reaction.emoji }}</span>
-                  <span class="reaction-count">{{ reaction.count }}</span>
-                </div>
-              </div>
-              
               <!-- Actions sur la bulle -->
               <div class="bubble-actions">
                 <button class="bubble-action" (click)="addReaction(message._id, '👍')">👍</button>
@@ -139,6 +125,14 @@
                 <button class="bubble-action" (click)="editMessage(message)">✏️</button>
                 <button class="bubble-action" (click)="deleteMessageForMe(message._id)">🗑️</button>
               </div>
+            </div>
+            
+            <!-- Réactions EXTERNES (hors bulle) -->
+            <div class="external-reactions" *ngIf="message.reactions && message.reactions.length > 0">
+              <span class="reaction-chip" *ngFor="let reaction of message.reactions">
+                <span class="emoji">{{ reaction.emoji }}</span>
+                <span class="count">{{ reaction.count || 1 }}</span>
+              </span>
             </div>
             
             <!-- Métadonnées -->

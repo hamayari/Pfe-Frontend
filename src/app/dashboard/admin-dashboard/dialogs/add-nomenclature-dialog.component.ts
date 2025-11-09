@@ -11,6 +11,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-add-nomenclature-dialog',
@@ -27,16 +30,24 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatCardModule,
     MatDividerModule,
     MatChipsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule
   ],
   template: `
     <div class="dialog-container">
       <div class="dialog-header">
-        <h2 mat-dialog-title>
-          <mat-icon>category</mat-icon>
-          Ajouter une nouvelle nomenclature
-        </h2>
-        <button mat-icon-button (click)="onCancel()" class="close-btn">
+        <div class="header-content">
+          <div class="header-icon-wrapper">
+            <mat-icon class="header-icon">category</mat-icon>
+          </div>
+          <div class="header-text">
+            <h2 mat-dialog-title>Ajouter une nouvelle nomenclature</h2>
+            <p class="header-subtitle">Créez une nouvelle nomenclature (Application, Zone ou Structure)</p>
+          </div>
+        </div>
+        <button mat-icon-button (click)="onCancel()" class="close-btn" matTooltip="Fermer">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -44,24 +55,46 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       <mat-dialog-content class="dialog-content">
         <form [formGroup]="nomenclatureForm" (ngSubmit)="onSubmit()">
           <div class="form-section">
-            <h3>Informations générales</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">info</mat-icon>
+              <h3>Informations générales</h3>
+            </div>
             
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Type de nomenclature</mat-label>
-                <mat-select formControlName="type" (selectionChange)="onTypeChange($event.value)">
-                  <mat-option value="APPLICATION">Application</mat-option>
-                  <mat-option value="GEOGRAPHIC_ZONE">Zone Géographique</mat-option>
-                  <mat-option value="STRUCTURE">Structure</mat-option>
+                <mat-label>Type de nomenclature *</mat-label>
+                <mat-icon matPrefix class="field-icon">category</mat-icon>
+                <mat-select formControlName="type" (selectionChange)="onTypeChange($event.value)" matTooltip="Sélectionnez le type de nomenclature">
+                  <mat-option value="APPLICATION">
+                    <div class="type-option">
+                      <mat-icon>apps</mat-icon>
+                      <span>Application</span>
+                    </div>
+                  </mat-option>
+                  <mat-option value="GEOGRAPHIC_ZONE">
+                    <div class="type-option">
+                      <mat-icon>location_on</mat-icon>
+                      <span>Zone Géographique</span>
+                    </div>
+                  </mat-option>
+                  <mat-option value="STRUCTURE">
+                    <div class="type-option">
+                      <mat-icon>business</mat-icon>
+                      <span>Structure</span>
+                    </div>
+                  </mat-option>
                 </mat-select>
+                <mat-hint>Choisissez le type de nomenclature</mat-hint>
                 <mat-error *ngIf="nomenclatureForm.get('type')?.hasError('required')">
                   Le type est requis
                 </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Code</mat-label>
-                <input matInput formControlName="code" placeholder="Ex: APP001, ZONE001">
+                <mat-label>Code *</mat-label>
+                <mat-icon matPrefix class="field-icon">tag</mat-icon>
+                <input matInput formControlName="code" placeholder="Ex: APP001, ZONE001" matTooltip="Code unique de la nomenclature">
+                <mat-hint>Format: XXX001</mat-hint>
                 <mat-error *ngIf="nomenclatureForm.get('code')?.hasError('required')">
                   Le code est requis
                 </mat-error>
@@ -69,17 +102,23 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
             </div>
 
             <div class="form-row">
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Libellé</mat-label>
-                <input matInput formControlName="label" placeholder="Nom de la nomenclature">
+              <mat-form-field appearance="outline" class="form-field full-width">
+                <mat-label>Libellé *</mat-label>
+                <mat-icon matPrefix class="field-icon">label</mat-icon>
+                <input matInput formControlName="label" placeholder="Nom de la nomenclature" matTooltip="Nom descriptif">
+                <mat-hint>Min. 2 caractères</mat-hint>
                 <mat-error *ngIf="nomenclatureForm.get('label')?.hasError('required')">
                   Le libellé est requis
                 </mat-error>
               </mat-form-field>
+            </div>
 
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3" placeholder="Description détaillée"></textarea>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field full-width">
+                <mat-label>Description *</mat-label>
+                <mat-icon matPrefix class="field-icon">description</mat-icon>
+                <textarea matInput formControlName="description" rows="3" placeholder="Description détaillée" matTooltip="Description complète de la nomenclature"></textarea>
+                <mat-hint>Min. 10 caractères</mat-hint>
                 <mat-error *ngIf="nomenclatureForm.get('description')?.hasError('required')">
                   La description est requise
                 </mat-error>
@@ -91,7 +130,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
           <!-- Champs spécifiques selon le type -->
           <div class="form-section" *ngIf="nomenclatureForm.get('type')?.value === 'APPLICATION'">
-            <h3>Informations Application</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">apps</mat-icon>
+              <h3>Informations Application</h3>
+            </div>
             
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
@@ -127,7 +169,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
           </div>
 
           <div class="form-section" *ngIf="nomenclatureForm.get('type')?.value === 'GEOGRAPHIC_ZONE'">
-            <h3>Informations Zone Géographique</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">location_on</mat-icon>
+              <h3>Informations Zone Géographique</h3>
+            </div>
             
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
@@ -166,7 +211,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
           </div>
 
           <div class="form-section" *ngIf="nomenclatureForm.get('type')?.value === 'STRUCTURE'">
-            <h3>Informations Structure</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">business</mat-icon>
+              <h3>Informations Structure</h3>
+            </div>
             
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
@@ -222,7 +270,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
           <mat-divider></mat-divider>
 
           <div class="form-section">
-            <h3>Paramètres</h3>
+            <div class="section-header">
+              <mat-icon class="section-icon">settings</mat-icon>
+              <h3>Paramètres</h3>
+            </div>
             
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
@@ -244,17 +295,25 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
             </div>
 
             <div class="form-row">
-              <div class="form-field checkbox-field">
+              <div class="form-field checkbox-field enhanced">
+                <mat-icon class="checkbox-icon">star</mat-icon>
                 <label>
                   <input type="checkbox" formControlName="isDefault">
-                  Nomenclature par défaut
+                  <span class="checkbox-label">
+                    <strong>Nomenclature par défaut</strong>
+                    <small>Utilisée par défaut dans les sélections</small>
+                  </span>
                 </label>
               </div>
 
-              <div class="form-field checkbox-field">
+              <div class="form-field checkbox-field enhanced">
+                <mat-icon class="checkbox-icon">visibility</mat-icon>
                 <label>
                   <input type="checkbox" formControlName="isVisible">
-                  Visible dans les listes
+                  <span class="checkbox-label">
+                    <strong>Visible dans les listes</strong>
+                    <small>Affichée dans les menus déroulants</small>
+                  </span>
                 </label>
               </div>
             </div>
@@ -263,7 +322,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       </mat-dialog-content>
 
       <mat-dialog-actions class="dialog-actions">
-        <button mat-button (click)="onCancel()" class="cancel-btn">
+        <button mat-stroked-button (click)="onCancel()" class="cancel-btn" matTooltip="Annuler et fermer">
           <mat-icon>cancel</mat-icon>
           Annuler
         </button>
@@ -271,9 +330,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
                 color="primary" 
                 (click)="onSubmit()" 
                 [disabled]="nomenclatureForm.invalid || isSubmitting"
-                class="submit-btn">
-          <mat-icon>save</mat-icon>
-          {{ isSubmitting ? 'Création...' : 'Créer la nomenclature' }}
+                class="submit-btn"
+                matTooltip="Créer la nouvelle nomenclature">
+          <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+          <mat-spinner *ngIf="isSubmitting" diameter="20" class="spinner"></mat-spinner>
+          {{ isSubmitting ? 'Création en cours...' : 'Créer la nomenclature' }}
         </button>
       </mat-dialog-actions>
     </div>
@@ -297,12 +358,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 32px;
+      padding: 28px 36px;
       background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
       color: white;
       border-radius: 16px 16px 0 0;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 4px 20px rgba(76, 175, 80, 0.2);
     }
 
     .dialog-header::before {
@@ -316,21 +378,44 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       pointer-events: none;
     }
 
-    .dialog-header h2 {
-      margin: 0;
+    .header-content {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 22px;
-      font-weight: 600;
+      gap: 20px;
       position: relative;
       z-index: 1;
     }
 
-    .dialog-header mat-icon {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
+    .header-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .header-text h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      margin: 4px 0 0 0;
+      font-size: 13px;
+      opacity: 0.9;
+      font-weight: 400;
     }
 
     .close-btn {
@@ -388,24 +473,34 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       margin-bottom: 0;
     }
 
-    .form-section h3 {
-      margin: 0 0 20px 0;
-      color: #1a1a1a;
-      font-weight: 600;
-      font-size: 18px;
+    .section-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
       border-bottom: 2px solid #f0f0f0;
     }
 
-    .form-section h3::before {
-      content: '';
-      width: 4px;
-      height: 20px;
-      background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-      border-radius: 2px;
+    .section-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 28px;
+      color: #4caf50;
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(69, 160, 73, 0.1) 100%);
+      border-radius: 8px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .section-header h3 {
+      margin: 0;
+      color: #1a1a1a;
+      font-weight: 600;
+      font-size: 18px;
+      flex: 1;
     }
 
     .form-row {
@@ -455,6 +550,25 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       background: #f8f9fa;
       border-radius: 8px;
       border: 1px solid #e1e5e9;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-field:hover {
+      background: #f0f2f5;
+      border-color: #4caf50;
+    }
+
+    .checkbox-field.enhanced {
+      padding: 18px;
+      gap: 14px;
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.05) 0%, rgba(69, 160, 73, 0.05) 100%);
+    }
+
+    .checkbox-icon {
+      color: #4caf50;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
 
     .checkbox-field label {
@@ -468,10 +582,28 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       width: 100%;
     }
 
+    .checkbox-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .checkbox-label strong {
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+
+    .checkbox-label small {
+      font-size: 12px;
+      color: #6c757d;
+      font-weight: 400;
+    }
+
     .checkbox-field input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       accent-color: #4caf50;
+      cursor: pointer;
     }
 
     .dialog-actions {
@@ -646,6 +778,53 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       color: #dc3545;
       font-size: 12px;
       margin-top: 4px;
+    }
+
+    /* Field icons */
+    .field-icon {
+      color: #4caf50;
+      margin-right: 8px;
+      font-size: 20px;
+    }
+
+    /* Full width field */
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Type option styling */
+    .type-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .type-option mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #4caf50;
+    }
+
+    .type-option span {
+      font-weight: 500;
+    }
+
+    /* Spinner in button */
+    .spinner {
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .spinner ::ng-deep circle {
+      stroke: white;
+    }
+
+    /* Enhanced hints */
+    ::ng-deep .mat-mdc-form-field-hint {
+      color: #6c757d;
+      font-size: 12px;
     }
   `]
 })

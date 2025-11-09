@@ -21,8 +21,12 @@
     "lib": [
       "ES2022",
       "dom"
-    ],
+    ]
   },
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/test.ts"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

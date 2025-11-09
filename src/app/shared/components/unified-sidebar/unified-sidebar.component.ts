@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -41,7 +41,7 @@ export interface SidebarItem {
   templateUrl: './unified-sidebar.component.html',
   styleUrls: ['./unified-sidebar.component.scss']
 })
-export class UnifiedSidebarComponent {
+export class UnifiedSidebarComponent implements OnInit {
   @Input() collapsed = false;
   isCollapsed = false;
   @Input() userName = 'Admin User';
@@ -51,61 +51,134 @@ export class UnifiedSidebarComponent {
   @Output() collapseChange = new EventEmitter<boolean>();
   @Output() logoutEvent = new EventEmitter<void>();
 
-  sidebarItems: SidebarItem[] = [
-    {
-      label: 'Administration',
-      icon: 'admin_panel_settings',
-      children: [
-        { label: 'Tableau de Bord', icon: 'dashboard', route: '/admin/dashboard' },
-        { label: 'Vue d\'ensemble', icon: 'visibility', route: '/admin/overview' },
-        { label: 'Analytique', icon: 'analytics', route: '/admin/analytics' }
-      ]
-    },
-    {
-      label: 'Gestion des Utilisateurs',
-      icon: 'people',
-      children: [
-        { label: 'Tous les utilisateurs', icon: 'group', route: '/admin/users', badge: 3 },
-        { label: 'Rôles & Permissions', icon: 'security', route: '/admin/roles' },
-        { label: 'Journal d\'audit', icon: 'history', route: '/admin/audit-logs' }
-      ]
-    },
-    {
-      label: 'Gestion des Nomenclatures',
-      icon: 'category',
-      children: [
-        { label: 'Applications', icon: 'apps', route: '/admin/applications' },
-        { label: 'Zones géographiques', icon: 'location_on', route: '/admin/zones' },
-        { label: 'Structures', icon: 'business', route: '/admin/structures' }
-      ]
-    },
-    {
-      label: 'Monitoring Système',
-      icon: 'monitor',
-      children: [
-        { label: 'Logs système', icon: 'list_alt', route: '/admin/system-logs' },
-        { label: 'Alertes', icon: 'warning', route: '/admin/alerts', badge: 2 },
-        { label: 'Statistiques serveur', icon: 'speed', route: '/admin/server-stats' }
-      ]
-    },
-    { divider: true },
-    {
-      label: 'Système',
-      icon: 'settings',
-      children: [
-        { label: 'Utilisateurs', icon: 'person', route: '/system/users' },
-        { label: 'Nomenclatures', icon: 'category', route: '/system/nomenclatures' },
-        { label: 'Surveillance', icon: 'monitoring', route: '/system/monitoring' },
-        { label: 'Rapports', icon: 'assessment', route: '/system/reports' }
-      ]
-    },
-    { divider: true },
-    {
-      label: 'Profil',
-      icon: 'account_circle',
-      route: '/profile'
+  @Input() role: string = 'ADMIN'; // Nouveau: rôle de l'utilisateur
+
+  sidebarItems: SidebarItem[] = [];
+
+  ngOnInit() {
+    this.loadMenuByRole();
+  }
+
+  loadMenuByRole() {
+    if (this.role === 'DECIDEUR' || this.role === 'DECISION_MAKER') {
+      this.sidebarItems = this.getDecideurMenu();
+    } else {
+      this.sidebarItems = this.getAdminMenu();
     }
-  ];
+  }
+
+  getDecideurMenu(): SidebarItem[] {
+    return [
+      {
+        label: 'Dashboard',
+        icon: 'dashboard',
+        route: '/decideur/dashboard'
+      },
+      {
+        label: 'Assistant IA',
+        icon: 'smart_toy',
+        route: '/decideur/chatbot',
+        badge: 1
+      },
+      { divider: true },
+      {
+        label: 'Conventions',
+        icon: 'description',
+        children: [
+          { label: 'Toutes les conventions', icon: 'list', route: '/decideur/conventions' },
+          { label: 'Actives', icon: 'check_circle', route: '/decideur/conventions/actives' },
+          { label: 'Expirations', icon: 'schedule', route: '/decideur/conventions/expirations', badge: 8 }
+        ]
+      },
+      {
+        label: 'Factures',
+        icon: 'receipt',
+        children: [
+          { label: 'Toutes les factures', icon: 'list', route: '/decideur/factures' },
+          { label: 'En retard', icon: 'warning', route: '/decideur/factures/retard', badge: 5 },
+          { label: 'Paiements', icon: 'payment', route: '/decideur/factures/paiements' }
+        ]
+      },
+      {
+        label: 'Analyses',
+        icon: 'analytics',
+        children: [
+          { label: 'Rapports', icon: 'assessment', route: '/decideur/rapports' },
+          { label: 'Statistiques', icon: 'bar_chart', route: '/decideur/statistiques' },
+          { label: 'Performance', icon: 'trending_up', route: '/decideur/performance' }
+        ]
+      },
+      { divider: true },
+      {
+        label: 'Paramètres',
+        icon: 'settings',
+        route: '/decideur/parametres'
+      },
+      {
+        label: 'Profil',
+        icon: 'account_circle',
+        route: '/profile'
+      }
+    ];
+  }
+
+  getAdminMenu(): SidebarItem[] {
+    return [
+      {
+        label: 'Administration',
+        icon: 'admin_panel_settings',
+        children: [
+          { label: 'Tableau de Bord', icon: 'dashboard', route: '/admin/dashboard' },
+          { label: 'Vue d\'ensemble', icon: 'visibility', route: '/admin/overview' },
+          { label: 'Analytique', icon: 'analytics', route: '/admin/analytics' }
+        ]
+      },
+      {
+        label: 'Gestion des Utilisateurs',
+        icon: 'people',
+        children: [
+          { label: 'Tous les utilisateurs', icon: 'group', route: '/admin/users', badge: 3 },
+          { label: 'Rôles & Permissions', icon: 'security', route: '/admin/roles' },
+          { label: 'Journal d\'audit', icon: 'history', route: '/admin/audit-logs' }
+        ]
+      },
+      {
+        label: 'Gestion des Nomenclatures',
+        icon: 'category',
+        children: [
+          { label: 'Applications', icon: 'apps', route: '/admin/applications' },
+          { label: 'Zones géographiques', icon: 'location_on', route: '/admin/zones' },
+          { label: 'Structures', icon: 'business', route: '/admin/structures' }
+        ]
+      },
+      {
+        label: 'Monitoring Système',
+        icon: 'monitor',
+        children: [
+          { label: 'Logs système', icon: 'list_alt', route: '/admin/system-logs' },
+          { label: 'Alertes', icon: 'warning', route: '/admin/alerts', badge: 2 },
+          { label: 'Statistiques serveur', icon: 'speed', route: '/admin/server-stats' }
+        ]
+      },
+      { divider: true },
+      {
+        label: 'Système',
+        icon: 'settings',
+        children: [
+          { label: 'Utilisateurs', icon: 'person', route: '/system/users' },
+          { label: 'Nomenclatures', icon: 'category', route: '/system/nomenclatures' },
+          { label: 'Surveillance', icon: 'monitoring', route: '/system/monitoring' },
+          { label: 'Rapports', icon: 'assessment', route: '/system/reports' }
+        ]
+      },
+      { divider: true },
+      {
+        label: 'Profil',
+        icon: 'account_circle',
+        route: '/profile'
+      }
+    ];
+  }
 
   toggleCollapse() {
     this.collapsed = !this.collapsed;

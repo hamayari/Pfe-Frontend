@@ -1,0 +1,282 @@
+// Styles partagés pour tous les dashboards - RÉFÉRENCE: Admin Dashboard
+// Variables - Palette exacte ngx-admin Material Light (Optimisées pour l'ergonomie)
+$header-height: 56px !default; // Réduit de 64px à 56px pour plus d'espace
+$sidebar-width: 200px !default; // Réduit de 180px à 200px mais plus compact visuellement
+
+// Couleurs principales
+$primary-color: #4F8DF9 !default; // Bleu clair pour éléments actifs
+$sidebar-bg: #2F3542 !default; // Gris foncé moderne pour sidebar
+$background-global: #F5F6FA !default; // Gris très pâle pour fond global
+$background-white: #FFFFFF !default; // Blanc pur pour cartes
+$header-bg: #FFFFFF !default; // Blanc pour header
+
+// Couleurs KPI (palette unifiée)
+$primary-accent: #4F8DF9; // Bleu principal pour tous les KPI
+$success-color: #2ECC71; // Vert uniquement pour les succès/statuts positifs
+$warning-color: #F39C12; // Orange pour les avertissements
+$danger-color: #E74C3C; // Rouge uniquement pour les erreurs/alertes critiques
+
+// Couleurs texte et éléments
+$text-primary: #2c2c2c;
+$text-secondary: #A4B0BE; // Gris doux pour icônes inactives
+$border-color: #e1e5e9;
+
+// Ombres
+$shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+// Container principal - Style ngx-admin
+.dashboard-container {
+  min-height: 100vh;
+  background: $background-global;
+  font-family: 'Roboto', sans-serif;
+}
+
+// Header - Style ngx-admin épuré avec ombre portée moderne
+.dashboard-header {
+  background: $header-bg;
+  color: $text-primary;
+  padding: 0 24px;
+  height: $header-height;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid $border-color;
+  position: fixed;
+  top: 0;
+  left: $sidebar-width;
+  right: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0;
+      color: $text-primary;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    // Icônes du header - Style Admin (Référence)
+    .header-icon,
+    .header-icon-btn {
+      background: transparent;
+      border: none;
+      color: $text-primary;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      position: relative;
+      margin: 0 4px;
+
+      // Forcer la couleur des icônes Material Icons
+      i, .material-icons {
+        color: inherit;
+      }
+
+      &:hover {
+        background: rgba($primary-color, 0.1);
+        color: $primary-color;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba($primary-color, 0.2);
+      }
+
+      &.has-notifications,
+      &.has-messages {
+        color: $primary-color;
+        background: rgba($primary-color, 0.1);
+      }
+
+      &.active {
+        color: $primary-color;
+        background: rgba($primary-color, 0.1);
+      }
+
+      .notification-badge,
+      .message-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: $danger-color;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        animation: pulse 2s infinite;
+      }
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(79, 141, 249, 0.1);
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .user-name {
+          font-size: 14px;
+          font-weight: 500;
+          color: $text-primary;
+        }
+
+        .user-role {
+          font-size: 12px;
+          color: $text-secondary;
+        }
+      }
+    }
+  }
+}
+
+// Sidebar - Style ngx-admin
+.dashboard-sidebar {
+  width: $sidebar-width;
+  background: $sidebar-bg;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+
+  .sidebar-header {
+    padding: 20px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        background: $primary-color;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+      }
+
+      .logo-text {
+        h2 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: white;
+        }
+
+        p {
+          margin: 0;
+          font-size: 11px;
+          color: $text-secondary;
+        }
+      }
+    }
+  }
+
+  .sidebar-menu {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 0;
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: $text-secondary;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+      }
+
+      &.active {
+        background: rgba(79, 141, 249, 0.15);
+        color: $primary-color;
+        border-left-color: $primary-color;
+      }
+
+      .menu-icon {
+        font-size: 20px;
+      }
+
+      .menu-label {
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Content area
+.dashboard-content {
+  margin-left: $sidebar-width;
+  margin-top: $header-height;
+  padding: 24px;
+  min-height: calc(100vh - #{$header-height});
+}
+
+// Animation pour les badges
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

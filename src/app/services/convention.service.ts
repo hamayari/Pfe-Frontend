@@ -18,7 +18,7 @@ export interface ConventionStats {
   providedIn: 'root'
 })
 export class ConventionService {
-  private apiUrl = `${environment.apiUrl}/api/conventions`;
+  private apiUrl = `${environment.apiUrl}/conventions`;
   private conventionsSubject = new BehaviorSubject<Convention[]>([]);
   private statsSubject = new BehaviorSubject<ConventionStats | null>(null);
 

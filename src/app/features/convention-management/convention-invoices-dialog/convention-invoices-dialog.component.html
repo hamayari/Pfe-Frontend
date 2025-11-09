@@ -1,0 +1,163 @@
+<div class="invoice-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>receipt</mat-icon>
+      Factures de la Convention
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <!-- Convention Info -->
+    <div class="convention-info">
+      <div class="info-item">
+        <span class="label">Référence:</span>
+        <span class="value">{{ data.convention.reference }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Titre:</span>
+        <span class="value">{{ data.convention.title }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Client:</span>
+        <span class="value">{{ data.convention.clientId }}</span>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards" *ngIf="!isLoading && invoices.length > 0">
+      <div class="summary-card total">
+        <div class="card-icon">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-label">Total Factures</div>
+          <div class="card-value">{{ invoices.length }}</div>
+          <div class="card-amount">{{ getTotalAmount() | number:'1.2-2' }} TND</div>
+        </div>
+      </div>
+
+      <div class="summary-card paid">
+        <div class="card-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-label">Payées</div>
+          <div class="card-value">{{ getPaidCount() }}</div>
+          <div class="card-amount">{{ getPaidAmount() | number:'1.2-2' }} TND</div>
+        </div>
+      </div>
+
+      <div class="summary-card pending">
+        <div class="card-icon">
+          <mat-icon>schedule</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-label">En attente</div>
+          <div class="card-value">{{ getPendingCount() }}</div>
+          <div class="card-amount">{{ getPendingAmount() | number:'1.2-2' }} TND</div>
+        </div>
+      </div>
+
+      <div class="summary-card overdue">
+        <div class="card-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-label">En retard</div>
+          <div class="card-value">{{ getOverdueCount() }}</div>
+          <div class="card-amount">{{ getOverdueAmount() | number:'1.2-2' }} TND</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Chargement des factures...</p>
+    </div>
+
+    <!-- No Invoices Message -->
+    <div class="no-invoices" *ngIf="!isLoading && invoices.length === 0">
+      <mat-icon>receipt</mat-icon>
+      <p>Aucune facture trouvée pour cette convention</p>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="invoices-table" *ngIf="!isLoading && invoices.length > 0">
+      <table mat-table [dataSource]="invoices" class="mat-elevation-z2">
+        
+        <!-- Invoice Number Column -->
+        <ng-container matColumnDef="invoiceNumber">
+          <th mat-header-cell *matHeaderCellDef>N° Facture</th>
+          <td mat-cell *matCellDef="let invoice">
+            <strong>{{ invoice.invoiceNumber }}</strong>
+          </td>
+        </ng-container>
+
+        <!-- Reference Column -->
+        <ng-container matColumnDef="reference">
+          <th mat-header-cell *matHeaderCellDef>Référence</th>
+          <td mat-cell *matCellDef="let invoice">{{ invoice.reference }}</td>
+        </ng-container>
+
+        <!-- Amount Column -->
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Montant</th>
+          <td mat-cell *matCellDef="let invoice">
+            <strong>{{ invoice.amount | number:'1.2-2' }} TND</strong>
+          </td>
+        </ng-container>
+
+        <!-- Issue Date Column -->
+        <ng-container matColumnDef="issueDate">
+          <th mat-header-cell *matHeaderCellDef>Date d'émission</th>
+          <td mat-cell *matCellDef="let invoice">
+            {{ invoice.issueDate | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <!-- Due Date Column -->
+        <ng-container matColumnDef="dueDate">
+          <th mat-header-cell *matHeaderCellDef>Date d'échéance</th>
+          <td mat-cell *matCellDef="let invoice">
+            {{ invoice.dueDate | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <td mat-cell *matCellDef="let invoice">
+            <mat-chip [class]="'status-chip ' + getStatusColor(invoice.status)">
+              {{ getStatusLabel(invoice.status) }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let invoice">
+            <button 
+              mat-icon-button 
+              (click)="downloadPDF(invoice)"
+              matTooltip="Télécharger PDF"
+              color="primary">
+              <mat-icon>download</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Fermer</button>
+  </mat-dialog-actions>
+</div>

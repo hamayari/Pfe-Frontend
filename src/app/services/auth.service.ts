@@ -177,9 +177,9 @@ export class AuthService {
     return '/dashboard';
   }
 
-  // Méthode pour forcer la reconnexion avec superadmin
+  // Méthode pour forcer la reconnexion avec admin
   forceReconnect(): Observable<LoginResponse> {
-    console.log('🔄 Forçage de la reconnexion avec superadmin...');
-    return this.login('superadmin', 'admin123');
+    console.log('🔄 Forçage de la reconnexion avec admin...');
+    return this.login('admin', 'admin123');
   }
 }

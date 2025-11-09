@@ -172,9 +172,6 @@ export class DashboardComponent implements OnInit {
             { path: '/exports', label: 'Exports', icon: 'cloud_download' },
             { path: '/messaging', label: 'Messagerie', icon: 'chat' }
           ]},
-          { section: 'Client', items: [
-            { path: '/client-space', label: 'Espace Client', icon: 'person' }
-          ]},
           { section: 'Profil', items: [
             { path: '/profile', label: 'Mon Profil', icon: 'account_circle' }
           ]}
@@ -197,9 +194,35 @@ export class DashboardComponent implements OnInit {
       case 'ROLE_PROJECT_MANAGER': return 'Chef de Projet';
       case 'ROLE_COMMERCIAL': return 'Commercial';
       case 'ROLE_DECISION_MAKER': return 'Décideur';
-      case 'ROLE_USER': return 'Utilisateur';
-      default: return role;
+      default: return 'Utilisateur';
     }
+  }
+
+  getSidebarClass(): string {
+    const role = this.currentUser?.roles?.[0];
+    console.log('🎨 Sidebar Class - Role:', role);
+    let sidebarClass = '';
+    
+    switch (role) {
+      case 'ROLE_ADMIN':
+      case 'ROLE_SUPER_ADMIN':
+        sidebarClass = 'sidebar-commercial'; // Utiliser le même style que commercial
+        break;
+      case 'ROLE_COMMERCIAL':
+        sidebarClass = 'sidebar-commercial';
+        break;
+      case 'ROLE_PROJECT_MANAGER':
+        sidebarClass = 'sidebar-project-manager';
+        break;
+      case 'ROLE_DECISION_MAKER':
+        sidebarClass = 'sidebar-decision-maker';
+        break;
+      default:
+        sidebarClass = 'sidebar-default';
+    }
+    
+    console.log('🎨 Sidebar Class Applied:', sidebarClass);
+    return sidebarClass;
   }
 
   isLoggedIn(): boolean {

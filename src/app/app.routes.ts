@@ -44,8 +44,45 @@ export const routes: Routes = [
   },
   {
     path: 'decision-maker-dashboard',
-    loadComponent: () => import('./dashboard/decision-maker-dashboard/decision-maker-dashboard.component').then(m => m.DecisionMakerDashboardComponent),
-    title: 'Dashboard Décideur'
+    redirectTo: '/decideur',
+    pathMatch: 'full'
+  },
+  
+  // Routes pour le décideur
+  {
+    path: 'decideur',
+    loadComponent: () => import('./features/decideur-dashboard/decideur-dashboard.component').then(m => m.DecideurDashboardComponent),
+    title: 'Dashboard Décideur',
+    canActivate: [],
+    data: { roles: ['DECISION_MAKER', 'DECIDEUR', 'ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] }
+  },
+  {
+    path: 'decideur/dashboard',
+    loadComponent: () => import('./features/decideur-dashboard/decideur-dashboard.component').then(m => m.DecideurDashboardComponent),
+    title: 'Dashboard Décideur',
+    canActivate: [],
+    data: { roles: ['DECISION_MAKER', 'DECIDEUR', 'ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] }
+  },
+  {
+    path: 'decideur/chatbot',
+    loadComponent: () => import('./features/chatbot-decideur/chatbot-decideur.component').then(m => m.ChatbotDecideurComponent),
+    title: 'Assistant Décisionnel',
+    canActivate: [],
+    data: { roles: ['DECISION_MAKER', 'DECIDEUR', 'ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] }
+  },
+  {
+    path: 'decideur/operational-chatbot',
+    loadComponent: () => import('./features/decideur-dashboard/operational-chatbot/operational-chatbot.component').then(m => m.OperationalChatbotComponent),
+    title: 'Assistant Opérationnel',
+    canActivate: [],
+    data: { roles: ['DECISION_MAKER', 'DECIDEUR', 'ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'COMMERCIAL'] }
+  },
+  {
+    path: 'chatbot-decideur',
+    loadComponent: () => import('./features/chatbot-decideur/chatbot-decideur.component').then(m => m.ChatbotDecideurComponent),
+    title: 'Assistant Décisionnel',
+    canActivate: [],
+    data: { roles: ['DECISION_MAKER', 'DECIDEUR', 'ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] }
   },
   
   // Route pour la messagerie
@@ -55,12 +92,47 @@ export const routes: Routes = [
     title: 'Messagerie'
   },
   
+  // Route pour le profil utilisateur
+  {
+    path: 'profile',
+    loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent),
+    title: 'Mon Profil'
+  },
+  
+  // Route pour la gestion des alertes KPI
+  {
+    path: 'kpi-alerts',
+    loadComponent: () => import('./components/kpi-alert-management/kpi-alert-management.component').then(m => m.KpiAlertManagementComponent),
+    title: 'Gestion des Alertes KPI',
+    canActivate: [],
+    data: { roles: ['PROJECT_MANAGER', 'DECISION_MAKER', 'ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] }
+  },
+  
+  // Route pour la configuration des alertes (Admin)
+  {
+    path: 'admin/alert-configuration',
+    loadComponent: () => import('./features/admin/alert-configuration/alert-configuration.component').then(m => m.AlertConfigurationComponent),
+    title: 'Configuration des Alertes',
+    canActivate: [],
+    data: { roles: ['ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] }
+  },
+  
   // Routes d'authentification (spécialisées par rôle)
   {
     path: 'auth/login',
     loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent),
     title: 'Connexion',
     data: { role: 'ANY', icon: 'lock' }
+  },
+  {
+    path: 'auth/forgot-password',
+    loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
+    title: 'Mot de passe oublié'
+  },
+  {
+    path: 'auth/reset-password',
+    loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
+    title: 'Réinitialiser le mot de passe'
   },
   {
     path: 'auth/login-admin',

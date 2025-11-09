@@ -28,6 +28,7 @@ import { Convention, ConventionFilter, ConventionStatus } from '../../../../core
 import { ConventionService } from '../../../../core/services/convention.service';
 import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ConventionFormDialogComponent } from '../../components/convention-form-dialog/convention-form-dialog.component';
+import { ConventionInvoicesDialogComponent } from '../../components/convention-invoices-dialog/convention-invoices-dialog.component';
 import { TruncatePipe } from '../../../../shared/pipes/truncate.pipe';
 
 @Component({
@@ -455,5 +456,16 @@ export class ConventionListComponent implements OnInit, OnDestroy {
   onPageChange(event: any): void {
     this.pageSize = event.pageSize;
     this.loadConventions();
+  }
+
+  /**
+   * Open dialog to view invoices for a convention
+   */
+  openInvoicesDialog(convention: Convention): void {
+    this.dialog.open(ConventionInvoicesDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      data: { convention }
+    });
   }
 }

@@ -215,6 +215,10 @@
               <mat-icon>visibility</mat-icon>
               <span>Voir les détails</span>
             </button>
+            <button mat-menu-item (click)="openInvoicesDialog(element)">
+              <mat-icon>receipt_long</mat-icon>
+              <span>Voir les factures</span>
+            </button>
             <button mat-menu-item (click)="openEditDialog(element)">
               <mat-icon>edit</mat-icon>
               <span>Modifier</span>

@@ -34,11 +34,38 @@ $shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
 
 // Style pour la modale de messagerie
 ::ng-deep .messaging-dialog {
+  .mat-mdc-dialog-container,
   .mat-dialog-container {
-    padding: 0;
-    border-radius: 12px;
-    overflow: hidden;
+    padding: 0 !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+    max-width: 1400px !important;
+    margin: auto !important;
   }
+}
+
+// Backdrop flou et sombre pour la messagerie
+::ng-deep .messaging-backdrop {
+  background: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(10px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(180%) !important;
+}
+
+// Assurer que le backdrop couvre tout l'écran
+::ng-deep .cdk-overlay-backdrop.messaging-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 999 !important;
+}
+
+// Assurer que le dialog est au-dessus du backdrop
+::ng-deep .cdk-overlay-pane.messaging-dialog {
+  z-index: 1000 !important;
+  position: fixed !important;
 }
 
 // Header - Style ngx-admin épuré avec ombre portée moderne
@@ -387,9 +414,9 @@ $shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
   min-height: 100vh;
 }
 
-// Sidebar - Style ngx-admin moderne et léger
+// Sidebar - Style ngx-admin moderne et léger (MÊME COULEUR QUE COMMERCIAL)
 .dashboard-sidebar {
-  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%) !important;
   width: $sidebar-width;
   height: 100vh;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -398,7 +425,21 @@ $shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
   left: 0;
   top: 0;
   z-index: 1001;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  
+  // Effet glassmorphism comme commercial
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+    z-index: 0;
+  }
 
   .sidebar-header {
     height: $header-height;
@@ -408,6 +449,7 @@ $shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
     align-items: center;
     position: relative;
     top: 0;
+    z-index: 1;
 
     .logo-container {
       display: flex;
@@ -443,6 +485,8 @@ $shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
     padding: 20px 0;
     height: calc(100vh - #{$header-height});
     overflow-y: auto;
+    position: relative;
+    z-index: 1;
 
     .nav-section {
       margin-bottom: 32px;
@@ -2777,3 +2821,135 @@ $shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
 }
 
+// ============================================
+// 🤖 CHATBOT OPÉRATIONNEL FLOTTANT ADMIN
+// ============================================
+.floating-operational-chatbot {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  box-shadow: 0 8px 24px rgba(244, 67, 54, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 999;
+
+  mat-icon {
+    color: white;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .chatbot-tooltip {
+    position: absolute;
+    right: 70px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 32px rgba(244, 67, 54, 0.5);
+
+    .chatbot-tooltip {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.chatbot-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.chatbot-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 500px;
+  background: white;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  animation: slideInChatbot 0.3s ease-out;
+
+  .chatbot-panel-header {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 600;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .close-chatbot-btn {
+      color: white;
+      
+      mat-icon {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .chatbot-panel-content {
+    flex: 1;
+    overflow: hidden;
+
+    .chatbot-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+}
+
+@keyframes slideInChatbot {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

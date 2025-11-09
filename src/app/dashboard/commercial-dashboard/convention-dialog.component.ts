@@ -571,17 +571,25 @@ export class ConventionDialogComponent {
     });
 
     if (data.mode === 'edit' && data.convention) {
+      console.log('📝 Mode édition - Convention reçue:', data.convention);
       this.conventionForm.patchValue({
         reference: data.convention.reference,
         title: data.convention.title,
-        description: data.convention.description,
-        governorate: data.convention.governorate,
+        description: data.convention.description || '',
+        clientId: data.convention.clientId || 'CLIENT-001',
+        client: data.convention.client || 'Client Test',
+        geographicZone: data.convention.governorate || data.convention.geographicZone || '',
+        structure: data.convention.structureId || 'STRUCT-001',
         amount: data.convention.amount,
         startDate: data.convention.startDate ? new Date(data.convention.startDate) : null,
         endDate: data.convention.endDate ? new Date(data.convention.endDate) : null,
-        status: data.convention.status,
-        tag: data.convention.tag || ''
+        status: data.convention.status || 'ACTIVE',
+        tag: data.convention.tag || '',
+        type: data.convention.type || 'CONVENTION',
+        numberOfPayments: data.convention.paymentTerms?.numberOfPayments || 1,
+        intervalDays: data.convention.paymentTerms?.intervalDays || 30
       });
+      console.log('✅ Formulaire initialisé avec:', this.conventionForm.value);
     }
   }
 

@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit {
   @Input() selectedRole: string = '';
   @Input() isModal: boolean = false;
   @Output() loginSuccess = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
   
   loginForm: FormGroup;
   isLoading = false;
@@ -35,6 +36,8 @@ export class LoginComponent implements OnInit {
   errorMessage = '';
   roleIcon = 'lock';
   roleLabel = 'Authentification';
+  roleColor = '#667eea';
+  roleGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
 
   constructor(
     private fb: FormBuilder,
@@ -53,6 +56,7 @@ export class LoginComponent implements OnInit {
     if (this.selectedRole && this.selectedRole !== '') {
       console.log('🔐 Rôle reçu en input:', this.selectedRole);
       localStorage.setItem('selectedRole', this.selectedRole);
+      this.updateRoleStyles();
     } else {
       // Sinon, utiliser le rôle de la route
       const data = this.route.snapshot.data || {};
@@ -69,9 +73,46 @@ export class LoginComponent implements OnInit {
 
       if (iconFromRoute) this.roleIcon = iconFromRoute;
       if (labelFromRoute) this.roleLabel = labelFromRoute;
+      this.updateRoleStyles();
     }
 
     console.log('Login Component initialisé avec rôle:', this.selectedRole);
+  }
+
+  private updateRoleStyles() {
+    switch (this.selectedRole.toLowerCase()) {
+      case 'admin':
+        this.roleIcon = 'admin_panel_settings';
+        this.roleLabel = 'Espace Administrateur';
+        this.roleColor = '#3f51b5';
+        this.roleGradient = 'linear-gradient(135deg, #3f51b5 0%, #1a237e 100%)';
+        break;
+      case 'commercial':
+        this.roleIcon = 'store';
+        this.roleLabel = 'Espace Commercial';
+        this.roleColor = '#4caf50';
+        this.roleGradient = 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)';
+        break;
+      case 'project-manager':
+      case 'projectmanager':
+        this.roleIcon = 'assignment';
+        this.roleLabel = 'Espace Chef de Projet';
+        this.roleColor = '#ff9800';
+        this.roleGradient = 'linear-gradient(135deg, #ff9800 0%, #e65100 100%)';
+        break;
+      case 'decision-maker':
+      case 'decisionmaker':
+        this.roleIcon = 'gavel';
+        this.roleLabel = 'Espace Décideur';
+        this.roleColor = '#9c27b0';
+        this.roleGradient = 'linear-gradient(135deg, #9c27b0 0%, #4a148c 100%)';
+        break;
+      default:
+        this.roleIcon = 'lock';
+        this.roleLabel = 'Authentification';
+        this.roleColor = '#667eea';
+        this.roleGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    }
   }
 
   private getRedirectPathForRole(primaryRole: string): string {
@@ -158,7 +199,11 @@ export class LoginComponent implements OnInit {
 
   forgotPassword(event: Event) {
     event.preventDefault();
-    alert('Fonctionnalité de récupération de mot de passe à implémenter');
+    this.router.navigate(['/auth/forgot-password']);
+  }
+
+  closeModal() {
+    this.modalClose.emit();
   }
 }
 

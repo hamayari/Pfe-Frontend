@@ -4,17 +4,73 @@
   background: #f4f7fa;
 }
 
-/* Sidebar améliorée */
+/* Sidebar améliorée - COULEUR BLEUE COMMERCIAL PAR DÉFAUT */
 .custom-sidebar {
   width: 240px;
-  background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+  background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%) !important;
   color: #fff;
   border: none;
-  box-shadow: 2px 0 12px rgba(26,35,126,0.08);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15) !important;
   display: flex;
   flex-direction: column;
   padding-top: 0;
   transition: width 0.2s;
+  position: relative;
+  
+  // Effet glassmorphism
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Sidebar Commercial & Admin (même couleur que commercial-dashboard) */
+.custom-sidebar.sidebar-commercial {
+  background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15) !important;
+  
+  // Effet glassmorphism overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  // S'assurer que le contenu est au-dessus de l'overlay
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Sidebar Project Manager (orange/jaune) */
+.custom-sidebar.sidebar-project-manager {
+  background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%);
+}
+
+/* Sidebar Decision Maker (violet) */
+.custom-sidebar.sidebar-decision-maker {
+  background: linear-gradient(135deg, #6a1b9a 0%, #8e24aa 100%);
+}
+
+/* Sidebar par défaut */
+.custom-sidebar.sidebar-default {
+  background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
 }
 
 .sidebar-header {

@@ -27,6 +27,12 @@ export interface Message {
   deletedAt?: Date;
   senderAvatar?: string;
   pinned?: boolean;
+  // Réponse à un message
+  replyTo?: {
+    messageId: string;
+    senderName: string;
+    content: string;
+  };
 }
 
 export interface Conversation {
@@ -164,6 +170,13 @@ export class MessagingService {
         const currentConversations = this.conversationsSubject.value;
         this.conversationsSubject.next([...currentConversations, newConversation]);
       }));
+  }
+
+  getDirectConversation(userId1: string, userId2: string): Observable<Conversation | null> {
+    return this.http.get<Conversation>(`${this.apiUrl}/conversations/direct/${userId1}/${userId2}`)
+      .pipe(
+        catchError(() => of(null))
+      );
   }
 
   // Owner updates: title/description/privacy

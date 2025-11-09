@@ -29,6 +29,52 @@
           <i class="material-icons">notifications</i>
           <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
         </button>
+        
+        <!-- Panneau de notifications dropdown -->
+        <div class="notification-panel" *ngIf="notificationPanelOpen">
+          <div class="notification-panel-header">
+            <h3>Notifications</h3>
+            <button class="mark-all-read-btn" (click)="markAllNotificationsAsRead()" *ngIf="notificationCount > 0">
+              <i class="material-icons">done_all</i>
+              Tout marquer comme lu
+            </button>
+          </div>
+          
+          <div class="notification-list" *ngIf="notifications.length > 0">
+            <div *ngFor="let notification of notifications" 
+                 class="notification-item" 
+                 [class.unread]="!notification.read"
+                 [class.notification-warning]="notification.type === 'WARNING'"
+                 [class.notification-success]="notification.type === 'SUCCESS'"
+                 [class.notification-info]="notification.type === 'INFO'">
+              <div class="notification-icon">
+                <i class="material-icons">{{ notification.icon }}</i>
+              </div>
+              <div class="notification-content">
+                <div class="notification-title">{{ notification.title }}</div>
+                <div class="notification-message">{{ notification.message }}</div>
+                <div class="notification-time">{{ getTimeAgo(notification.timestamp) }}</div>
+              </div>
+              <button class="mark-read-btn" 
+                      (click)="markNotificationAsRead(notification)" 
+                      *ngIf="!notification.read"
+                      title="Marquer comme lu">
+                <i class="material-icons">check</i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="no-notifications" *ngIf="notifications.length === 0">
+            <i class="material-icons">notifications_none</i>
+            <p>Aucune notification</p>
+          </div>
+          
+          <div class="notification-panel-footer">
+            <button class="view-all-btn" (click)="viewAllNotifications()">
+              Voir toutes les notifications
+            </button>
+          </div>
+        </div>
       </div>
       
       <!-- Messages -->
@@ -57,8 +103,8 @@
                onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
         </div>
         <div class="user-details">
-          <div class="username">{{ currentUser?.username || 'Commercial' }}</div>
-          <div class="role">Commercial Métier</div>
+          <div class="username">{{ currentUser?.name || currentUser?.username || 'Commercial' }}</div>
+          <div class="role">{{ currentUser?.role || 'COMMERCIAL' }}</div>
         </div>
         <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
       </div>
@@ -88,8 +134,8 @@
              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
       </div>
       <div class="profile-info">
-        <div class="profile-name">{{ currentUser?.username || 'Commercial' }}</div>
-        <div class="profile-role">Commercial Métier</div>
+        <div class="profile-name">{{ currentUser?.name || currentUser?.username || 'Commercial' }}</div>
+        <div class="profile-role">{{ currentUser?.role || 'COMMERCIAL' }}</div>
       </div>
       <button class="logout-btn" (click)="logout()" mat-icon-button>
         <mat-icon>logout</mat-icon>
@@ -118,7 +164,7 @@
                       <mat-icon>add_circle</mat-icon>
                       <span>Nouvelle Convention</span>
                     </div>
-                    <div class="menu-item" [class.active]="activeSection === 'convention-tracking'" (click)="setActiveSection('convention-tracking')">
+                    <div class="menu-item" [class.active]="activeSection === 'convention-tracking'" (click)="navigateToConventionTracking()">
                       <mat-icon>track_changes</mat-icon>
                       <span>Suivi Conventions</span>
                     </div>
@@ -190,6 +236,19 @@
         </div>
       </div>
 
+      <!-- Section Communication -->
+      <div class="menu-section">
+        <div class="section-title">COMMUNICATION</div>
+        <div class="menu-item" [class.active]="activeSection === 'messaging'" (click)="setActiveSection('messaging')">
+          <mat-icon [matBadge]="messageCount" matBadgeColor="warn" [matBadgeHidden]="messageCount === 0">forum</mat-icon>
+          <span>Messagerie</span>
+        </div>
+        <div class="menu-item" [class.active]="activeSection === 'notification-preferences'" (click)="setActiveSection('notification-preferences')">
+          <mat-icon>notifications_active</mat-icon>
+          <span>Préférences Notifications</span>
+        </div>
+      </div>
+
       <!-- Section Profil -->
       <div class="menu-section">
         <div class="section-title">PROFIL</div>
@@ -247,6 +306,11 @@
           </button>
         </div>
         
+        <!-- Test WebSocket -->
+        <button class="header-icon-btn" (click)="testWebSocketNotification()" title="Tester Notification WebSocket" style="background: #4caf50;">
+          <i class="material-icons">science</i>
+        </button>
+        
         <!-- Paramètres -->
         <button class="header-icon-btn" (click)="toggleSettings()" title="Paramètres">
           <i class="material-icons">settings</i>
@@ -265,8 +329,8 @@
                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjhERjkiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMEgxOEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'" />
           </div>
           <div class="user-details">
-            <div class="username">{{ currentUser?.username || 'Commercial' }}</div>
-            <div class="role">Commercial Métier</div>
+            <div class="username">{{ currentUser?.name || currentUser?.username || 'Commercial' }}</div>
+            <div class="role">{{ currentUser?.role || 'COMMERCIAL' }}</div>
           </div>
           <i class="material-icons dropdown-icon" [class.rotated]="userMenuOpen">keyboard_arrow_down</i>
         </div>
@@ -449,8 +513,52 @@
       </div>
     </div>
 
+    <!-- Section Messagerie -->
+    <div *ngIf="activeSection === 'messaging'" class="messaging-section-wrapper">
+      <app-messaging-panel></app-messaging-panel>
+    </div>
+
+    <!-- Section Préférences Notifications -->
+    <div *ngIf="activeSection === 'notification-preferences'" class="notification-preferences-wrapper">
+      <app-notification-preferences></app-notification-preferences>
+    </div>
+
+    <!-- Section Profil -->
+    <div *ngIf="activeSection === 'profile'" class="profile-section-wrapper" style="padding: 20px; position: relative; z-index: 10;">
+      <mat-card style="max-width: 800px; margin: 0 auto; position: relative; z-index: 10;">
+        <mat-card-header>
+          <mat-card-title style="display: flex; align-items: center; gap: 12px;">
+            <mat-icon style="color: #e74c3c;">lock</mat-icon>
+            Sécurité du compte
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content style="padding: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Bouton Changer le mot de passe -->
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="openChangePasswordModal()"
+              style="width: 100%; height: 60px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 100; pointer-events: auto;">
+              <mat-icon>vpn_key</mat-icon>
+              <span>Changer le mot de passe</span>
+            </button>
+            
+            <!-- Bouton 2FA -->
+            <button 
+              mat-stroked-button 
+              color="accent"
+              style="width: 100%; height: 60px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 100; pointer-events: auto;">
+              <mat-icon>security</mat-icon>
+              <span>Authentification à deux facteurs</span>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
     <!-- Onglets de suivi (restructurés) -->
-    <div class="tabs-section">
+    <div class="tabs-section" *ngIf="activeSection !== 'profile'">
       <mat-tab-group class="modern-tabs" [selectedIndex]="activeTabIndex" (selectedIndexChange)="onTabChange($event)">
         <!-- Onglet Conventions -->
         <mat-tab label="Conventions">
@@ -486,20 +594,40 @@
                     <mat-icon>download</mat-icon>
                   </button>
                   <mat-menu #exportConventionsMenu="matMenu">
-                    <button mat-menu-item (click)="exportData()">
+                    <button mat-menu-item (click)="exportConventions('excel')">
                       <mat-icon>table_chart</mat-icon>
                       Excel
                     </button>
-                    <button mat-menu-item (click)="exportData()">
+                    <button mat-menu-item (click)="exportConventions('pdf')">
                       <mat-icon>picture_as_pdf</mat-icon>
                       PDF
+                    </button>
+                    <button mat-menu-item (click)="exportConventions('csv')">
+                      <mat-icon>description</mat-icon>
+                      CSV
                     </button>
                   </mat-menu>
                 </div>
               </mat-card-header>
           <mat-card-content>
+            <!-- Bannière d'alerte en mode suivi -->
+            <div *ngIf="activeSection === 'convention-tracking'" class="tracking-alert-banner">
+              <div class="alert-icon">
+                <mat-icon>track_changes</mat-icon>
+              </div>
+              <div class="alert-content">
+                <h3>🔍 Mode Suivi Actif</h3>
+                <p>Affichage des conventions nécessitant votre attention (expirées ou expirant dans les 30 jours)</p>
+              </div>
+              <div class="alert-actions">
+                <button (click)="navigateToConventions()" matTooltip="Voir toutes les conventions">
+                  Voir Tout
+                </button>
+              </div>
+            </div>
+
             <div class="table-container">
-              <table mat-table [dataSource]="filteredConventions" class="data-table">
+              <table mat-table [dataSource]="conventionDataSource" class="data-table">
                 <!-- Checkbox Column -->
                 <ng-container matColumnDef="select">
                   <th mat-header-cell *matHeaderCellDef>
@@ -554,9 +682,18 @@
                 <ng-container matColumnDef="dueDate">
                   <th mat-header-cell *matHeaderCellDef>Échéance</th>
                   <td mat-cell *matCellDef="let element">
-                    <span [ngClass]="{'overdue': isOverdue(element.dueDate)}">
-                      {{ element.dueDate | date:'shortDate' }}
-                    </span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span [ngClass]="{'overdue': isOverdue(element.dueDate)}">
+                        {{ element.dueDate | date:'shortDate' }}
+                      </span>
+                      <!-- Indicateur d'urgence en mode suivi -->
+                      <span *ngIf="activeSection === 'convention-tracking'" 
+                            class="urgency-indicator"
+                            [ngClass]="'urgency-' + getUrgencyLevel(element)"
+                            [matTooltip]="getUrgencyText(element)">
+                        <mat-icon>{{ getUrgencyIcon(element) }}</mat-icon>
+                      </span>
+                    </div>
                   </td>
                 </ng-container>
 
@@ -580,29 +717,49 @@
                         <mat-icon>edit</mat-icon>
                         Modifier
                       </button>
+                      <button mat-menu-item (click)="duplicateConvention(element)">
+                        <mat-icon>content_copy</mat-icon>
+                        Dupliquer
+                      </button>
+                      <button mat-menu-item (click)="downloadConventionPDF(element)">
+                        <mat-icon>picture_as_pdf</mat-icon>
+                        Télécharger PDF
+                      </button>
+                      <button mat-menu-item (click)="viewConventionAudit(element)">
+                        <mat-icon>history</mat-icon>
+                        Historique
+                      </button>
+                      <button mat-menu-item [matMenuTriggerFor]="tagsMenu">
+                        <mat-icon>label</mat-icon>
+                        Ajouter tag
+                      </button>
                       <button mat-menu-item (click)="deleteConvention(element)" class="delete-action">
                         <mat-icon>delete</mat-icon>
                         Supprimer
                       </button>
+                    </mat-menu>
+                    
+                    <!-- Sous-menu pour les tags -->
+                    <mat-menu #tagsMenu="matMenu">
                       <button mat-menu-item (click)="addTagToConvention(element, 'Prioritaire')">
                         <mat-icon>label</mat-icon>
-                        Ajouter tag: Prioritaire
+                        Prioritaire
                       </button>
                       <button mat-menu-item (click)="addTagToConvention(element, 'Important')">
                         <mat-icon>label</mat-icon>
-                        Ajouter tag: Important
+                        Important
                       </button>
                       <button mat-menu-item (click)="addTagToConvention(element, 'Urgent')">
                         <mat-icon>label</mat-icon>
-                        Ajouter tag: Urgent
+                        Urgent
                       </button>
                       <button mat-menu-item (click)="addTagToConvention(element, 'Nouveau')">
                         <mat-icon>label</mat-icon>
-                        Ajouter tag: Nouveau
+                        Nouveau
                       </button>
                       <button mat-menu-item (click)="addTagToConvention(element, 'Renouvellement')">
                         <mat-icon>label</mat-icon>
-                        Ajouter tag: Renouvellement
+                        Renouvellement
                       </button>
                     </mat-menu>
                   </td>
@@ -612,7 +769,10 @@
                 <tr mat-row *matRowDef="let row; columns: conventionColumns;"></tr>
               </table>
 
-              <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+              <mat-paginator #conventionPaginator
+                             [pageSizeOptions]="[5, 10, 25, 50]" 
+                             [pageSize]="5"
+                             showFirstLastButtons></mat-paginator>
             </div>
           </mat-card-content>
         </mat-card>
@@ -629,6 +789,23 @@
               <span class="selection-info" *ngIf="selectedInvoices.length > 0">
                 {{ selectedInvoices.length }} sélectionnée(s)
               </span>
+              <button mat-icon-button [matMenuTriggerFor]="exportInvoicesMenu" matTooltip="Exporter">
+                <mat-icon>download</mat-icon>
+              </button>
+              <mat-menu #exportInvoicesMenu="matMenu">
+                <button mat-menu-item (click)="exportInvoices('excel')">
+                  <mat-icon>table_chart</mat-icon>
+                  Excel
+                </button>
+                <button mat-menu-item (click)="exportInvoices('pdf')">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  PDF
+                </button>
+                <button mat-menu-item (click)="exportInvoices('csv')">
+                  <mat-icon>description</mat-icon>
+                  CSV
+                </button>
+              </mat-menu>
               <button mat-stroked-button color="warn" (click)="deleteAllInvoices()" 
                       matTooltip="Supprimer toutes les factures">
                 <mat-icon>delete_forever</mat-icon>
@@ -638,7 +815,7 @@
           </mat-card-header>
           <mat-card-content>
             <div class="table-container">
-              <table mat-table [dataSource]="filteredInvoices" class="data-table">
+              <table mat-table [dataSource]="invoiceDataSource" class="data-table">
                 <!-- Checkbox Column -->
                 <ng-container matColumnDef="select">
                   <th mat-header-cell *matHeaderCellDef>
@@ -733,96 +910,1286 @@
                 <tr mat-row *matRowDef="let row; columns: invoiceColumns;"></tr>
               </table>
 
-              <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+              <mat-paginator #invoicePaginator
+                             [pageSizeOptions]="[5, 10, 25, 50]" 
+                             [pageSize]="5"
+                             showFirstLastButtons></mat-paginator>
             </div>
           </mat-card-content>
         </mat-card>
       </div>
     </mat-tab>
 
-    <!-- Onglet Notifications -->
-    <mat-tab label="Notifications">
+    <!-- Onglet Suivi Statuts Factures -->
+    <mat-tab label="Suivi Statuts">
       <div class="tab-content">
-        <mat-card class="table-card">
+        <div class="status-tracking-header">
+          <h2>📊 Suivi des Statuts de Factures</h2>
+          <p>Vue d'ensemble et analyse des statuts de paiement</p>
+        </div>
+
+        <!-- Statistiques par statut -->
+        <div class="status-stats-grid">
+          <!-- Factures Payées -->
+          <mat-card class="status-card status-paid-card">
+            <mat-card-header>
+              <div class="status-icon paid">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+              <mat-card-title>Factures Payées</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="status-count">{{ getInvoiceCountByStatus('PAID') }}</div>
+              <div class="status-amount">
+                {{ calculateTotalByStatus('PAID') | currency:'EUR' }}
+              </div>
+              <button mat-stroked-button color="primary" (click)="filterInvoicesByStatus('PAID')">
+                <mat-icon>visibility</mat-icon>
+                Voir détails
+              </button>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Factures En Attente -->
+          <mat-card class="status-card status-pending-card">
+            <mat-card-header>
+              <div class="status-icon pending">
+                <mat-icon>schedule</mat-icon>
+              </div>
+              <mat-card-title>En Attente</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="status-count">{{ getInvoiceCountByStatus('PENDING') }}</div>
+              <div class="status-amount">
+                {{ calculateTotalByStatus('PENDING') | currency:'EUR' }}
+              </div>
+              <button mat-stroked-button color="accent" (click)="filterInvoicesByStatus('PENDING')">
+                <mat-icon>visibility</mat-icon>
+                Voir détails
+              </button>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Factures En Retard -->
+          <mat-card class="status-card status-overdue-card">
+            <mat-card-header>
+              <div class="status-icon overdue">
+                <mat-icon>warning</mat-icon>
+              </div>
+              <mat-card-title>En Retard</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="status-count">{{ getInvoiceCountByStatus('OVERDUE') }}</div>
+              <div class="status-amount">
+                {{ calculateTotalByStatus('OVERDUE') | currency:'EUR' }}
+              </div>
+              <button mat-stroked-button color="warn" (click)="filterInvoicesByStatus('OVERDUE')">
+                <mat-icon>visibility</mat-icon>
+                Voir détails
+              </button>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Factures Partielles -->
+          <mat-card class="status-card status-partial-card">
+            <mat-card-header>
+              <div class="status-icon partial">
+                <mat-icon>pie_chart</mat-icon>
+              </div>
+              <mat-card-title>Paiement Partiel</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="status-count">{{ getInvoiceCountByStatus('PARTIAL') }}</div>
+              <div class="status-amount">
+                {{ calculateTotalByStatus('PARTIAL') | currency:'EUR' }}
+              </div>
+              <button mat-stroked-button (click)="filterInvoicesByStatus('PARTIAL')">
+                <mat-icon>visibility</mat-icon>
+                Voir détails
+              </button>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Graphique de répartition -->
+        <mat-card class="chart-card">
           <mat-card-header>
-            <mat-card-title>Historique des Notifications</mat-card-title>
+            <mat-card-title>Répartition des Statuts</mat-card-title>
+            <div class="card-actions">
+              <button mat-icon-button matTooltip="Actualiser">
+                <mat-icon>refresh</mat-icon>
+              </button>
+            </div>
           </mat-card-header>
           <mat-card-content>
-            <div class="notifications-list">
-              <div class="notification-item">
-                <div class="notification-icon">
-                  <mat-icon class="notification-email">email</mat-icon>
+            <div class="status-distribution">
+              <div class="distribution-bar">
+                <div class="bar-segment paid" 
+                     [style.width.%]="getStatusPercentage('PAID')"
+                     matTooltip="Payées: {{ getStatusPercentage('PAID') | number:'1.1-1' }}%">
                 </div>
-                <div class="notification-content">
-                  <div class="notification-header">
-                    <span class="notification-subject">Rappel de paiement envoyé</span>
-                    <span class="notification-time">{{ currentDate | date:'short' }}</span>
+                <div class="bar-segment pending" 
+                     [style.width.%]="getStatusPercentage('PENDING')"
+                     matTooltip="En attente: {{ getStatusPercentage('PENDING') | number:'1.1-1' }}%">
+                </div>
+                <div class="bar-segment overdue" 
+                     [style.width.%]="getStatusPercentage('OVERDUE')"
+                     matTooltip="En retard: {{ getStatusPercentage('OVERDUE') | number:'1.1-1' }}%">
+                </div>
+                <div class="bar-segment partial" 
+                     [style.width.%]="getStatusPercentage('PARTIAL')"
+                     matTooltip="Partielles: {{ getStatusPercentage('PARTIAL') | number:'1.1-1' }}%">
+                </div>
+              </div>
+              
+              <div class="distribution-legend">
+                <div class="legend-item">
+                  <span class="legend-color paid"></span>
+                  <span class="legend-label">Payées ({{ getStatusPercentage('PAID') | number:'1.1-1' }}%)</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color pending"></span>
+                  <span class="legend-label">En attente ({{ getStatusPercentage('PENDING') | number:'1.1-1' }}%)</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color overdue"></span>
+                  <span class="legend-label">En retard ({{ getStatusPercentage('OVERDUE') | number:'1.1-1' }}%)</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color partial"></span>
+                  <span class="legend-label">Partielles ({{ getStatusPercentage('PARTIAL') | number:'1.1-1' }}%)</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Liste des factures filtrées par statut -->
+        <mat-card class="filtered-invoices-card" *ngIf="selectedStatusFilter">
+          <mat-card-header>
+            <mat-card-title>Factures - {{ getInvoiceStatusLabel(selectedStatusFilter) }}</mat-card-title>
+            <div class="card-actions">
+              <button mat-stroked-button (click)="clearStatusFilter()">
+                <mat-icon>clear</mat-icon>
+                Effacer le filtre
+              </button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="table-container">
+              <table mat-table [dataSource]="filteredStatusInvoiceDataSource" class="data-table">
+                <!-- Numéro de facture -->
+                <ng-container matColumnDef="invoiceNumber">
+                  <th mat-header-cell *matHeaderCellDef>N° Facture</th>
+                  <td mat-cell *matCellDef="let element">{{ element.reference || element.invoiceNumber || 'N/A' }}</td>
+                </ng-container>
+
+                <!-- Convention -->
+                <ng-container matColumnDef="convention">
+                  <th mat-header-cell *matHeaderCellDef>Convention</th>
+                  <td mat-cell *matCellDef="let element">{{ element.conventionReference || 'N/A' }}</td>
+                </ng-container>
+
+                <!-- Montant -->
+                <ng-container matColumnDef="amount">
+                  <th mat-header-cell *matHeaderCellDef>Montant</th>
+                  <td mat-cell *matCellDef="let element">{{ element.amount | currency:'EUR' }}</td>
+                </ng-container>
+
+                <!-- Date d'échéance -->
+                <ng-container matColumnDef="dueDate">
+                  <th mat-header-cell *matHeaderCellDef>Échéance</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span [ngClass]="{'overdue': isOverdue(element.dueDate)}">
+                      {{ element.dueDate | date:'shortDate' }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Actions -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button [matMenuTriggerFor]="statusActionMenu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #statusActionMenu="matMenu">
+                      <button mat-menu-item (click)="sendReminder(element)">
+                        <mat-icon>email</mat-icon>
+                        Envoyer rappel
+                      </button>
+                      <button mat-menu-item (click)="markAsPaid(element)">
+                        <mat-icon>check_circle</mat-icon>
+                        Marquer comme payée
+                      </button>
+                      <button mat-menu-item (click)="downloadInvoicePDF(element)">
+                        <mat-icon>picture_as_pdf</mat-icon>
+                        Télécharger PDF
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['invoiceNumber', 'convention', 'amount', 'dueDate', 'actions']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['invoiceNumber', 'convention', 'amount', 'dueDate', 'actions'];"></tr>
+                
+                <!-- Message si aucune facture -->
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell" colspan="5" style="text-align: center; padding: 2rem;">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #cbd5e0;">inbox</mat-icon>
+                    <p style="margin-top: 1rem; color: #718096; font-size: 1rem;">
+                      Aucune facture avec le statut "{{ getInvoiceStatusLabel(selectedStatusFilter) }}"
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Notifications AMÉLIORÉ avec sous-onglets -->
+    <mat-tab label="Notifications">
+      <div class="tab-content">
+        
+        <!-- Sous-onglets pour différencier Alertes Système et SMS/Email -->
+        <mat-tab-group class="sub-tabs" [(selectedIndex)]="notificationSubTabIndex">
+          
+          <!-- Sous-onglet: Alertes Système -->
+          <mat-tab label="🔔 Alertes Système">
+            <div class="sub-tab-content alerts-system-section">
+              <div class="section-header">
+                <h2>Alertes Système en Temps Réel</h2>
+                <p>Tableau de bord des alertes critiques et avertissements</p>
+              </div>
+
+          <!-- Statistiques des alertes -->
+          <div class="alerts-stats-grid">
+            <mat-card class="alert-stat-card critical">
+              <mat-card-header>
+                <div class="stat-icon">
+                  <mat-icon>error</mat-icon>
+                </div>
+                <mat-card-title>Critiques</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="stat-count">{{ overdueInvoices.length }}</div>
+                <div class="stat-label">Factures en retard</div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="alert-stat-card warning">
+              <mat-card-header>
+                <div class="stat-icon">
+                  <mat-icon>warning</mat-icon>
+                </div>
+                <mat-card-title>Avertissements</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="stat-count">{{ upcomingInvoices.length }}</div>
+                <div class="stat-label">Échéances proches</div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="alert-stat-card info">
+              <mat-card-header>
+                <div class="stat-icon">
+                  <mat-icon>info</mat-icon>
+                </div>
+                <mat-card-title>Informations</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="stat-count">{{ conventions.length }}</div>
+                <div class="stat-label">Conventions actives</div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <!-- Liste des alertes actives -->
+          <mat-card class="active-alerts-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>notifications_active</mat-icon>
+                Alertes Actives
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="alerts-list">
+                <!-- Alertes critiques -->
+                <div class="alert-item critical" *ngFor="let invoice of overdueInvoices.slice(0, 5)">
+                  <div class="alert-icon">
+                    <mat-icon>error</mat-icon>
                   </div>
-                  <div class="notification-details">
-                    <span class="notification-recipient">client@example.com</span>
-                    <span class="notification-status status-sent">Envoyé</span>
+                  <div class="alert-content">
+                    <div class="alert-title">Facture en retard</div>
+                    <div class="alert-message">
+                      {{ invoice.invoiceNumber || invoice.id || 'Facture' }} - En retard de {{ getDaysOverdue(invoice.dueDate) }} jour(s)
+                    </div>
+                    <div class="alert-meta">
+                      <span>Montant: {{ invoice.amount | currency:'EUR' }}</span>
+                      <span>Échéance: {{ invoice.dueDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  </div>
+                  <div class="alert-actions">
+                    <button mat-icon-button (click)="sendReminder(invoice)" matTooltip="Envoyer rappel">
+                      <mat-icon>send</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="viewInvoiceDetails(invoice)" matTooltip="Voir détails">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Alertes d'avertissement -->
+                <div class="alert-item warning" *ngFor="let invoice of upcomingInvoices.slice(0, 5)">
+                  <div class="alert-icon">
+                    <mat-icon>schedule</mat-icon>
+                  </div>
+                  <div class="alert-content">
+                    <div class="alert-title">Échéance proche</div>
+                    <div class="alert-message">
+                      {{ invoice.invoiceNumber || invoice.id || 'Facture' }} - Échéance dans {{ getDaysUntil(invoice.dueDate) }} jour(s)
+                    </div>
+                    <div class="alert-meta">
+                      <span>Montant: {{ invoice.amount | currency:'EUR' }}</span>
+                      <span>Échéance: {{ invoice.dueDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  </div>
+                  <div class="alert-actions">
+                    <button mat-icon-button (click)="sendReminder(invoice)" matTooltip="Envoyer rappel">
+                      <mat-icon>send</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="viewInvoiceDetails(invoice)" matTooltip="Voir détails">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="no-data" *ngIf="overdueInvoices.length === 0 && upcomingInvoices.length === 0">
+                  <mat-icon>check_circle</mat-icon>
+                  <p>Aucune alerte active - Tout est à jour !</p>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+            </div>
+          </mat-tab>
+
+          <!-- Sous-onglet: Alertes SMS/Email -->
+          <mat-tab label="📧 SMS/Email">
+            <div class="sub-tab-content sms-email-management-section">
+              <div class="section-header">
+                <h2>Gestion des Alertes SMS/Email</h2>
+                <p>Configuration et historique des communications automatiques</p>
+              </div>
+        
+        <!-- Configuration des Relances Automatiques -->
+        <mat-card class="scheduler-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>schedule_send</mat-icon>
+              Relances Automatiques
+            </mat-card-title>
+            <div class="header-actions">
+              <button mat-raised-button color="primary" (click)="triggerManualScheduler()">
+                <mat-icon>play_arrow</mat-icon>
+                Déclencher Maintenant
+              </button>
+              <button mat-raised-button color="accent" (click)="getSchedulerStatus()">
+                <mat-icon>info</mat-icon>
+                Statut
+              </button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="scheduler-config">
+              <div class="config-section">
+                <h3>
+                  <mat-icon>settings</mat-icon>
+                  Configuration
+                </h3>
+                <div class="config-grid">
+                  <div class="config-item">
+                    <mat-icon class="config-icon">schedule</mat-icon>
+                    <div class="config-details">
+                      <strong>Fréquence</strong>
+                      <p>Tous les jours à 9h00</p>
+                    </div>
+                  </div>
+                  <div class="config-item">
+                    <mat-icon class="config-icon">notifications_active</mat-icon>
+                    <div class="config-details">
+                      <strong>Rappels</strong>
+                      <p>7, 3 et 1 jour(s) avant échéance</p>
+                    </div>
+                  </div>
+                  <div class="config-item">
+                    <mat-icon class="config-icon">email</mat-icon>
+                    <div class="config-details">
+                      <strong>Email</strong>
+                      <p>Activé ✓</p>
+                    </div>
+                  </div>
+                  <div class="config-item">
+                    <mat-icon class="config-icon">sms</mat-icon>
+                    <div class="config-details">
+                      <strong>SMS</strong>
+                      <p>Activé ✓</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="scheduler-status" *ngIf="schedulerStatus">
+                <h3>
+                  <mat-icon>info</mat-icon>
+                  Statut du Scheduler
+                </h3>
+                <div class="status-grid">
+                  <div class="status-item">
+                    <span class="status-label">Service:</span>
+                    <mat-chip color="primary" selected>{{ schedulerStatus.scheduler }}</mat-chip>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">État:</span>
+                    <mat-chip color="accent" selected>
+                      <mat-icon>check_circle</mat-icon>
+                      {{ schedulerStatus.status }}
+                    </mat-chip>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">Dernière vérification:</span>
+                    <span>{{ schedulerStatus.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </mat-card-content>
         </mat-card>
+
+        <!-- Historique des Notifications -->
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>history</mat-icon>
+              Historique des Notifications
+            </mat-card-title>
+            <div class="header-actions">
+              <mat-form-field appearance="outline" class="filter-field">
+                <mat-label>Filtrer par type</mat-label>
+                <mat-select [(ngModel)]="notificationFilter" (selectionChange)="filterNotifications()">
+                  <mat-option value="all">Toutes</mat-option>
+                  <mat-option value="email">Email</mat-option>
+                  <mat-option value="sms">SMS</mat-option>
+                  <mat-option value="system">Système</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="notifications-list">
+              <div class="notification-item" *ngFor="let notification of getFilteredNotifications()">
+                <div class="notification-icon">
+                  <mat-icon [class]="'notification-' + notification.type">
+                    {{ notification.type === 'email' ? 'email' : notification.type === 'sms' ? 'sms' : 'notifications' }}
+                  </mat-icon>
+                </div>
+                <div class="notification-content">
+                  <div class="notification-header">
+                    <span class="notification-subject">{{ notification.subject }}</span>
+                    <span class="notification-time">{{ notification.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <div class="notification-details">
+                    <span class="notification-recipient">{{ notification.recipient }}</span>
+                    <mat-chip [color]="notification.status === 'sent' ? 'primary' : 'warn'" selected>
+                      {{ notification.status === 'sent' ? 'Envoyé' : 'Échec' }}
+                    </mat-chip>
+                  </div>
+                  <div class="notification-message" *ngIf="notification.message">
+                    {{ notification.message }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="no-data" *ngIf="getFilteredNotifications().length === 0">
+                <mat-icon>inbox</mat-icon>
+                <p>Aucune notification trouvée</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+            </div>
+          </mat-tab>
+        
+        </mat-tab-group>
       </div>
     </mat-tab>
 
     <!-- Onglet Calendrier -->
     <mat-tab label="Calendrier">
       <div class="tab-content">
-        <div class="calendar-controls">
-          <button mat-flat-button color="primary">
-            <mat-icon>calendar_today</mat-icon>
-            Vue Calendrier
-          </button>
-          <button mat-stroked-button color="accent" [matMenuTriggerFor]="exportCalendarMenu">
-            <mat-icon>download</mat-icon>
-            Exporter Calendrier
-          </button>
-          <mat-menu #exportCalendarMenu="matMenu">
-            <button mat-menu-item>
-              <mat-icon>event</mat-icon>
-              Format iCal (.ics)
-            </button>
-            <button mat-menu-item>
-              <mat-icon>picture_as_pdf</mat-icon>
-              PDF
-            </button>
-            <button mat-menu-item>
-              <mat-icon>table_chart</mat-icon>
-              Excel
-            </button>
-          </mat-menu>
+        <div class="calendar-header">
+          <h2>📅 Calendrier des Échéances</h2>
+          <p>Vue mensuelle des conventions et factures</p>
         </div>
 
-        <div class="calendar-events-list">
-          <mat-card class="table-card">
-            <mat-card-header>
-              <mat-card-title>Événements du Calendrier</mat-card-title>
-              <mat-card-subtitle>Prochaines échéances et événements importants</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="events-list">
-                <div class="event-item event-pending" *ngFor="let convention of conventions.slice(0, 5)">
-                  <div class="event-icon">
-                    <mat-icon>schedule</mat-icon>
+        <!-- Contrôles de navigation du calendrier -->
+        <mat-card class="calendar-card">
+          <mat-card-header>
+            <div class="calendar-nav">
+              <button mat-icon-button (click)="previousMonth()" matTooltip="Mois précédent">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <h3 class="calendar-month-year">{{ getCurrentMonthYear() }}</h3>
+              <button mat-icon-button (click)="nextMonth()" matTooltip="Mois suivant">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+              <button mat-stroked-button (click)="goToToday()" class="today-btn">
+                <mat-icon>today</mat-icon>
+                Aujourd'hui
+              </button>
+            </div>
+          </mat-card-header>
+
+          <mat-card-content>
+            <!-- Grille du calendrier -->
+            <div class="calendar-grid">
+              <!-- En-têtes des jours de la semaine -->
+              <div class="calendar-day-header" *ngFor="let dayName of dayNames">
+                {{ dayName }}
+              </div>
+
+              <!-- Jours du mois -->
+              <div *ngFor="let day of calendarDays" 
+                   class="calendar-day"
+                   [class.empty]="!day.date"
+                   [class.today]="day.isToday"
+                   [class.weekend]="day.isWeekend"
+                   [class.has-events]="day.hasEvents"
+                   [ngClass]="getDayEventClass(day)">
+                
+                <div class="day-number" *ngIf="day.date">
+                  {{ day.day }}
+                </div>
+
+                <!-- Marqueurs d'événements -->
+                <div class="day-events" *ngIf="day.hasEvents">
+                  <div class="event-marker" 
+                       *ngFor="let event of day.events.slice(0, 3)"
+                       [class.convention-marker]="event.type === 'convention'"
+                       [class.facture-marker]="event.type === 'facture'"
+                       [class.overdue-marker]="event.status === 'OVERDUE' || event.status === 'EXPIRED'"
+                       [matTooltip]="event.type === 'convention' ? 'Convention: ' + event.title : 'Facture: ' + event.reference">
+                    <mat-icon *ngIf="event.type === 'convention'">description</mat-icon>
+                    <mat-icon *ngIf="event.type === 'facture'">receipt</mat-icon>
                   </div>
-                  <div class="event-details">
-                    <div class="event-title">{{ convention.title }}</div>
-                    <div class="event-description">Échéance: {{ convention.dueDate | date:'fullDate' }}</div>
-                    <div class="event-date">{{ convention.dueDate | date:'shortDate' }}</div>
-                  </div>
-                  <div class="event-status">
-                    <span class="status-badge">{{ getStatusLabel(convention.status) }}</span>
+                  <div class="more-events" *ngIf="day.events.length > 3">
+                    +{{ day.events.length - 3 }}
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Légende -->
+            <div class="calendar-legend">
+              <div class="legend-item">
+                <div class="legend-marker convention-marker">
+                  <mat-icon>description</mat-icon>
+                </div>
+                <span>Convention</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-marker facture-marker">
+                  <mat-icon>receipt</mat-icon>
+                </div>
+                <span>Facture</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-marker overdue-marker">
+                  <mat-icon>error</mat-icon>
+                </div>
+                <span>En retard</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-marker today-marker"></div>
+                <span>Aujourd'hui</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Échéances -->
+    <mat-tab label="Échéances">
+      <div class="tab-content">
+        <div class="due-dates-header">
+          <h2>📅 Gestion des Échéances</h2>
+          <p>Vue d'ensemble des échéances de conventions et factures</p>
+        </div>
+
+        <!-- Statistiques des échéances -->
+        <div class="due-dates-stats">
+          <mat-card class="stat-card overdue">
+            <mat-card-header>
+              <div class="stat-icon">
+                <mat-icon>error</mat-icon>
+              </div>
+              <mat-card-title>En Retard</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getOverdueDueDates().length }}</div>
+              <div class="stat-label">Échéances dépassées</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card upcoming">
+            <mat-card-header>
+              <div class="stat-icon">
+                <mat-icon>schedule</mat-icon>
+              </div>
+              <mat-card-title>À Venir</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getUpcomingDueDates().length }}</div>
+              <div class="stat-label">Prochains 30 jours</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card total">
+            <mat-card-header>
+              <div class="stat-icon">
+                <mat-icon>event</mat-icon>
+              </div>
+              <mat-card-title>Total</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getAllDueDates().length }}</div>
+              <div class="stat-label">Toutes les échéances</div>
             </mat-card-content>
           </mat-card>
         </div>
+
+        <!-- Liste des échéances en retard -->
+        <mat-card class="due-dates-card" *ngIf="getOverdueDueDates().length > 0">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon error">error</mat-icon>
+              Échéances en Retard
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="due-dates-list">
+              <div class="due-date-item overdue" *ngFor="let item of getPagedOverdueDueDates()">
+                <div class="item-icon">
+                  <mat-icon *ngIf="item.type === 'convention'">description</mat-icon>
+                  <mat-icon *ngIf="item.type === 'facture'">receipt</mat-icon>
+                </div>
+                <div class="item-details">
+                  <div class="item-header">
+                    <span class="item-type">{{ item.type === 'convention' ? 'Convention' : 'Facture' }}</span>
+                    <span class="item-reference">{{ item.reference }}</span>
+                  </div>
+                  <div class="item-title">{{ item.title }}</div>
+                  <div class="item-meta">
+                    <span class="item-date">
+                      <mat-icon>event</mat-icon>
+                      {{ item.dueDate | date:'fullDate' }}
+                    </span>
+                    <span class="item-overdue-days">
+                      En retard de {{ getDaysOverdue(item.dueDate) }} jour(s)
+                    </span>
+                  </div>
+                </div>
+                <div class="item-amount">
+                  <div class="amount-value">{{ item.amount | currency:'EUR' }}</div>
+                  <span class="status-badge" [ngClass]="item.type === 'convention' ? getStatusClass(item.status) : getInvoiceStatusClass(item.status)">
+                    {{ item.type === 'convention' ? getStatusLabel(item.status) : getInvoiceStatusLabel(item.status) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <mat-paginator #overdueDatesPaginator
+                           [length]="getOverdueDueDates().length"
+                           [pageSizeOptions]="[5, 10, 25]"
+                           [pageSize]="5"
+                           (page)="onOverdueDatesPageChange($event)"
+                           showFirstLastButtons
+                           *ngIf="getOverdueDueDates().length > 0">
+            </mat-paginator>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Liste des échéances à venir -->
+        <mat-card class="due-dates-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon warning">schedule</mat-icon>
+              Échéances à Venir (30 prochains jours)
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="due-dates-list" *ngIf="getUpcomingDueDates().length > 0; else noUpcoming">
+              <div class="due-date-item upcoming" *ngFor="let item of getPagedUpcomingDueDates()">
+                <div class="item-icon">
+                  <mat-icon *ngIf="item.type === 'convention'">description</mat-icon>
+                  <mat-icon *ngIf="item.type === 'facture'">receipt</mat-icon>
+                </div>
+                <div class="item-details">
+                  <div class="item-header">
+                    <span class="item-type">{{ item.type === 'convention' ? 'Convention' : 'Facture' }}</span>
+                    <span class="item-reference">{{ item.reference }}</span>
+                  </div>
+                  <div class="item-title">{{ item.title }}</div>
+                  <div class="item-meta">
+                    <span class="item-date">
+                      <mat-icon>event</mat-icon>
+                      {{ item.dueDate | date:'fullDate' }}
+                    </span>
+                    <span class="item-days-until">
+                      Dans {{ getDaysUntil(item.dueDate) }} jour(s)
+                    </span>
+                  </div>
+                </div>
+                <div class="item-amount">
+                  <div class="amount-value">{{ item.amount | currency:'EUR' }}</div>
+                  <span class="status-badge" [ngClass]="item.type === 'convention' ? getStatusClass(item.status) : getInvoiceStatusClass(item.status)">
+                    {{ item.type === 'convention' ? getStatusLabel(item.status) : getInvoiceStatusLabel(item.status) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <mat-paginator #dueDatesPaginator
+                           [length]="getUpcomingDueDates().length"
+                           [pageSizeOptions]="[5, 10, 25]"
+                           [pageSize]="5"
+                           (page)="onDueDatesPageChange($event)"
+                           showFirstLastButtons
+                           *ngIf="getUpcomingDueDates().length > 0">
+            </mat-paginator>
+            <ng-template #noUpcoming>
+              <div class="no-data">
+                <mat-icon>check_circle</mat-icon>
+                <p>Aucune échéance dans les 30 prochains jours</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Événements -->
+    <mat-tab label="Événements">
+      <div class="tab-content">
+        <div class="events-header">
+          <h2>📋 Événements et Activités</h2>
+          <p>Suivi des événements récents et à venir</p>
+        </div>
+
+        <!-- Statistiques des événements -->
+        <div class="events-stats">
+          <mat-card class="stat-card">
+            <mat-card-header>
+              <div class="stat-icon upcoming">
+                <mat-icon>schedule</mat-icon>
+              </div>
+              <mat-card-title>À Venir</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getUpcomingEvents().length }}</div>
+              <div class="stat-label">Prochains 7 jours</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <mat-card-header>
+              <div class="stat-icon recent">
+                <mat-icon>history</mat-icon>
+              </div>
+              <mat-card-title>Récents</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getRecentEvents().length }}</div>
+              <div class="stat-label">30 derniers jours</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <mat-card-header>
+              <div class="stat-icon total">
+                <mat-icon>event_note</mat-icon>
+              </div>
+              <mat-card-title>Total</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ conventions.length + invoices.length }}</div>
+              <div class="stat-label">Tous les événements</div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Événements à venir (7 prochains jours) -->
+        <mat-card class="events-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon upcoming">schedule</mat-icon>
+              Événements à Venir (7 prochains jours)
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="events-timeline" *ngIf="upcomingEventsDataSource.data.length > 0; else noUpcomingEvents">
+              <div class="timeline-item" *ngFor="let event of getPagedUpcomingEvents()">
+                <div class="timeline-marker" [ngClass]="event.type">
+                  <mat-icon>{{ event.icon }}</mat-icon>
+                </div>
+                <div class="timeline-content">
+                  <div class="event-header">
+                    <span class="event-type-badge" [ngClass]="event.type">
+                      {{ event.type === 'convention' ? 'Convention' : 'Facture' }}
+                    </span>
+                    <span class="event-reference">{{ event.reference }}</span>
+                    <span class="event-days-badge">Dans {{ event.daysUntil }} jour(s)</span>
+                  </div>
+                  <div class="event-title">{{ event.action }}: {{ event.title }}</div>
+                  <div class="event-meta">
+                    <span class="event-date">
+                      <mat-icon>event</mat-icon>
+                      {{ event.date | date:'fullDate' }}
+                    </span>
+                    <span class="event-amount">{{ event.amount | currency:'EUR' }}</span>
+                    <span class="status-badge" [ngClass]="event.type === 'convention' ? getStatusClass(event.status) : getInvoiceStatusClass(event.status)">
+                      {{ event.type === 'convention' ? getStatusLabel(event.status) : getInvoiceStatusLabel(event.status) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <mat-paginator #upcomingEventsPaginator
+                           [length]="upcomingEventsDataSource.data.length"
+                           [pageSizeOptions]="[5, 10, 25]"
+                           [pageSize]="5"
+                           (page)="onUpcomingEventsPageChange($event)"
+                           showFirstLastButtons
+                           *ngIf="upcomingEventsDataSource.data.length > 0">
+            </mat-paginator>
+            <ng-template #noUpcomingEvents>
+              <div class="no-data">
+                <mat-icon>check_circle</mat-icon>
+                <p>Aucun événement prévu dans les 7 prochains jours</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Événements récents (30 derniers jours) -->
+        <mat-card class="events-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon recent">history</mat-icon>
+              Événements Récents (30 derniers jours)
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="events-timeline" *ngIf="recentEventsDataSource.data.length > 0; else noRecentEvents">
+              <div class="timeline-item" *ngFor="let event of getPagedRecentEvents()">
+                <div class="timeline-marker" [ngClass]="event.type">
+                  <mat-icon>{{ event.icon }}</mat-icon>
+                </div>
+                <div class="timeline-content">
+                  <div class="event-header">
+                    <span class="event-type-badge" [ngClass]="event.type">
+                      {{ event.type === 'convention' ? 'Convention' : 'Facture' }}
+                    </span>
+                    <span class="event-reference">{{ event.reference }}</span>
+                  </div>
+                  <div class="event-title">{{ event.action }}: {{ event.title }}</div>
+                  <div class="event-meta">
+                    <span class="event-date">
+                      <mat-icon>event</mat-icon>
+                      {{ event.date | date:'fullDate' }}
+                    </span>
+                    <span class="event-amount">{{ event.amount | currency:'EUR' }}</span>
+                    <span class="status-badge" [ngClass]="event.type === 'convention' ? getStatusClass(event.status) : getInvoiceStatusClass(event.status)">
+                      {{ event.type === 'convention' ? getStatusLabel(event.status) : getInvoiceStatusLabel(event.status) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <mat-paginator #recentEventsPaginator
+                           [length]="recentEventsDataSource.data.length"
+                           [pageSizeOptions]="[5, 10, 25]"
+                           [pageSize]="5"
+                           (page)="onRecentEventsPageChange($event)"
+                           showFirstLastButtons
+                           *ngIf="recentEventsDataSource.data.length > 0">
+            </mat-paginator>
+            <ng-template #noRecentEvents>
+              <div class="no-data">
+                <mat-icon>inbox</mat-icon>
+                <p>Aucun événement récent</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Historique -->
+    <mat-tab label="Historique">
+      <div class="tab-content">
+        <div class="history-header">
+          <h2>📜 Historique des Activités</h2>
+          <p>Suivi complet de toutes les actions et modifications</p>
+        </div>
+
+        <!-- Informations utilisateur -->
+        <mat-card class="user-info-card">
+          <div class="user-info">
+            <mat-icon class="user-icon">account_circle</mat-icon>
+            <div class="user-details">
+              <h3>Historique de {{ currentUser.username }}</h3>
+              <p>Vos actions et modifications personnelles</p>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Statistiques de l'historique -->
+        <div class="history-stats">
+          <mat-card class="stat-card">
+            <mat-card-header>
+              <div class="stat-icon">
+                <mat-icon>event_note</mat-icon>
+              </div>
+              <mat-card-title>Mes Actions</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getUserAuditStats().total }}</div>
+              <div class="stat-label">Total de mes actions</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <mat-card-header>
+              <div class="stat-icon">
+                <mat-icon>add_circle</mat-icon>
+              </div>
+              <mat-card-title>Créations</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getUserAuditStats().creates }}</div>
+              <div class="stat-label">Éléments créés</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <mat-card-header>
+              <div class="stat-icon">
+                <mat-icon>edit</mat-icon>
+              </div>
+              <mat-card-title>Modifications</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getUserAuditStats().updates }}</div>
+              <div class="stat-label">Éléments modifiés</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <mat-card-header>
+              <div class="stat-icon">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+              <mat-card-title>Paiements</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-count">{{ getUserAuditStats().payments }}</div>
+              <div class="stat-label">Paiements traités</div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Timeline de l'historique AMÉLIORÉ -->
+        <mat-card class="history-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon">timeline</mat-icon>
+              Historique Complet
+            </mat-card-title>
+            <div class="header-actions">
+              <button mat-raised-button color="primary" (click)="exportHistoryCSV()">
+                <mat-icon>download</mat-icon>
+                Export CSV
+              </button>
+              <!-- Export JSON masqué -->
+            </div>
+          </mat-card-header>
+          
+          <!-- Filtres Avancés -->
+          <mat-card-content>
+            <mat-expansion-panel class="filters-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>filter_list</mat-icon>
+                  Filtres Avancés
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              
+              <div class="filters-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Recherche</mat-label>
+                  <input matInput [(ngModel)]="historySearchTerm" (ngModelChange)="filterHistory()" placeholder="Rechercher...">
+                  <mat-icon matPrefix>search</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Type d'action</mat-label>
+                  <mat-select [(ngModel)]="historyFilterAction" (selectionChange)="filterHistory()">
+                    <mat-option [value]="null">Toutes les actions</mat-option>
+                    <mat-option value="CREATE">Création</mat-option>
+                    <mat-option value="UPDATE">Modification</mat-option>
+                    <mat-option value="DELETE">Suppression</mat-option>
+                    <mat-option value="PAYMENT">Paiement</mat-option>
+                    <mat-option value="STATUS_CHANGE">Changement statut</mat-option>
+                    <mat-option value="EXPORT">Export</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Type d'entité</mat-label>
+                  <mat-select [(ngModel)]="historyFilterEntity" (selectionChange)="filterHistory()">
+                    <mat-option [value]="null">Tous les types</mat-option>
+                    <mat-option value="CONVENTION">Convention</mat-option>
+                    <mat-option value="FACTURE">Facture</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <button mat-raised-button (click)="resetHistoryFilters()">
+                  <mat-icon>refresh</mat-icon>
+                  Réinitialiser
+                </button>
+              </div>
+            </mat-expansion-panel>
+
+            <!-- Timeline -->
+            <div class="history-timeline" *ngIf="getFilteredHistory().length > 0; else noHistory">
+              <div class="history-item" *ngFor="let item of getPagedHistory()">
+                <div class="history-marker" [ngClass]="item.color">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                </div>
+                <div class="history-content">
+                  <div class="history-header">
+                    <mat-chip [color]="getActionChipColor(item.action)" selected>
+                      <mat-icon>{{ item.icon }}</mat-icon>
+                      {{ item.action }}
+                    </mat-chip>
+                    <span class="history-entity-badge" [ngClass]="item.type">
+                      {{ item.entity }}
+                    </span>
+                    <span class="history-reference">{{ item.reference }}</span>
+                    <span class="history-user">
+                      <mat-icon>person</mat-icon>
+                      {{ item.user }}
+                    </span>
+                    <span class="history-date">{{ item.date | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <div class="history-title">{{ item.title }}</div>
+                  <div class="history-meta">
+                    <span class="history-details" *ngIf="item.details">
+                      <mat-icon>info</mat-icon>
+                      {{ item.details }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <mat-paginator #historyPaginator
+                           [length]="getFilteredHistory().length"
+                           [pageSizeOptions]="[5, 10, 25, 50, 100]"
+                           [pageSize]="10"
+                           (page)="onHistoryPageChange($event)"
+                           showFirstLastButtons
+                           *ngIf="getFilteredHistory().length > 0">
+            </mat-paginator>
+            
+            <ng-template #noHistory>
+              <div class="no-data">
+                <mat-icon>inbox</mat-icon>
+                <p>Aucun historique disponible</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Rapports -->
+    <mat-tab label="Rapports">
+      <div class="tab-content">
+        <div class="reports-header">
+          <h2>📊 Rapports et Analyses</h2>
+          <p>Analyses détaillées et statistiques de performance</p>
+        </div>
+
+        <!-- Boutons d'export -->
+        <div class="export-actions">
+          <button mat-raised-button color="primary">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Exporter en PDF
+          </button>
+          <button mat-raised-button color="accent">
+            <mat-icon>table_chart</mat-icon>
+            Exporter en Excel
+          </button>
+          <button mat-stroked-button>
+            <mat-icon>print</mat-icon>
+            Imprimer
+          </button>
+        </div>
+
+        <!-- Rapport Financier -->
+        <mat-card class="report-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon">attach_money</mat-icon>
+              Rapport Financier
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="financial-stats">
+              <div class="financial-stat">
+                <div class="stat-label">Revenu Total</div>
+                <div class="stat-value primary">{{ getFinancialReport().totalRevenue | currency:'EUR' }}</div>
+              </div>
+              <div class="financial-stat">
+                <div class="stat-label">Montant Payé</div>
+                <div class="stat-value success">{{ getFinancialReport().paidAmount | currency:'EUR' }}</div>
+              </div>
+              <div class="financial-stat">
+                <div class="stat-label">En Attente</div>
+                <div class="stat-value warning">{{ getFinancialReport().pendingAmount | currency:'EUR' }}</div>
+              </div>
+              <div class="financial-stat">
+                <div class="stat-label">En Retard</div>
+                <div class="stat-value danger">{{ getFinancialReport().overdueAmount | currency:'EUR' }}</div>
+              </div>
+              <div class="financial-stat">
+                <div class="stat-label">Taux de Recouvrement</div>
+                <div class="stat-value info">{{ getFinancialReport().collectionRate | number:'1.1-1' }}%</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Rapport de Performance -->
+        <mat-card class="report-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon">trending_up</mat-icon>
+              Rapport de Performance
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="performance-grid">
+              <div class="performance-item">
+                <mat-icon class="perf-icon">description</mat-icon>
+                <div class="perf-details">
+                  <div class="perf-value">{{ getPerformanceReport().totalConventions }}</div>
+                  <div class="perf-label">Total Conventions</div>
+                </div>
+              </div>
+              <div class="performance-item">
+                <mat-icon class="perf-icon">receipt</mat-icon>
+                <div class="perf-details">
+                  <div class="perf-value">{{ getPerformanceReport().totalInvoices }}</div>
+                  <div class="perf-label">Total Factures</div>
+                </div>
+              </div>
+              <div class="performance-item">
+                <mat-icon class="perf-icon">check_circle</mat-icon>
+                <div class="perf-details">
+                  <div class="perf-value">{{ getPerformanceReport().paymentRate | number:'1.1-1' }}%</div>
+                  <div class="perf-label">Taux de Paiement</div>
+                </div>
+              </div>
+              <div class="performance-item">
+                <mat-icon class="perf-icon">euro</mat-icon>
+                <div class="perf-details">
+                  <div class="perf-value">{{ getPerformanceReport().averageConventionAmount | currency:'EUR' }}</div>
+                  <div class="perf-label">Montant Moyen</div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Rapport par Gouvernorat -->
+        <mat-card class="report-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon">location_on</mat-icon>
+              Rapport par Gouvernorat
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="getReportByGovernorate()" class="report-table">
+              <ng-container matColumnDef="governorate">
+                <th mat-header-cell *matHeaderCellDef>Gouvernorat</th>
+                <td mat-cell *matCellDef="let row">{{ row.governorate }}</td>
+              </ng-container>
+              <ng-container matColumnDef="count">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let row">{{ row.count }}</td>
+              </ng-container>
+              <ng-container matColumnDef="totalAmount">
+                <th mat-header-cell *matHeaderCellDef>Montant Total</th>
+                <td mat-cell *matCellDef="let row">{{ row.totalAmount | currency:'EUR' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="activeCount">
+                <th mat-header-cell *matHeaderCellDef>Actives</th>
+                <td mat-cell *matCellDef="let row">{{ row.activeCount }}</td>
+              </ng-container>
+              <ng-container matColumnDef="expiredCount">
+                <th mat-header-cell *matHeaderCellDef>Expirées</th>
+                <td mat-cell *matCellDef="let row">{{ row.expiredCount }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['governorate', 'count', 'totalAmount', 'activeCount', 'expiredCount']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['governorate', 'count', 'totalAmount', 'activeCount', 'expiredCount']"></tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Rapport par Mois -->
+        <mat-card class="report-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="title-icon">date_range</mat-icon>
+              Rapport par Période
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="getReportByMonth()" class="report-table">
+              <ng-container matColumnDef="monthName">
+                <th mat-header-cell *matHeaderCellDef>Période</th>
+                <td mat-cell *matCellDef="let row">{{ row.monthName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="conventionsCount">
+                <th mat-header-cell *matHeaderCellDef>Conventions</th>
+                <td mat-cell *matCellDef="let row">{{ row.conventionsCount }}</td>
+              </ng-container>
+              <ng-container matColumnDef="totalAmount">
+                <th mat-header-cell *matHeaderCellDef>Montant Total</th>
+                <td mat-cell *matCellDef="let row">{{ row.totalAmount | currency:'EUR' }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['monthName', 'conventionsCount', 'totalAmount']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['monthName', 'conventionsCount', 'totalAmount']"></tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
       </div>
     </mat-tab>
       </mat-tab-group>
@@ -969,6 +2336,36 @@
 //   }
 // }
 </script>
+
+<!-- Chatbot Opérationnel Flottant -->
+<div class="floating-operational-chatbot" (click)="openOperationalChatbot()">
+  <mat-icon>support_agent</mat-icon>
+  <div class="chatbot-tooltip">Assistant Opérationnel</div>
+</div>
+
+<!-- Overlay -->
+<div class="chatbot-overlay" *ngIf="isOperationalChatbotOpen" (click)="closeOperationalChatbot()"></div>
+
+<!-- Panel Chatbot Opérationnel -->
+<div class="chatbot-panel" *ngIf="isOperationalChatbotOpen">
+  <div class="chatbot-panel-header">
+    <h3>
+      <mat-icon>support_agent</mat-icon>
+      Assistant Opérationnel Commercial
+    </h3>
+    <button mat-icon-button (click)="closeOperationalChatbot()" class="close-chatbot-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="chatbot-panel-content">
+    <iframe 
+      src="/decideur/operational-chatbot" 
+      class="chatbot-iframe"
+      frameborder="0">
+    </iframe>
+  </div>
+</div>
+
 <style>
 .tag-chip-designed {
   display: inline-block;

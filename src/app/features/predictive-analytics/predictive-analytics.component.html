@@ -1,0 +1,229 @@
+<div class="predictive-analytics-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div class="title-section">
+      <h1>
+        <mat-icon>insights</mat-icon>
+        Analytique Prédictive
+      </h1>
+      <p class="subtitle">Prévisions et tendances basées sur l'IA</p>
+    </div>
+    
+    <div class="controls">
+      <mat-form-field appearance="outline">
+        <mat-label>Modèle de prédiction</mat-label>
+        <mat-select [(ngModel)]="selectedModel" (selectionChange)="onModelChange()">
+          <mat-option *ngFor="let model of models" [value]="model.value">
+            <mat-icon>{{ model.icon }}</mat-icon>
+            {{ model.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Période de prévision</mat-label>
+        <mat-select [(ngModel)]="forecastMonths" (selectionChange)="onPeriodChange()">
+          <mat-option *ngFor="let period of periods" [value]="period">
+            {{ period }} mois
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Calcul des prévisions en cours...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- KPIs Prédictifs -->
+    <div class="kpis-section">
+      <mat-card class="kpi-card revenue">
+        <mat-icon class="kpi-icon">trending_up</mat-icon>
+        <div class="kpi-content">
+          <h3>Revenus Prévus (Mois Prochain)</h3>
+          <p class="kpi-value">{{ predictiveKPIs.nextMonthRevenue | number:'1.0-0' }} TND</p>
+          <span class="kpi-trend positive">
+            <mat-icon>arrow_upward</mat-icon>
+            +{{ predictiveKPIs.growthRate | number:'1.1-1' }}%
+          </span>
+        </div>
+      </mat-card>
+
+      <mat-card class="kpi-card growth">
+        <mat-icon class="kpi-icon">show_chart</mat-icon>
+        <div class="kpi-content">
+          <h3>Taux de Croissance</h3>
+          <p class="kpi-value">{{ predictiveKPIs.growthRate | number:'1.1-1' }}%</p>
+          <span class="kpi-subtitle">Sur {{ forecastMonths }} mois</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="kpi-card confidence">
+        <mat-icon class="kpi-icon">verified</mat-icon>
+        <div class="kpi-content">
+          <h3>Niveau de Confiance</h3>
+          <p class="kpi-value">{{ predictiveKPIs.confidence }}%</p>
+          <mat-chip [color]="getRiskColor(predictiveKPIs.riskLevel)" selected>
+            <mat-icon>{{ getRiskIcon(predictiveKPIs.riskLevel) }}</mat-icon>
+            {{ predictiveKPIs.riskLevel === 'low' ? 'Faible Risque' : 
+               predictiveKPIs.riskLevel === 'medium' ? 'Risque Modéré' : 'Risque Élevé' }}
+          </mat-chip>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Graphiques de Prévision -->
+    <div class="charts-grid">
+      <!-- Revenus Prédits -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>attach_money</mat-icon>
+            Prévision des Revenus
+          </mat-card-title>
+          <mat-card-subtitle>Évolution prévue sur {{ forecastMonths }} mois</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #revenueChart></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Conventions Prédites -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>description</mat-icon>
+            Prévision des Conventions
+          </mat-card-title>
+          <mat-card-subtitle>Nombre de conventions attendues</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #conventionsChart></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Paiements Prédits -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>payment</mat-icon>
+            Prévision des Paiements
+          </mat-card-title>
+          <mat-card-subtitle>Paiements attendus par mois</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #paymentsChart></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Tendance Globale -->
+      <mat-card class="chart-card full-width">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>timeline</mat-icon>
+            Analyse de Tendance Multi-Axes
+          </mat-card-title>
+          <mat-card-subtitle>Corrélation revenus et conventions</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #trendChart></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Insights et Recommandations -->
+    <mat-card class="insights-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>lightbulb</mat-icon>
+          Insights et Recommandations
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="insights-grid">
+          <div class="insight-item positive">
+            <mat-icon>trending_up</mat-icon>
+            <div class="insight-content">
+              <h4>Croissance Positive</h4>
+              <p>Les prévisions indiquent une croissance de {{ predictiveKPIs.growthRate | number:'1.1-1' }}% sur les {{ forecastMonths }} prochains mois.</p>
+            </div>
+          </div>
+
+          <div class="insight-item info">
+            <mat-icon>info</mat-icon>
+            <div class="insight-content">
+              <h4>Saisonnalité Détectée</h4>
+              <p>Le modèle a identifié des patterns saisonniers dans vos données historiques.</p>
+            </div>
+          </div>
+
+          <div class="insight-item warning" *ngIf="predictiveKPIs.riskLevel !== 'low'">
+            <mat-icon>warning</mat-icon>
+            <div class="insight-content">
+              <h4>Attention Requise</h4>
+              <p>Le niveau de confiance diminue pour les prévisions à long terme. Recommandation : réviser les objectifs trimestriels.</p>
+            </div>
+          </div>
+
+          <div class="insight-item success">
+            <mat-icon>check_circle</mat-icon>
+            <div class="insight-content">
+              <h4>Opportunité Identifiée</h4>
+              <p>Les 3 prochains mois présentent un potentiel de croissance élevé. Considérez l'augmentation des ressources.</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Détails des Prévisions -->
+    <mat-card class="details-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>table_chart</mat-icon>
+          Détails des Prévisions Mensuelles
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="forecast-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Mois</th>
+                <th>Revenus Prévus</th>
+                <th>Conventions</th>
+                <th>Paiements</th>
+                <th>Confiance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of forecast.revenue; let i = index">
+                <td><strong>{{ item.month }}</strong></td>
+                <td>{{ item.predicted | number:'1.0-0' }} TND</td>
+                <td>{{ forecast.conventions[i].predicted }}</td>
+<td>{{ forecast.payments[i].predicted }}</td>
+                <td>
+                  <div class="confidence-bar">
+                    <div class="confidence-fill" [style.width.%]="item.confidence"></div>
+                    <span>{{ item.confidence }}%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

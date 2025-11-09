@@ -11,7 +11,7 @@ export interface Invoice {
     currency: string;
     taxRate: number;
     discount?: number;
-    status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED' | 'PARTIALLY_PAID';
+    status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED' | 'PARTIALLY_PAID' | 'PENDING' | 'PROOF_PENDING' | 'PROOF_VALIDATED' | 'PENDING_VERIFICATION' | 'PROOF_REJECTED';
     paymentMethod: string;
     issueDate: Date;
     dueDate: Date;

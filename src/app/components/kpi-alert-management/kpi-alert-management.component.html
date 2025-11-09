@@ -1,0 +1,313 @@
+<div class="kpi-alert-management">
+  <!-- Header avec statistiques -->
+  <div class="header">
+    <div class="title-section">
+      <h1>
+        <mat-icon>notifications_active</mat-icon>
+        Gestion des Alertes KPI
+      </h1>
+      <button mat-raised-button color="primary" (click)="triggerManualCheck()">
+        <mat-icon>refresh</mat-icon>
+        Vérifier maintenant
+      </button>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="statistics-cards">
+      <mat-card class="stat-card new">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>fiber_new</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ statistics.new }}</div>
+            <div class="stat-label">Nouvelles</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card in-progress">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>pending_actions</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ statistics.inProgress }}</div>
+            <div class="stat-label">En cours</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card resolved">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ statistics.resolved }}</div>
+            <div class="stat-label">Résolues</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card archived">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>archive</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ statistics.archived }}</div>
+            <div class="stat-label">Archivées</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <mat-tab-group [(selectedIndex)]="selectedTab" (selectedIndexChange)="onTabChange($event)">
+    
+    <!-- Onglet Alertes Actives -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>warning</mat-icon>
+        Alertes Actives
+        <span class="badge" *ngIf="statistics.active > 0">{{ statistics.active }}</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Loading -->
+        <div *ngIf="loading.active" class="loading">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>Chargement des alertes actives...</p>
+        </div>
+
+        <!-- Liste des alertes actives -->
+        <div *ngIf="!loading.active && activeAlerts.length > 0" class="alerts-list">
+          <mat-card *ngFor="let alert of activeAlerts" class="alert-card" [class.new]="alert.alertStatus === 'NEW'" [class.in-progress]="alert.alertStatus === 'IN_PROGRESS'">
+            <mat-card-header>
+              <div class="alert-header">
+                <div class="alert-title">
+                  <mat-icon [style.color]="getSeverityColor(alert.severity)">
+                    {{ getSeverityIcon(alert.severity) }}
+                  </mat-icon>
+                  <h3>{{ alert.message }}</h3>
+                </div>
+                <mat-chip-set>
+                  <mat-chip [style.background-color]="getSeverityColor(alert.severity)">
+                    {{ alert.severity }}
+                  </mat-chip>
+                  <mat-chip>{{ getStatusLabel(alert.alertStatus) }}</mat-chip>
+                </mat-chip-set>
+              </div>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="alert-details">
+                <div class="detail-row">
+                  <strong>KPI:</strong> {{ alert.kpiName }}
+                </div>
+                <div class="detail-row">
+                  <strong>Valeur actuelle:</strong> {{ alert.currentValue }}
+                </div>
+                <div class="detail-row">
+                  <strong>Détecté:</strong> {{ getTimeAgo(alert.detectedAt) }} ({{ formatDate(alert.detectedAt) }})
+                </div>
+                <div class="detail-row recommendation">
+                  <strong>Recommandation:</strong>
+                  <p>{{ alert.recommendation }}</p>
+                </div>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button mat-button (click)="takeCharge(alert)" *ngIf="alert.alertStatus === 'NEW'">
+                <mat-icon>assignment_ind</mat-icon>
+                Prendre en charge
+              </button>
+              <button mat-button (click)="addComment(alert)">
+                <mat-icon>comment</mat-icon>
+                Commenter
+              </button>
+              <button mat-button (click)="resolveAlert(alert)">
+                <mat-icon>check_circle</mat-icon>
+                Résoudre
+              </button>
+              <button mat-button (click)="viewHistory(alert)">
+                <mat-icon>history</mat-icon>
+                Historique
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+
+        <!-- Aucune alerte -->
+        <div *ngIf="!loading.active && activeAlerts.length === 0" class="no-alerts">
+          <mat-icon>check_circle_outline</mat-icon>
+          <h3>Aucune alerte active</h3>
+          <p>Tous les KPI sont dans les normes</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Alertes Résolues -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>check_circle</mat-icon>
+        Alertes Résolues
+        <span class="badge" *ngIf="statistics.resolved > 0">{{ statistics.resolved }}</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Loading -->
+        <div *ngIf="loading.resolved" class="loading">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>Chargement des alertes résolues...</p>
+        </div>
+
+        <!-- Liste des alertes résolues -->
+        <div *ngIf="!loading.resolved && resolvedAlerts.length > 0" class="alerts-list">
+          <mat-card *ngFor="let alert of resolvedAlerts" class="alert-card resolved">
+            <mat-card-header>
+              <div class="alert-header">
+                <div class="alert-title">
+                  <mat-icon color="primary">check_circle</mat-icon>
+                  <h3>{{ alert.message }}</h3>
+                </div>
+              </div>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="alert-details">
+                <div class="detail-row">
+                  <strong>Résolu par:</strong> {{ alert.resolvedByName || 'N/A' }}
+                </div>
+                <div class="detail-row">
+                  <strong>Résolu le:</strong> {{ formatDate(alert.resolvedAt!) }}
+                </div>
+                <div class="detail-row">
+                  <strong>Commentaire:</strong>
+                  <p>{{ alert.resolutionComment }}</p>
+                </div>
+                <div class="detail-row" *ngIf="alert.actionsTaken">
+                  <strong>Actions prises:</strong>
+                  <p style="white-space: pre-wrap;">{{ alert.actionsTaken }}</p>
+                </div>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button mat-button (click)="viewHistory(alert)">
+                <mat-icon>history</mat-icon>
+                Voir l'historique
+              </button>
+              <button mat-button (click)="archiveAlert(alert)">
+                <mat-icon>archive</mat-icon>
+                Archiver
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+
+        <!-- Aucune alerte -->
+        <div *ngIf="!loading.resolved && resolvedAlerts.length === 0" class="no-alerts">
+          <mat-icon>inbox</mat-icon>
+          <h3>Aucune alerte résolue récemment</h3>
+          <p>Les alertes résolues depuis moins de 7 jours apparaîtront ici</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Historique -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>archive</mat-icon>
+        Historique
+        <span class="badge" *ngIf="statistics.archived > 0">{{ statistics.archived }}</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Loading -->
+        <div *ngIf="loading.archived" class="loading">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>Chargement de l'historique...</p>
+        </div>
+
+        <!-- Liste des alertes archivées -->
+        <div *ngIf="!loading.archived && archivedAlerts.length > 0" class="alerts-list">
+          <mat-card *ngFor="let alert of archivedAlerts" class="alert-card archived">
+            <mat-card-header>
+              <div class="alert-header">
+                <div class="alert-title">
+                  <mat-icon>archive</mat-icon>
+                  <h3>{{ alert.message }}</h3>
+                </div>
+              </div>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="alert-details">
+                <div class="detail-row">
+                  <strong>Archivé le:</strong> {{ formatDate(alert.archivedAt!) }}
+                </div>
+                <div class="detail-row">
+                  <strong>Résolu par:</strong> {{ alert.resolvedByName || 'N/A' }}
+                </div>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button mat-button (click)="viewHistory(alert)">
+                <mat-icon>history</mat-icon>
+                Voir l'historique complet
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+
+        <!-- Aucune alerte -->
+        <div *ngIf="!loading.archived && archivedAlerts.length === 0" class="no-alerts">
+          <mat-icon>inbox</mat-icon>
+          <h3>Aucune alerte archivée</h3>
+          <p>L'historique des alertes archivées apparaîtra ici</p>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Modal Historique -->
+  <div *ngIf="selectedAlert" class="history-modal" (click)="selectedAlert = null">
+    <div class="history-content" (click)="$event.stopPropagation()">
+      <div class="history-header">
+        <h2>
+          <mat-icon>history</mat-icon>
+          Historique de l'alerte
+        </h2>
+        <button mat-icon-button (click)="selectedAlert = null">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="history-body">
+        <div class="timeline">
+          <div *ngFor="let action of selectedAlert.actionHistory" class="timeline-item">
+            <div class="timeline-icon">
+              <mat-icon>{{ action.actionType === 'CREATED' ? 'add_circle' : action.actionType === 'RESOLVED' ? 'check_circle' : action.actionType === 'ARCHIVED' ? 'archive' : 'comment' }}</mat-icon>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">{{ action.actionType }}</div>
+              <div class="timeline-user">Par: {{ action.performedByName }}</div>
+              <div class="timeline-date">{{ formatDate(action.performedAt) }}</div>
+              <div class="timeline-comment" *ngIf="action.comment">{{ action.comment }}</div>
+              <div class="timeline-status" *ngIf="action.previousStatus">
+                <span class="status-badge">{{ action.previousStatus }}</span>
+                <mat-icon>arrow_forward</mat-icon>
+                <span class="status-badge">{{ action.newStatus }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

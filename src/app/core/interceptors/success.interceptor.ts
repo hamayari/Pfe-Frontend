@@ -1,37 +1,46 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { SuccessToastService } from '../services/success-toast.service';
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+  HttpResponse
+} from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class SuccessInterceptor implements HttpInterceptor {
-  constructor(private toast: SuccessToastService) {}
+  constructor(private snackBar: MatSnackBar) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
-    return next.handle(req).pipe(
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    return next.handle(request).pipe(
       tap(event => {
-        if (isMutation && event instanceof HttpResponse && event.status >= 200 && event.status < 300) {
-          const hint = req.headers.get('X-App-Action') || this.inferActionFromUrl(req.url, req.method);
-          if (hint) {
-            this.toast.show(`Succès: ${hint}`);
+        if (event instanceof HttpResponse) {
+          // Only show success toasts for mutating requests (POST, PUT, PATCH, DELETE)
+          const method = request.method.toUpperCase();
+          if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+            const message = this.getSuccessMessage(method, request.url);
+            this.snackBar.open(message, 'Fermer', {
+              duration: 2500,
+              panelClass: ['success-snackbar']
+            });
           }
         }
       })
     );
   }
 
-  private inferActionFromUrl(url: string, method: string): string {
-    const resource = url.split('?')[0].split('/').filter(Boolean).slice(-1)[0] || 'opération';
-    switch (method) {
-      case 'POST': return `création ${resource}`;
-      case 'PUT': return `mise à jour ${resource}`;
-      case 'PATCH': return `modification ${resource}`;
-      case 'DELETE': return `suppression ${resource}`;
-      default: return 'opération';
-    }
+  private getSuccessMessage(method: string, url: string): string {
+    if (method === 'POST') return 'Création effectuée avec succès';
+    if (method === 'PUT' || method === 'PATCH') return 'Mise à jour effectuée avec succès';
+    if (method === 'DELETE') return 'Suppression effectuée avec succès';
+    return 'Opération effectuée avec succès';
   }
 }
+
+
 
 
 

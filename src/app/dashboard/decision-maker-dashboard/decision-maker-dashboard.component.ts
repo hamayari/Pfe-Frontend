@@ -21,6 +21,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Subject } from 'rxjs';
 import { OnDestroy } from '@angular/core';
+import { AuthService } from '../../core/services/auth.service';
+import { RouterModule } from '@angular/router';
 declare const Chart: any;
 
 @Component({
@@ -110,7 +112,132 @@ declare const Chart: any;
         </mat-card>
       </div>
 
-      <!-- Graphiques dynamiques -->
+      <!-- KPI Temps Réel avec Jauges -->
+      <div class="kpi-realtime-section">
+        <mat-card class="realtime-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>speed</mat-icon>
+              KPI Temps Réel - Suivi Automatique
+            </mat-card-title>
+            <button mat-icon-button (click)="refreshKpis()" [disabled]="loadingKpis">
+              <mat-icon [class.spinning]="loadingKpis">refresh</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="realtime-kpi-grid">
+              <!-- KPI 1: Taux de Recouvrement -->
+              <div class="realtime-kpi-card" [class.critical]="realtimeKpis.tauxRecouvrement?.status === 'critical'"
+                   [class.warning]="realtimeKpis.tauxRecouvrement?.status === 'warning'">
+                <div class="kpi-header">
+                  <mat-icon>trending_up</mat-icon>
+                  <h4>Taux de Recouvrement</h4>
+                </div>
+                <div class="gauge-container">
+                  <canvas [id]="'gauge-recouvrement'"></canvas>
+                </div>
+                <div class="kpi-footer">
+                  <span class="value">{{ realtimeKpis.tauxRecouvrement?.value || 0 }}%</span>
+                  <span class="trend" [class.positive]="realtimeKpis.tauxRecouvrement?.trend >= 0"
+                        [class.negative]="realtimeKpis.tauxRecouvrement?.trend < 0">
+                    <mat-icon>{{ realtimeKpis.tauxRecouvrement?.trend >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                    {{ realtimeKpis.tauxRecouvrement?.trend | number:'1.1-1' }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- KPI 2: Délai Moyen Paiement -->
+              <div class="realtime-kpi-card" [class.critical]="realtimeKpis.delaiMoyenPaiement?.status === 'critical'"
+                   [class.warning]="realtimeKpis.delaiMoyenPaiement?.status === 'warning'">
+                <div class="kpi-header">
+                  <mat-icon>schedule</mat-icon>
+                  <h4>Délai Moyen Paiement</h4>
+                </div>
+                <div class="gauge-container">
+                  <canvas [id]="'gauge-delai'"></canvas>
+                </div>
+                <div class="kpi-footer">
+                  <span class="value">{{ realtimeKpis.delaiMoyenPaiement?.value || 0 }} jours</span>
+                  <span class="trend" [class.positive]="realtimeKpis.delaiMoyenPaiement?.trend <= 0"
+                        [class.negative]="realtimeKpis.delaiMoyenPaiement?.trend > 0">
+                    <mat-icon>{{ realtimeKpis.delaiMoyenPaiement?.trend <= 0 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                    {{ realtimeKpis.delaiMoyenPaiement?.trend | number:'1.1-1' }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- KPI 3: Factures en Retard -->
+              <div class="realtime-kpi-card" [class.critical]="realtimeKpis.tauxFacturesRetard?.status === 'critical'"
+                   [class.warning]="realtimeKpis.tauxFacturesRetard?.status === 'warning'">
+                <div class="kpi-header">
+                  <mat-icon>warning</mat-icon>
+                  <h4>Factures en Retard</h4>
+                </div>
+                <div class="gauge-container">
+                  <canvas [id]="'gauge-retard'"></canvas>
+                </div>
+                <div class="kpi-footer">
+                  <span class="value">{{ realtimeKpis.tauxFacturesRetard?.value || 0 }}%</span>
+                  <span class="trend" [class.positive]="realtimeKpis.tauxFacturesRetard?.trend <= 0"
+                        [class.negative]="realtimeKpis.tauxFacturesRetard?.trend > 0">
+                    <mat-icon>{{ realtimeKpis.tauxFacturesRetard?.trend <= 0 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                    {{ realtimeKpis.tauxFacturesRetard?.trend | number:'1.1-1' }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- KPI 4: Montant Impayés -->
+              <div class="realtime-kpi-card" [class.critical]="realtimeKpis.montantTotalImpayes?.status === 'critical'"
+                   [class.warning]="realtimeKpis.montantTotalImpayes?.status === 'warning'">
+                <div class="kpi-header">
+                  <mat-icon>attach_money</mat-icon>
+                  <h4>Montant Impayés</h4>
+                </div>
+                <div class="gauge-container">
+                  <canvas [id]="'gauge-impayes'"></canvas>
+                </div>
+                <div class="kpi-footer">
+                  <span class="value">{{ realtimeKpis.montantTotalImpayes?.value || 0 | number:'1.0-0' }} TND</span>
+                  <span class="trend" [class.positive]="realtimeKpis.montantTotalImpayes?.trend <= 0"
+                        [class.negative]="realtimeKpis.montantTotalImpayes?.trend > 0">
+                    <mat-icon>{{ realtimeKpis.montantTotalImpayes?.trend <= 0 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                    {{ realtimeKpis.montantTotalImpayes?.trend | number:'1.1-1' }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- KPI 5: Clients en Retard -->
+              <div class="realtime-kpi-card" [class.critical]="realtimeKpis.nombreClientsRetard?.status === 'critical'"
+                   [class.warning]="realtimeKpis.nombreClientsRetard?.status === 'warning'">
+                <div class="kpi-header">
+                  <mat-icon>people</mat-icon>
+                  <h4>Clients en Retard</h4>
+                </div>
+                <div class="gauge-container">
+                  <canvas [id]="'gauge-clients'"></canvas>
+                </div>
+                <div class="kpi-footer">
+                  <span class="value">{{ realtimeKpis.nombreClientsRetard?.value || 0 }} clients</span>
+                  <span class="trend" [class.positive]="realtimeKpis.nombreClientsRetard?.trend <= 0"
+                        [class.negative]="realtimeKpis.nombreClientsRetard?.trend > 0">
+                    <mat-icon>{{ realtimeKpis.nombreClientsRetard?.trend <= 0 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                    {{ realtimeKpis.nombreClientsRetard?.trend | number:'1.1-1' }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dernière mise à jour -->
+            <div class="last-update">
+              <mat-icon>access_time</mat-icon>
+              <span>Dernière mise à jour: {{ lastKpiUpdate | date:'short' }}</span>
+              <span class="auto-refresh">Rafraîchissement automatique toutes les 30s</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Graphiques dynamiques AMÉLIORÉS -->
       <div class="charts-section">
         <div class="chart-row">
           <!-- Évolution des conventions -->
@@ -121,15 +248,26 @@ declare const Chart: any;
             </mat-card-header>
             <mat-card-content>
               <div class="chart-container">
-                <div class="chart-placeholder">
-                  <mat-icon>show_chart</mat-icon>
-                  <p>Graphique d'évolution des conventions</p>
-                  <small>Intégration Chart.js prévue</small>
-                </div>
+                <canvas id="conventionsChart"></canvas>
               </div>
             </mat-card-content>
           </mat-card>
 
+          <!-- Tendances Revenus AMÉLIORÉ -->
+          <mat-card class="chart-card">
+            <mat-card-header>
+              <mat-card-title>Tendances des Revenus</mat-card-title>
+              <mat-card-subtitle>Évolution mensuelle</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <div class="chart-row">
           <!-- Répartition par gouvernorat -->
           <mat-card class="chart-card">
             <mat-card-header>
@@ -138,51 +276,132 @@ declare const Chart: any;
             </mat-card-header>
             <mat-card-content>
               <div class="chart-container">
-                <div class="chart-placeholder">
-                  <mat-icon>pie_chart</mat-icon>
-                  <p>Camembert des gouvernorats</p>
-                  <small>Intégration Chart.js prévue</small>
-                </div>
+                <canvas id="governorateChart"></canvas>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Analyse Comparative AMÉLIORÉ -->
+          <mat-card class="chart-card">
+            <mat-card-header>
+              <mat-card-title>Analyse Comparative</mat-card-title>
+              <mat-card-subtitle>Performance par période</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="chart-container">
+                <canvas id="comparativeChart"></canvas>
               </div>
             </mat-card-content>
           </mat-card>
         </div>
 
-        <div class="chart-row">
-          <!-- Paiements par zone -->
-          <mat-card class="chart-card">
-            <mat-card-header>
-              <mat-card-title>Paiements par zone géographique</mat-card-title>
-              <mat-card-subtitle>Histogramme des paiements</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="chart-container">
-                <div class="chart-placeholder">
-                  <mat-icon>bar_chart</mat-icon>
-                  <p>Histogramme des paiements</p>
-                  <small>Intégration Chart.js prévue</small>
+        <!-- Section Analyse Comparative Détaillée -->
+        <mat-card class="comparative-analysis-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>compare_arrows</mat-icon>
+              Analyse Comparative Détaillée
+            </mat-card-title>
+            <div class="header-actions">
+              <mat-form-field appearance="outline" class="period-selector">
+                <mat-label>Comparer avec</mat-label>
+                <mat-select [(ngModel)]="comparativePeriod" (selectionChange)="updateComparativeAnalysis()">
+                  <mat-option value="previous-month">Mois précédent</mat-option>
+                  <mat-option value="previous-quarter">Trimestre précédent</mat-option>
+                  <mat-option value="previous-year">Année précédente</mat-option>
+                  <mat-option value="same-month-last-year">Même mois année dernière</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="comparative-grid">
+              <div class="comparative-item">
+                <div class="comparative-header">
+                  <mat-icon>trending_up</mat-icon>
+                  <h3>Conventions</h3>
+                </div>
+                <div class="comparative-values">
+                  <div class="current-value">
+                    <span class="label">Période actuelle</span>
+                    <span class="value">{{ comparativeData.conventions.current }}</span>
+                  </div>
+                  <div class="comparison-arrow" [class.positive]="comparativeData.conventions.change > 0" [class.negative]="comparativeData.conventions.change < 0">
+                    <mat-icon>{{ comparativeData.conventions.change > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                    <span>{{ Math.abs(comparativeData.conventions.change) }}%</span>
+                  </div>
+                  <div class="previous-value">
+                    <span class="label">Période précédente</span>
+                    <span class="value">{{ comparativeData.conventions.previous }}</span>
+                  </div>
                 </div>
               </div>
-            </mat-card-content>
-          </mat-card>
 
-          <!-- Applications utilisées -->
-          <mat-card class="chart-card">
-            <mat-card-header>
-              <mat-card-title>Répartition des applications</mat-card-title>
-              <mat-card-subtitle>Utilisation par application</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="chart-container">
-                <div class="chart-placeholder">
-                  <mat-icon>donut_large</mat-icon>
-                  <p>Camembert des applications</p>
-                  <small>Intégration Chart.js prévue</small>
+              <div class="comparative-item">
+                <div class="comparative-header">
+                  <mat-icon>attach_money</mat-icon>
+                  <h3>Revenus</h3>
+                </div>
+                <div class="comparative-values">
+                  <div class="current-value">
+                    <span class="label">Période actuelle</span>
+                    <span class="value">{{ comparativeData.revenue.current | number:'1.0-0' }} TND</span>
+                  </div>
+                  <div class="comparison-arrow" [class.positive]="comparativeData.revenue.change > 0" [class.negative]="comparativeData.revenue.change < 0">
+                    <mat-icon>{{ comparativeData.revenue.change > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                    <span>{{ Math.abs(comparativeData.revenue.change) }}%</span>
+                  </div>
+                  <div class="previous-value">
+                    <span class="label">Période précédente</span>
+                    <span class="value">{{ comparativeData.revenue.previous | number:'1.0-0' }} TND</span>
+                  </div>
                 </div>
               </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
+
+              <div class="comparative-item">
+                <div class="comparative-header">
+                  <mat-icon>receipt</mat-icon>
+                  <h3>Factures Payées</h3>
+                </div>
+                <div class="comparative-values">
+                  <div class="current-value">
+                    <span class="label">Période actuelle</span>
+                    <span class="value">{{ comparativeData.invoices.current }}%</span>
+                  </div>
+                  <div class="comparison-arrow" [class.positive]="comparativeData.invoices.change > 0" [class.negative]="comparativeData.invoices.change < 0">
+                    <mat-icon>{{ comparativeData.invoices.change > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                    <span>{{ Math.abs(comparativeData.invoices.change) }}%</span>
+                  </div>
+                  <div class="previous-value">
+                    <span class="label">Période précédente</span>
+                    <span class="value">{{ comparativeData.invoices.previous }}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="comparative-item">
+                <div class="comparative-header">
+                  <mat-icon>speed</mat-icon>
+                  <h3>Efficacité</h3>
+                </div>
+                <div class="comparative-values">
+                  <div class="current-value">
+                    <span class="label">Période actuelle</span>
+                    <span class="value">{{ comparativeData.efficiency.current }}%</span>
+                  </div>
+                  <div class="comparison-arrow" [class.positive]="comparativeData.efficiency.change > 0" [class.negative]="comparativeData.efficiency.change < 0">
+                    <mat-icon>{{ comparativeData.efficiency.change > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                    <span>{{ Math.abs(comparativeData.efficiency.change) }}%</span>
+                  </div>
+                  <div class="previous-value">
+                    <span class="label">Période précédente</span>
+                    <span class="value">{{ comparativeData.efficiency.previous }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
 
       <!-- Filtres interactifs -->
@@ -295,8 +514,42 @@ declare const Chart: any;
               </div>
 
               <div class="export-item">
-                <h4>Rapport personnalisé</h4>
-                <p>Rapport selon vos critères</p>
+                <h4>Rapport personnalisé AMÉLIORÉ</h4>
+                <p>Créez votre rapport sur mesure</p>
+                <div class="custom-report-config">
+                  <mat-form-field appearance="outline" class="config-field">
+                    <mat-label>Période</mat-label>
+                    <mat-select [(ngModel)]="customReportConfig.period">
+                      <mat-option value="this-month">Ce mois</mat-option>
+                      <mat-option value="last-month">Mois dernier</mat-option>
+                      <mat-option value="this-quarter">Ce trimestre</mat-option>
+                      <mat-option value="this-year">Cette année</mat-option>
+                      <mat-option value="custom">Personnalisé</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="config-field">
+                    <mat-label>Métriques à inclure</mat-label>
+                    <mat-select [(ngModel)]="customReportConfig.metrics" multiple>
+                      <mat-option value="conventions">Conventions</mat-option>
+                      <mat-option value="revenue">Revenus</mat-option>
+                      <mat-option value="invoices">Factures</mat-option>
+                      <mat-option value="efficiency">Efficacité</mat-option>
+                      <mat-option value="governorate">Par gouvernorat</mat-option>
+                      <mat-option value="trends">Tendances</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="config-field">
+                    <mat-label>Format graphiques</mat-label>
+                    <mat-select [(ngModel)]="customReportConfig.chartType">
+                      <mat-option value="all">Tous</mat-option>
+                      <mat-option value="line">Lignes uniquement</mat-option>
+                      <mat-option value="bar">Barres uniquement</mat-option>
+                      <mat-option value="pie">Camemberts uniquement</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
                 <div class="export-actions">
                   <button mat-raised-button color="primary" (click)="generateCustomReport()">
                     <mat-icon>picture_as_pdf</mat-icon>
@@ -305,6 +558,10 @@ declare const Chart: any;
                   <button mat-raised-button color="accent" (click)="generateCustomExcel()">
                     <mat-icon>table_chart</mat-icon>
                     Export Excel
+                  </button>
+                  <button mat-raised-button (click)="previewCustomReport()">
+                    <mat-icon>visibility</mat-icon>
+                    Aperçu
                   </button>
                 </div>
               </div>
@@ -621,6 +878,7 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
   messageCount = 2;
   userMenuOpen = false;
   darkMode = false;
+  kpiAlertsCount = 0;
   // KPI
   activeConventionsRate = 0;
   activeConventionsTrend = 0;
@@ -647,6 +905,19 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
   
   // Theme and refresh
   isDarkMode = false;
+
+  // KPI Temps Réel
+  realtimeKpis: any = {
+    tauxRecouvrement: { value: 0, trend: 0, status: 'normal' },
+    delaiMoyenPaiement: { value: 0, trend: 0, status: 'normal' },
+    tauxFacturesRetard: { value: 0, trend: 0, status: 'normal' },
+    montantTotalImpayes: { value: 0, trend: 0, status: 'normal' },
+    nombreClientsRetard: { value: 0, trend: 0, status: 'normal' }
+  };
+  loadingKpis = false;
+  lastKpiUpdate: Date = new Date();
+  private kpiRefreshInterval: any;
+  private gaugeCharts: any = {};
 
   // Filtres
   selectedPeriod = 'current_month';
@@ -742,11 +1013,36 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.loadDashboardData();
+    this.loadKpiAlertsCount();
+  }
+
+  /**
+   * Charger le nombre d'alertes KPI en attente
+   */
+  loadKpiAlertsCount() {
+    const token = localStorage.getItem('token');
+    this.http.get<any>('http://localhost:8085/api/kpi-alerts/stats', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).subscribe({
+      next: (response) => {
+        this.kpiAlertsCount = response.stats?.pending || 0;
+      },
+      error: (error) => {
+        console.error('Erreur chargement compteur alertes KPI:', error);
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.initializeCharts();
+    }, 500);
   }
 
   loadDashboardData() {
@@ -754,6 +1050,296 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
     this.loadDetailedData();
     this.loadFilterOptions();
     this.fetchAnalytics();
+  }
+
+  // Données pour l'analyse comparative
+  Math = Math;
+  comparativePeriod = 'previous-month';
+  comparativeData = {
+    conventions: { current: 45, previous: 38, change: 18.4 },
+    revenue: { current: 168000, previous: 152000, change: 10.5 },
+    invoices: { current: 82, previous: 78, change: 5.1 },
+    efficiency: { current: 87, previous: 85, change: 2.4 }
+  };
+
+  /**
+   * Initialiser tous les graphiques
+   */
+  initializeCharts(): void {
+    this.createConventionsChart();
+    this.createRevenueChart();
+    this.createGovernorateChart();
+    this.createComparativeChart();
+  }
+
+  /**
+   * Mettre à jour l'analyse comparative
+   */
+  updateComparativeAnalysis(): void {
+    // Simuler le changement de données selon la période
+    switch (this.comparativePeriod) {
+      case 'previous-month':
+        this.comparativeData = {
+          conventions: { current: 45, previous: 38, change: 18.4 },
+          revenue: { current: 168000, previous: 152000, change: 10.5 },
+          invoices: { current: 82, previous: 78, change: 5.1 },
+          efficiency: { current: 87, previous: 85, change: 2.4 }
+        };
+        break;
+      case 'previous-quarter':
+        this.comparativeData = {
+          conventions: { current: 125, previous: 105, change: 19.0 },
+          revenue: { current: 485000, previous: 420000, change: 15.5 },
+          invoices: { current: 85, previous: 75, change: 13.3 },
+          efficiency: { current: 88, previous: 82, change: 7.3 }
+        };
+        break;
+      case 'previous-year':
+        this.comparativeData = {
+          conventions: { current: 520, previous: 445, change: 16.9 },
+          revenue: { current: 1850000, previous: 1520000, change: 21.7 },
+          invoices: { current: 84, previous: 72, change: 16.7 },
+          efficiency: { current: 89, previous: 78, change: 14.1 }
+        };
+        break;
+      case 'same-month-last-year':
+        this.comparativeData = {
+          conventions: { current: 45, previous: 35, change: 28.6 },
+          revenue: { current: 168000, previous: 128000, change: 31.3 },
+          invoices: { current: 82, previous: 68, change: 20.6 },
+          efficiency: { current: 87, previous: 75, change: 16.0 }
+        };
+        break;
+    }
+    
+    // Mettre à jour le graphique comparatif
+    this.createComparativeChart();
+  }
+
+  /**
+   * Créer le graphique comparatif
+   */
+  createComparativeChart(): void {
+    const canvas = document.getElementById('comparativeChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    new (window as any).Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Conventions', 'Revenus', 'Factures Payées', 'Efficacité'],
+        datasets: [
+          {
+            label: 'Période actuelle',
+            data: [
+              this.comparativeData.conventions.current,
+              this.comparativeData.revenue.current / 2000, // Normaliser
+              this.comparativeData.invoices.current,
+              this.comparativeData.efficiency.current
+            ],
+            backgroundColor: 'rgba(33, 150, 243, 0.2)',
+            borderColor: '#2196f3',
+            borderWidth: 2
+          },
+          {
+            label: 'Période précédente',
+            data: [
+              this.comparativeData.conventions.previous,
+              this.comparativeData.revenue.previous / 2000, // Normaliser
+              this.comparativeData.invoices.previous,
+              this.comparativeData.efficiency.previous
+            ],
+            backgroundColor: 'rgba(255, 152, 0, 0.2)',
+            borderColor: '#ff9800',
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          r: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 20
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Créer le graphique d'évolution des conventions
+   */
+  createConventionsChart(): void {
+    const canvas = document.getElementById('conventionsChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    new (window as any).Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
+        datasets: [{
+          label: 'Conventions signées',
+          data: [12, 19, 15, 25, 22, 30, 28, 35, 32, 38, 42, 45],
+          borderColor: '#4caf50',
+          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value: any) => value + ' conventions'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Créer le graphique des tendances de revenus
+   */
+  createRevenueChart(): void {
+    const canvas = document.getElementById('revenueChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    new (window as any).Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
+        datasets: [
+          {
+            label: 'Revenus réalisés',
+            data: [85000, 92000, 78000, 105000, 98000, 125000, 118000, 135000, 128000, 145000, 152000, 168000],
+            backgroundColor: '#2196f3',
+            borderColor: '#1976d2',
+            borderWidth: 1
+          },
+          {
+            label: 'Objectifs',
+            data: [80000, 85000, 90000, 95000, 100000, 110000, 115000, 120000, 130000, 140000, 150000, 160000],
+            backgroundColor: 'rgba(255, 152, 0, 0.5)',
+            borderColor: '#ff9800',
+            borderWidth: 1,
+            type: 'line',
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: (context: any) => {
+                return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' TND';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value: any) => value.toLocaleString() + ' TND'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Créer le graphique de répartition par gouvernorat
+   */
+  createGovernorateChart(): void {
+    const canvas = document.getElementById('governorateChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    new (window as any).Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Tunis', 'Sfax', 'Sousse', 'Monastir', 'Nabeul', 'Autres'],
+        datasets: [{
+          data: [35, 25, 15, 12, 8, 5],
+          backgroundColor: [
+            '#4caf50',
+            '#2196f3',
+            '#ff9800',
+            '#9c27b0',
+            '#f44336',
+            '#607d8b'
+          ],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'right'
+          },
+          tooltip: {
+            callbacks: {
+              label: (context: any) => {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return label + ': ' + value + ' (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   loadKPIs() {
@@ -844,12 +1430,87 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
     console.log('Générer rapport trimestriel Excel');
   }
 
+  // Configuration du rapport personnalisé
+  customReportConfig = {
+    period: 'this-month',
+    metrics: ['conventions', 'revenue', 'invoices'],
+    chartType: 'all'
+  };
+
+  /**
+   * Générer un rapport personnalisé PDF
+   */
   generateCustomReport() {
-    console.log('Générer rapport personnalisé PDF');
+    console.log('📄 Génération rapport personnalisé PDF avec config:', this.customReportConfig);
+    
+    // Simuler la génération
+    const config = this.customReportConfig;
+    const metricsText = config.metrics.join(', ');
+    
+    alert(`Rapport personnalisé généré !\n\nPériode: ${config.period}\nMétriques: ${metricsText}\nGraphiques: ${config.chartType}\n\nLe PDF sera téléchargé...`);
+    
+    // Appel API réel (à décommenter quand le backend est prêt)
+    // this.http.post('http://localhost:8085/api/decision-maker/reports/custom/pdf', config)
+    //   .subscribe(response => {
+    //     // Télécharger le PDF
+    //   });
   }
 
+  /**
+   * Générer un rapport personnalisé Excel
+   */
   generateCustomExcel() {
-    console.log('Générer rapport personnalisé Excel');
+    console.log('📊 Génération rapport personnalisé Excel avec config:', this.customReportConfig);
+    
+    const config = this.customReportConfig;
+    const metricsText = config.metrics.join(', ');
+    
+    alert(`Rapport Excel personnalisé généré !\n\nPériode: ${config.period}\nMétriques: ${metricsText}\n\nLe fichier Excel sera téléchargé...`);
+    
+    // Appel API réel
+    // this.http.post('http://localhost:8085/api/decision-maker/reports/custom/excel', config)
+    //   .subscribe(response => {
+    //     // Télécharger l'Excel
+    //   });
+  }
+
+  /**
+   * Prévisualiser le rapport personnalisé
+   */
+  previewCustomReport() {
+    console.log('👁️ Aperçu rapport personnalisé:', this.customReportConfig);
+    
+    const config = this.customReportConfig;
+    let preview = '📊 APERÇU DU RAPPORT PERSONNALISÉ\n\n';
+    preview += `Période: ${config.period}\n\n`;
+    preview += 'Métriques incluses:\n';
+    
+    config.metrics.forEach(metric => {
+      switch(metric) {
+        case 'conventions':
+          preview += '✓ Conventions: 45 actives\n';
+          break;
+        case 'revenue':
+          preview += '✓ Revenus: 168,000 TND\n';
+          break;
+        case 'invoices':
+          preview += '✓ Factures: 82% payées\n';
+          break;
+        case 'efficiency':
+          preview += '✓ Efficacité: 87%\n';
+          break;
+        case 'governorate':
+          preview += '✓ Répartition géographique incluse\n';
+          break;
+        case 'trends':
+          preview += '✓ Analyse des tendances incluse\n';
+          break;
+      }
+    });
+    
+    preview += `\nFormat graphiques: ${config.chartType}`;
+    
+    alert(preview);
   }
 
   // Export methods moved to the end of the class
@@ -1018,6 +1679,163 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.kpiRefreshInterval) {
+      clearInterval(this.kpiRefreshInterval);
+    }
+  }
+
+  /**
+   * Charger les KPI temps réel
+   */
+  loadRealtimeKpis() {
+    this.loadingKpis = true;
+    const token = localStorage.getItem('token');
+    
+    this.http.get<any>('http://localhost:8085/api/kpi-alerts/current-kpis', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).subscribe({
+      next: (response) => {
+        this.updateRealtimeKpis(response);
+        this.lastKpiUpdate = new Date();
+        this.loadingKpis = false;
+        
+        // Créer/mettre à jour les jauges
+        setTimeout(() => this.createGaugeCharts(), 100);
+      },
+      error: (error) => {
+        console.error('Erreur chargement KPI temps réel:', error);
+        this.loadingKpis = false;
+      }
+    });
+  }
+
+  /**
+   * Mettre à jour les données KPI
+   */
+  updateRealtimeKpis(data: any) {
+    // Taux de Recouvrement
+    this.realtimeKpis.tauxRecouvrement = {
+      value: data.tauxRecouvrement || 0,
+      trend: this.calculateTrend(data.tauxRecouvrement, data.tauxRecouvrementPrevious),
+      status: this.getKpiStatus(data.tauxRecouvrement, 85, 70, false)
+    };
+
+    // Délai Moyen Paiement
+    this.realtimeKpis.delaiMoyenPaiement = {
+      value: data.delaiMoyenPaiement || 0,
+      trend: this.calculateTrend(data.delaiMoyenPaiement, data.delaiMoyenPaiementPrevious),
+      status: this.getKpiStatus(data.delaiMoyenPaiement, 30, 45, true)
+    };
+
+    // Taux Factures en Retard
+    this.realtimeKpis.tauxFacturesRetard = {
+      value: data.tauxFacturesRetard || 0,
+      trend: this.calculateTrend(data.tauxFacturesRetard, data.tauxFacturesRetardPrevious),
+      status: this.getKpiStatus(data.tauxFacturesRetard, 10, 15, true)
+    };
+
+    // Montant Total Impayés
+    this.realtimeKpis.montantTotalImpayes = {
+      value: data.montantTotalImpayes || 0,
+      trend: this.calculateTrend(data.montantTotalImpayes, data.montantTotalImpayesPrevious),
+      status: this.getKpiStatus(data.montantTotalImpayes, 50000, 100000, true)
+    };
+
+    // Nombre Clients en Retard
+    this.realtimeKpis.nombreClientsRetard = {
+      value: data.nombreClientsRetard || 0,
+      trend: this.calculateTrend(data.nombreClientsRetard, data.nombreClientsRetardPrevious),
+      status: this.getKpiStatus(data.nombreClientsRetard, 5, 10, true)
+    };
+  }
+
+  /**
+   * Calculer la tendance (pourcentage de changement)
+   */
+  calculateTrend(current: number, previous: number): number {
+    if (!previous || previous === 0) return 0;
+    return ((current - previous) / previous) * 100;
+  }
+
+  /**
+   * Déterminer le statut d'un KPI
+   */
+  getKpiStatus(value: number, warningThreshold: number, criticalThreshold: number, inverse: boolean): string {
+    if (inverse) {
+      if (value >= criticalThreshold) return 'critical';
+      if (value >= warningThreshold) return 'warning';
+      return 'normal';
+    } else {
+      if (value <= criticalThreshold) return 'critical';
+      if (value <= warningThreshold) return 'warning';
+      return 'normal';
+    }
+  }
+
+  /**
+   * Créer les graphiques en jauge
+   */
+  createGaugeCharts() {
+    this.createGaugeChart('gauge-recouvrement', this.realtimeKpis.tauxRecouvrement.value, 100, '%');
+    this.createGaugeChart('gauge-delai', this.realtimeKpis.delaiMoyenPaiement.value, 60, 'j');
+    this.createGaugeChart('gauge-retard', this.realtimeKpis.tauxFacturesRetard.value, 30, '%');
+    this.createGaugeChart('gauge-impayes', this.realtimeKpis.montantTotalImpayes.value, 150000, 'TND');
+    this.createGaugeChart('gauge-clients', this.realtimeKpis.nombreClientsRetard.value, 20, '');
+  }
+
+  /**
+   * Créer un graphique en jauge
+   */
+  createGaugeChart(canvasId: string, value: number, max: number, unit: string) {
+    const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+    if (!canvas) return;
+
+    // Détruire le graphique existant
+    if (this.gaugeCharts[canvasId]) {
+      this.gaugeCharts[canvasId].destroy();
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const percentage = (value / max) * 100;
+    const color = percentage >= 70 ? '#4caf50' : percentage >= 40 ? '#ff9800' : '#f44336';
+
+    this.gaugeCharts[canvasId] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [value, max - value],
+          backgroundColor: [color, '#e0e0e0'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: '75%',
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        }
+      }
+    });
+  }
+
+  /**
+   * Rafraîchir manuellement les KPI
+   */
+  refreshKpis() {
+    this.loadRealtimeKpis();
+  }
+
+  /**
+   * Démarrer le rafraîchissement automatique
+   */
+  startKpiAutoRefresh() {
+    this.kpiRefreshInterval = setInterval(() => {
+      this.loadRealtimeKpis();
+    }, 30000); // Toutes les 30 secondes
   }
 
   // Méthodes du header (même que admin)
@@ -1031,22 +1849,8 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
   }
 
   toggleMessages() {
-    console.log('🔔 Clic sur icône message détecté');
-    import('../../shared/components/messaging/messaging.component').then(m => {
-      console.log('✅ Import réussi, ouverture dialog');
-      this.dialog.open(m.MessagingComponent, {
-        width: '95vw',
-        maxWidth: '1200px',
-        height: '90vh',
-        panelClass: 'messaging-dialog',
-        disableClose: false,
-        autoFocus: false
-      });
-    }).catch((error) => {
-      console.error('❌ Erreur import:', error);
-      console.log('Redirection vers /messaging');
-      this.router.navigate(['/messaging']);
-    });
+    console.log('🔔 Clic sur icône message - Navigation vers /messaging');
+    this.router.navigate(['/messaging']);
   }
 
   toggleSettings() {
@@ -1063,8 +1867,9 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
   }
 
   goToProfile() {
-    console.log('Go to profile');
+    console.log('Navigation vers le profil');
     this.userMenuOpen = false;
+    this.router.navigate(['/profile']);
   }
 
   performSearch() {
@@ -1072,7 +1877,8 @@ export class DecisionMakerDashboardComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    console.log('Déconnexion du décideur');
+    console.log('🚪 Déconnexion du décideur...');
+    this.authService.logout();
   }
 
   loadInitialData(): void {

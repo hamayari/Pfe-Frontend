@@ -1873,15 +1873,15 @@
             <small class="form-text">Sélectionnez le pays pour le format de numéro</small>
           </div>
           <div class="form-group">
-            <label for="userRole">Rôle</label>
+            <label for="userRole">Rôle *</label>
             <select id="userRole" [(ngModel)]="userForm.role" name="role" required>
               <option value="">Sélectionner un rôle</option>
-              <option value="ROLE_SUPER_ADMIN">Super Administrateur</option>
               <option value="ROLE_ADMIN">Administrateur</option>
               <option value="ROLE_COMMERCIAL">Commercial</option>
-              <option value="ROLE_CHEF_PROJET">Chef de Projet</option>
-              <option value="ROLE_DECIDEUR">Décideur</option>
+              <option value="ROLE_PROJECT_MANAGER">Chef de Projet</option>
+              <option value="ROLE_DECISION_MAKER">Décideur</option>
             </select>
+            <small class="form-text">Sélectionnez le rôle métier de l'utilisateur</small>
           </div>
           <div class="form-group">
             <label for="userPassword">Mot de passe {{ isEditMode ? '(optionnel)' : '' }}</label>
@@ -2140,6 +2140,35 @@
           </div>
         </form>
       </div>
+    </div>
+  </div>
+  
+  <!-- Chatbot Opérationnel Flottant -->
+  <div class="floating-operational-chatbot" (click)="openOperationalChatbot()">
+    <mat-icon>support_agent</mat-icon>
+    <div class="chatbot-tooltip">Assistant Opérationnel Admin</div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="chatbot-overlay" *ngIf="isOperationalChatbotOpen" (click)="closeOperationalChatbot()"></div>
+
+  <!-- Panel Chatbot Opérationnel -->
+  <div class="chatbot-panel" *ngIf="isOperationalChatbotOpen">
+    <div class="chatbot-panel-header">
+      <h3>
+        <mat-icon>support_agent</mat-icon>
+        Assistant Opérationnel Admin
+      </h3>
+      <button mat-icon-button (click)="closeOperationalChatbot()" class="close-chatbot-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="chatbot-panel-content">
+      <iframe 
+        src="/decideur/operational-chatbot" 
+        class="chatbot-iframe"
+        frameborder="0">
+      </iframe>
     </div>
   </div>
   

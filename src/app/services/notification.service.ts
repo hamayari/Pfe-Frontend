@@ -1,124 +1,192 @@
 import { Injectable } from '@angular/core';
-// import { ToastrService } from 'ngx-toastr';
-import { WebsocketService, WebSocketMessage } from './websocket.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { inject } from '@angular/core';
 
-export interface NotificationSettings {
-  emailEnabled: boolean;
-  smsEnabled: boolean;
-  whatsappEnabled: boolean;
-  daysBeforeDueDate: number;
-}
-
-export interface NotificationHistory {
-  id: string;
-  message: string;
-  date: string;
+export interface Notification {
+  id?: string;
+  userId: string;
   type: string;
+  title: string;
+  message: string;
+  priority: string;
+  category: string;
   read: boolean;
-  subject?: string;
-  sentAt?: string;
-  recipient?: string;
-  status?: string;
+  acknowledged: boolean;
+  timestamp: Date;
+  readAt?: Date;
+  status: string;
 }
 
-export interface NotificationData {
-  alert?: string;
-  success?: string;
-  info?: string;
-  error?: string;
-  log?: string;
-  message?: string;
-}
-
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class NotificationService {
-  // private toastr: ToastrService = inject(ToastrService);
   private apiUrl = `${environment.apiUrl}/notifications`;
-  constructor(private websocket: WebsocketService, private http: HttpClient) {
-    this.websocket.dashboardUpdates$.subscribe((message: WebSocketMessage) => {
-      const data = message.data as NotificationData;
-      if (data.alert) {
-        // this.toastr.warning(data.alert, 'Alerte');
-      }
-      if (data.success) {
-        // this.toastr.success(data.success, 'Succès');
-      }
-      if (data.info) {
-        // this.toastr.info(data.info, 'Info');
-      }
-      if (data.error) {
-        // this.toastr.error(data.error, 'Erreur');
-      }
+  
+  constructor(private http: HttpClient) {}
+  
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     });
   }
-
-  showSuccess(msg: string): void {
-    // this.toastr.success(msg, 'Succès');
-  }
-  showError(msg: string): void {
-    // this.toastr.error(msg, 'Erreur');
-  }
-  showInfo(msg: string): void {
-    // this.toastr.info(msg, 'Info');
-  }
-  showWarning(msg: string): void {
-    // this.toastr.warning(msg, 'Alerte');
-  }
-
-  // Settings
-  getNotificationSettings(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/settings`);
-  }
-  updateNotificationSettings(payload: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/settings`, payload);
-  }
-
-  // History
-  getNotificationHistory(): Observable<NotificationHistory[]> {
-    return this.http.get<NotificationHistory[]>(`${this.apiUrl}/history`);
-  }
-
-  // Unread count
-  getUnreadCount(): Observable<{ unreadCount: number }> {
-    return this.http.get<{ unreadCount: number }>(`${this.apiUrl}/unread-count`);
-  }
-
-  // Bulk mark as read
-  markReadBulk(ids: string[]): Observable<{ updated: number }> {
-    return this.http.post<{ updated: number }>(`${this.apiUrl}/mark-read-bulk`, { ids });
-  }
-
-  // Payments notifications and mark read single
-  getPaymentNotifications(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/paiement`);
-  }
-  markPaymentNotificationRead(id: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/paiement/${id}/read`, {});
-  }
-
-  // Manual reminder (if needed by tests)
-  sendManualReminder(invoiceId: string, type: 'email' | 'sms'): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reminder`, { invoiceId, type });
-  }
-
-  // Templates API
-  getTemplates(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.apiUrl}/notification-templates`);
-  }
-  getTemplatesByType(type: string): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.apiUrl}/notification-templates/type/${type}`);
+  
+  private getCurrentUserId(): string {
+    const userStr = localStorage.getItem('currentUser');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        return user.id || '';
+      } catch (e) {
+        console.error('Error parsing currentUser:', e);
+      }
     }
+    return '';
+  }
+  
+  /**
+   * Récupérer toutes les notifications de l'utilisateur actuel
+   */
+  getNotifications(): Observable<Notification[]> {
+    const userId = this.getCurrentUserId();
+    console.log('📥 Récupération notifications pour userId:', userId);
+    return this.http.get<Notification[]>(
+      `${this.apiUrl}/user/${userId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Récupérer les notifications non lues
+   */
+  getUnreadNotifications(): Observable<Notification[]> {
+    const userId = this.getCurrentUserId();
+    return this.http.get<Notification[]>(
+      `${this.apiUrl}/user/${userId}/unread`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Compter les notifications non lues
+   */
+  getUnreadCount(): Observable<number> {
+    const userId = this.getCurrentUserId();
+    return this.http.get<number>(
+      `${this.apiUrl}/user/${userId}/unread/count`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Marquer une notification comme lue
+   */
+  markAsRead(notificationId: string): Observable<any> {
+    const userId = this.getCurrentUserId();
+    return this.http.put(
+      `${this.apiUrl}/${notificationId}/read?userId=${userId}`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Marquer toutes les notifications comme lues
+   */
+  markAllAsRead(): Observable<any> {
+    const userId = this.getCurrentUserId();
+    return this.http.put(
+      `${this.apiUrl}/user/${userId}/read-all`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Supprimer une notification
+   */
+  deleteNotification(notificationId: string): Observable<any> {
+    return this.http.delete(
+      `${this.apiUrl}/${notificationId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Récupérer les alertes déléguées (pour Chef de Projet)
+   */
+  getDelegatedAlerts(): Observable<Notification[]> {
+    const userId = this.getCurrentUserId();
+    console.log('📥 Récupération alertes déléguées pour userId:', userId);
+    return this.http.get<Notification[]>(
+      `${this.apiUrl}/user/${userId}/delegated-alerts`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Marquer plusieurs notifications comme lues (bulk)
+   */
+  markReadBulk(notificationIds: string[]): Observable<{ success: boolean; count: number }> {
+    const userId = this.getCurrentUserId();
+    return this.http.put<{ success: boolean; count: number }>(
+      `${this.apiUrl}/user/${userId}/read-bulk`,
+      { notificationIds },
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Récupérer les notifications de paiement (legacy - pour compatibilité)
+   */
+  getPaymentNotifications(): Observable<Notification[]> {
+    return this.getNotifications();
+  }
+  
+  /**
+   * Récupérer les paramètres de notification (legacy - pour compatibilité)
+   */
+  getNotificationSettings(): Observable<any> {
+    const userId = this.getCurrentUserId();
+    return this.http.get<any>(
+      `${this.apiUrl}/user/${userId}/settings`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Mettre à jour les paramètres de notification (legacy - pour compatibilité)
+   */
+  updateNotificationSettings(settings: any): Observable<any> {
+    const userId = this.getCurrentUserId();
+    return this.http.put<any>(
+      `${this.apiUrl}/user/${userId}/settings`,
+      settings,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Récupérer les templates par type (legacy - pour compatibilité)
+   */
+  getTemplatesByType(type: string): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/templates?type=${type}`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
+  /**
+   * Sauvegarder un template (legacy - pour compatibilité)
+   */
   saveTemplate(template: any): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/notification-templates`, template);
-  }
-  deactivateTemplate(id: string): Observable<void> {
-    return this.http.put<void>(`${environment.apiUrl}/notification-templates/${id}/deactivate`, {});
-  }
-  generateFromTemplate(id: string, variables: any): Observable<{subject: string, content: string}> {
-    return this.http.post<{subject: string, content: string}>(`${environment.apiUrl}/notification-templates/${id}/generate`, variables);
+    return this.http.post<any>(
+      `${this.apiUrl}/templates`,
+      template,
+      { headers: this.getHeaders() }
+    );
   }
 }

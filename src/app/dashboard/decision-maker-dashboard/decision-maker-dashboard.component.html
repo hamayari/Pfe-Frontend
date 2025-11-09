@@ -78,6 +78,62 @@
     </div>
   </header>
 
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <a routerLink="/decision-maker-dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <i class="material-icons">dashboard</i>
+        <span>Dashboard</span>
+      </a>
+      
+      <a routerLink="/chatbot-decideur" routerLinkActive="active" class="nav-item chatbot-link">
+        <i class="material-icons">smart_toy</i>
+        <span>🤖 Assistant IA</span>
+      </a>
+      
+      <a routerLink="/kpi-alerts" routerLinkActive="active" class="nav-item kpi-alerts-link">
+        <i class="material-icons">warning</i>
+        <span>Alertes KPI</span>
+        <span class="badge" *ngIf="kpiAlertsCount > 0">{{ kpiAlertsCount }}</span>
+      </a>
+      
+      <a routerLink="/decision-maker-dashboard" class="nav-item">
+        <i class="material-icons">assessment</i>
+        <span>Rapports</span>
+      </a>
+      
+      <a routerLink="/decision-maker-dashboard" class="nav-item">
+        <i class="material-icons">analytics</i>
+        <span>Analyses</span>
+      </a>
+      
+      <a routerLink="/decision-maker-dashboard" class="nav-item">
+        <i class="material-icons">people</i>
+        <span>Utilisateurs</span>
+      </a>
+      
+      <a routerLink="/decision-maker-dashboard" class="nav-item">
+        <i class="material-icons">description</i>
+        <span>Conventions</span>
+      </a>
+      
+      <a routerLink="/decision-maker-dashboard" class="nav-item">
+        <i class="material-icons">receipt</i>
+        <span>Factures</span>
+      </a>
+      
+      <div style="margin: 20px 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
+      
+      <a routerLink="/profile" class="nav-item">
+        <i class="material-icons">person</i>
+        <span>Mon Profil</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
   <!-- KPI Cards -->
   <div class="stats-grid">
     <mat-card class="stat-card">
@@ -413,4 +469,6 @@
       </mat-card-content>
     </mat-card>
   </div>
+  
+  </main>
 </div>

@@ -1,0 +1,123 @@
+<div class="profile-section-container">
+  <!-- En-tête de la section profil -->
+  <div class="profile-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">person</mat-icon>
+      <div class="header-text">
+        <h1>Mon Profil</h1>
+        <p>Gérez vos informations personnelles et la sécurité de votre compte</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="profile-content" *ngIf="currentUser">
+    <!-- Carte d'information utilisateur -->
+    <mat-card class="user-info-card">
+      <mat-card-content>
+        <div class="user-avatar-section">
+          <div class="avatar-circle">
+            <mat-icon class="avatar-icon">person</mat-icon>
+          </div>
+          <div class="user-basic-info">
+            <h2 class="user-name">{{ currentUser.name || currentUser.username }}</h2>
+            <p class="user-email">{{ currentUser.email }}</p>
+            <div class="user-role-badge">
+              <mat-icon>badge</mat-icon>
+              <span>{{ getRoleLabel(currentUser.role) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon class="info-icon">account_circle</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Nom d'utilisateur</span>
+              <span class="info-value">{{ currentUser.username }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon class="info-icon">email</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Adresse email</span>
+              <span class="info-value">{{ currentUser.email }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon class="info-icon">security</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Rôle</span>
+              <span class="info-value">{{ getRoleLabel(currentUser.role) }}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="currentUser.phoneNumber">
+            <mat-icon class="info-icon">phone</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Téléphone</span>
+              <span class="info-value">{{ currentUser.phoneNumber }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Carte de sécurité du compte -->
+    <mat-card class="security-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="security-icon">lock</mat-icon>
+          Sécurité du compte
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="security-options">
+          <!-- Option: Changer le mot de passe -->
+          <button mat-stroked-button class="security-button" (click)="openChangePasswordModal()">
+            <div class="button-content">
+              <div class="button-icon-wrapper">
+                <mat-icon class="button-icon">vpn_key</mat-icon>
+              </div>
+              <div class="button-text">
+                <span class="button-title">Changer le mot de passe</span>
+                <span class="button-description">Modifiez votre mot de passe actuel</span>
+              </div>
+            </div>
+            <mat-icon class="arrow-icon">chevron_right</mat-icon>
+          </button>
+
+          <!-- Option: Authentification à deux facteurs -->
+          <button mat-stroked-button class="security-button" (click)="enable2FA()">
+            <div class="button-content">
+              <div class="button-icon-wrapper">
+                <mat-icon class="button-icon">security</mat-icon>
+              </div>
+              <div class="button-text">
+                <span class="button-title">Authentification à deux facteurs</span>
+                <span class="button-description">Ajoutez une couche de sécurité supplémentaire</span>
+              </div>
+            </div>
+            <mat-icon class="arrow-icon">chevron_right</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Message de chargement -->
+  <div class="loading-container" *ngIf="!currentUser">
+    <mat-card class="loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-icon class="loading-icon">account_circle</mat-icon>
+          <p>Chargement de votre profil...</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,20 +1,12 @@
+// Import des styles partagés - RÉFÉRENCE: Admin Dashboard
+@import '../shared-dashboard-styles.scss';
+
 .dashboard-container {
-  padding: 20px;
-  background-color: #f5f5f5;
+  display: flex;
+  background-color: $background-global;
   min-height: 100vh;
-  padding-top: 100px; // Pour compenser le header fixe
+  padding-top: 80px; // Pour compenser le header fixe
 }
-
-// Variables - Palette exacte ngx-admin Material Light
-$header-height: 64px;
-$sidebar-width: 180px;
-
-// Couleurs principales
-$primary-color: #4F8DF9; // Bleu clair pour éléments actifs
-$sidebar-bg: #2F3542; // Gris foncé moderne pour sidebar
-$background-global: #F5F6FA; // Gris très pâle pour fond global
-$background-white: #FFFFFF; // Blanc pur pour cartes
-$header-bg: #FFFFFF; // Blanc pour header
 
 // Couleurs KPI (palette unifiée)
 $primary-accent: #4F8DF9; // Bleu principal pour tous les KPI
@@ -380,11 +372,134 @@ $shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
 
 // Messaging Dialog Styles
 ::ng-deep .messaging-dialog {
+  .mat-mdc-dialog-container,
   .mat-dialog-container {
     padding: 0;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+    z-index: 1001 !important;
   }
+}
+
+// Backdrop flou et sombre pour la messagerie
+::ng-deep .messaging-backdrop {
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 1000 !important;
+}
+
+// Sidebar Navigation
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 80px;
+  width: 260px;
+  height: calc(100vh - 80px);
+  background: white;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  overflow-y: auto;
+
+  .sidebar-nav {
+    padding: 20px 0;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 24px;
+      color: #5a6c7d;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+      font-size: 15px;
+      font-weight: 500;
+
+      i.material-icons {
+        font-size: 22px;
+        width: 22px;
+      }
+
+      &:hover {
+        background: rgba(79, 141, 249, 0.08);
+        color: #4F8DF9;
+        border-left-color: #4F8DF9;
+      }
+
+      &.active {
+        background: rgba(79, 141, 249, 0.12);
+        color: #4F8DF9;
+        border-left-color: #4F8DF9;
+        font-weight: 600;
+      }
+
+      &.chatbot-link {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        margin: 10px 12px;
+        border-radius: 12px;
+        border-left: none;
+        
+        &:hover {
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+          transform: translateX(5px);
+        }
+
+        &.active {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+      }
+
+      &.kpi-alerts-link {
+        position: relative;
+        
+        .badge {
+          position: absolute;
+          top: 50%;
+          right: 20px;
+          transform: translateY(-50%);
+          background: #f44336;
+          color: white;
+          border-radius: 12px;
+          padding: 2px 8px;
+          font-size: 12px;
+          font-weight: 600;
+          min-width: 20px;
+          text-align: center;
+          animation: pulse 2s infinite;
+        }
+
+        &:hover .badge {
+          background: #d32f2f;
+        }
+
+        &.active .badge {
+          background: white;
+          color: #4F8DF9;
+        }
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.1);
+  }
+}
+
+// Main Content avec marge pour la sidebar
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 20px;
+  width: calc(100% - 260px);
 }
 
 .stats-grid {

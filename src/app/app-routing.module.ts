@@ -12,6 +12,11 @@ const routes: Routes = [
     loadComponent: () => import('./shared/components/messaging/messaging.component').then(m => m.MessagingComponent),
     data: { title: 'Messagerie' }
   },
+  {
+    path: 'profile',
+    loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent),
+    data: { title: 'Mon Profil' }
+  },
   { 
     path: 'dashboard', 
     loadComponent: () => import('./shared/components/dashboard-redirect/dashboard-redirect.component').then(m => m.DashboardRedirectComponent),
