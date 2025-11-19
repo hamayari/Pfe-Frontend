@@ -324,3 +324,42 @@ describe('ConventionService', () => {
     });
   });
 });
+
+
+  describe('getConventions', () => {
+    it('should handle API error', (done) => {
+      service.getConventions().subscribe(
+        () => fail('should have failed'),
+        (error) => {
+          expect(error.status).toBe(500);
+          done();
+        }
+      );
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+    });
+
+    it('should handle network error', (done) => {
+      service.getConventions().subscribe(
+        () => fail('should have failed'),
+        (error) => {
+          expect(error).toBeTruthy();
+          done();
+        }
+      );
+
+      const req = httpMock.expectOne(apiUrl);
+      req.error(new ErrorEvent('Network error'));
+    });
+
+    it('should handle empty response', (done) => {
+      service.getConventions().subscribe(conventions => {
+        expect(conventions).toEqual([]);
+        done();
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush([]);
+    });
+  });

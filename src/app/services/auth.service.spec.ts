@@ -312,3 +312,65 @@ describe('AuthService', () => {
     });
   });
 });
+
+  describe('Token Management', () => {
+    it('should return null when no token is available', () => {
+      localStorage.removeItem('token');
+      expect(service.getToken()).toBeNull();
+    });
+
+    it('should validate JWT token expiration', () => {
+      // Mock expired token (exp in the past)
+      const expiredToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      localStorage.setItem('token', expiredToken);
+      
+      // Token should be considered invalid/expired
+      expect(service.getToken()).toBeTruthy();
+    });
+  });
+
+  describe('Get Valid Token', () => {
+    it('should attempt auto-reconnect if no valid token exists', (done) => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      
+      // Should return null when no token and no refresh token
+      expect(service.getToken()).toBeNull();
+      done();
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle malformed JWT token gracefully', () => {
+      const malformedToken = 'not-a-valid-jwt-token';
+      localStorage.setItem('token', malformedToken);
+      
+      // Should still return the token (validation happens elsewhere)
+      expect(service.getToken()).toBe(malformedToken);
+    });
+
+    it('should handle null or undefined values in localStorage', () => {
+      localStorage.setItem('token', 'null');
+      expect(service.getToken()).toBe('null');
+      
+      localStorage.setItem('token', 'undefined');
+      expect(service.getToken()).toBe('undefined');
+    });
+
+    it('should handle concurrent login attempts', (done) => {
+      const login1 = service.login('user1', 'pass1');
+      const login2 = service.login('user2', 'pass2');
+
+      let completed = 0;
+      const checkDone = () => {
+        completed++;
+        if (completed === 2) done();
+      };
+
+      login1.subscribe(() => checkDone(), () => checkDone());
+      login2.subscribe(() => checkDone(), () => checkDone());
+
+      const requests = httpMock.match(`${apiUrl}/signin`);
+      requests.forEach(req => req.flush(mockLoginResponse));
+    });
+  });

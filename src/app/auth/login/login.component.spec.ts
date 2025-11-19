@@ -120,8 +120,8 @@ describe('LoginComponent', () => {
       usernameControl?.setValue('ab');
       passwordControl?.setValue('12345');
 
-      expect(usernameControl?.hasError('minLength')).toBe(true);
-      expect(passwordControl?.hasError('minLength')).toBe(true);
+      expect(usernameControl?.hasError('minlength')).toBe(true);
+      expect(passwordControl?.hasError('minlength')).toBe(true);
     });
 
     it('should initialize with default role styles when no role is provided', () => {
@@ -432,6 +432,55 @@ describe('LoginComponent', () => {
       component.onSubmit();
 
       expect(authService.login).not.toHaveBeenCalled();
+    });
+  });
+});
+
+
+  describe('Edge Cases', () => {
+    it('should handle empty roles array from backend', fakeAsync(() => {
+      const responseWithoutRoles = { ...mockLoginResponse, roles: [] };
+      authService.login.and.returnValue(of(responseWithoutRoles));
+      component.selectedRole = 'admin';
+      component.loginForm.patchValue({
+        username: 'testuser',
+        password: 'password123'
+      });
+
+      component.onSubmit();
+      tick();
+
+      expect(router.navigate).toHaveBeenCalledWith(['/admin-dashboard']);
+    }));
+
+    it('should not submit when already loading', () => {
+      component.isLoading = true;
+      component.loginForm.patchValue({
+        username: 'testuser',
+        password: 'password123'
+      });
+
+      component.onSubmit();
+
+      expect(authService.login).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('LocalStorage Interaction', () => {
+    it('should retrieve role from localStorage when not provided', () => {
+      (localStorage.getItem as jasmine.Spy).and.returnValue('commercial');
+      component.selectedRole = '';
+      
+      component.ngOnInit();
+      
+      expect(localStorage.getItem).toHaveBeenCalledWith('selectedRole');
+    });
+
+    it('should store selected role in localStorage on init', () => {
+      component.selectedRole = 'admin';
+      component.ngOnInit();
+      
+      expect(localStorage.setItem).toHaveBeenCalledWith('selectedRole', 'admin');
     });
   });
 });
