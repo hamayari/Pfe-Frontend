@@ -10,6 +10,7 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
+      require('karma-junit-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client: {
@@ -42,22 +43,32 @@ module.exports = function (config) {
         }
       }
     },
-    reporters: ['progress', 'kjhtml', 'coverage'],
+    junitReporter: {
+      outputDir: './test-results',
+      outputFile: 'TESTS-results.xml',
+      suite: '',
+      useBrowserName: false,
+      nameFormatter: undefined,
+      classNameFormatter: undefined,
+      properties: {},
+      xmlVersion: null
+    },
+    reporters: ['progress', 'kjhtml', 'coverage', 'junit'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: ['Chrome', 'ChromeHeadless'],
     customLaunchers: {
-      ChromeHeadless: {
-        base: 'Chrome',
+      ChromeHeadlessCI: {
+        base: 'ChromeHeadless',
         flags: [
-          '--headless',
-          '--disable-gpu',
           '--no-sandbox',
-          '--remote-debugging-port=9222',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor'
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-software-rasterizer',
+          '--disable-extensions',
+          '--remote-debugging-port=9222'
         ]
       }
     },
