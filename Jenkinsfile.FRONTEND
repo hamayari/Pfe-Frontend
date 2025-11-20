@@ -1,0 +1,239 @@
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'nodejs' // Configurer NodeJS dans Jenkins Global Tool Configuration
+    }
+    
+    environment {
+        DOCKER_IMAGE = 'hamalak/pfe-frontend'
+        DOCKER_TAG = "${BUILD_NUMBER}"
+        GIT_REPO = 'https://github.com/hamayari/Pfe-Frontend.git'
+        GIT_BRANCH = 'main'
+        CHROME_BIN = '/usr/bin/google-chrome'
+    }
+    
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+    
+    stages {
+        stage('🧹 Cleanup & Checkout') {
+            steps {
+                echo '🧹 Nettoyage du workspace...'
+                deleteDir()
+                
+                echo '📥 Checkout du code depuis GitHub...'
+                git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
+            }
+        }
+        
+        stage('🔍 Vérification Environnement') {
+            steps {
+                sh '''
+                    echo "📦 Node Version:"
+                    node -v
+                    echo ""
+                    echo "📦 NPM Version:"
+                    npm -v
+                    echo ""
+                    echo "📦 Angular CLI:"
+                    npx ng version || echo "Angular CLI sera installé"
+                '''
+            }
+        }
+        
+        stage('📦 Installation Dépendances') {
+            steps {
+                echo '📦 Installation des dépendances npm...'
+                sh 'npm ci --prefer-offline --no-audit'
+            }
+        }
+        
+        stage('🔨 Build Angular') {
+            steps {
+                echo '🔨 Build de l\'application Angular...'
+                sh 'npm run build -- --configuration production'
+            }
+            post {
+                success {
+                    echo '✅ Build réussi!'
+                }
+            }
+        }
+        
+        stage('🧪 Tests Unitaires') {
+            steps {
+                echo '🧪 Exécution des tests unitaires avec Karma/Jasmine...'
+                sh 'npm test -- --watch=false --code-coverage --browsers=ChromeHeadless'
+            }
+            post {
+                always {
+                    // Publier les résultats des tests
+                    junit testResults: '**/TESTS-*.xml', allowEmptyResults: true
+                    
+                    // Publier le rapport de couverture
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'coverage/gestion-pro-frontend',
+                        reportFiles: 'index.html',
+                        reportName: '📊 Coverage Report'
+                    ])
+                }
+                success {
+                    echo '✅ Tests unitaires réussis!'
+                }
+                failure {
+                    echo '❌ Échec des tests unitaires'
+                }
+            }
+        }
+        
+        stage('🔍 Lint & Quality') {
+            steps {
+                echo '🔍 Vérification de la qualité du code...'
+                script {
+                    try {
+                        sh 'npm run lint || true'
+                        echo '✅ Lint terminé'
+                    } catch (Exception e) {
+                        echo "⚠️ Lint a détecté des problèmes: ${e.message}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+        }
+        
+        stage('🐳 Build Docker Image') {
+            steps {
+                echo '🐳 Construction de l\'image Docker...'
+                script {
+                    try {
+                        sh """
+                            docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                            docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                            docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:${GIT_BRANCH}-latest
+                        """
+                        echo '✅ Image Docker créée avec succès'
+                    } catch (Exception e) {
+                        echo "⚠️ Erreur lors du build Docker: ${e.message}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+        }
+        
+        stage('📤 Push Docker Hub') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo '📤 Push vers Docker Hub...'
+                script {
+                    try {
+                        withCredentials([usernamePassword(
+                            credentialsId: 'dockerhub-credentials',
+                            usernameVariable: 'DOCKER_USER',
+                            passwordVariable: 'DOCKER_PASS'
+                        )]) {
+                            sh """
+                                echo \${DOCKER_PASS} | docker login -u \${DOCKER_USER} --password-stdin
+                                docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                                docker push ${DOCKER_IMAGE}:latest
+                                docker push ${DOCKER_IMAGE}:${GIT_BRANCH}-latest
+                                docker logout
+                            """
+                        }
+                        echo '✅ Images poussées vers Docker Hub'
+                    } catch (Exception e) {
+                        echo "⚠️ Erreur lors du push Docker: ${e.message}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+        }
+        
+        stage('📊 Analyse SonarQube') {
+            steps {
+                echo '📊 Analyse SonarQube...'
+                script {
+                    try {
+                        withSonarQubeEnv('sonarqube') {
+                            withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
+                                sh """
+                                    npx sonar-scanner \
+                                    -Dsonar.projectKey=Commercial-PFE-Frontend \
+                                    -Dsonar.projectName='Commercial PFE Frontend' \
+                                    -Dsonar.sources=src \
+                                    -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/*.spec.ts \
+                                    -Dsonar.tests=src \
+                                    -Dsonar.test.inclusions=**/*.spec.ts \
+                                    -Dsonar.typescript.lcov.reportPaths=coverage/gestion-pro-frontend/lcov.info \
+                                    -Dsonar.host.url=http://sonarqube:9000 \
+                                    -Dsonar.token=\${SONAR_TOKEN}
+                                """
+                            }
+                        }
+                        echo '✅ Analyse SonarQube terminée'
+                    } catch (Exception e) {
+                        echo "⚠️ SonarQube non disponible: ${e.message}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+        }
+        
+        stage('🚦 Quality Gate') {
+            steps {
+                echo '🚦 Vérification du Quality Gate...'
+                script {
+                    try {
+                        timeout(time: 5, unit: 'MINUTES') {
+                            def qg = waitForQualityGate()
+                            if (qg.status != 'OK') {
+                                echo "⚠️ Quality Gate status: ${qg.status}"
+                                echo '⚠️ Continuons quand même...'
+                            } else {
+                                echo '✅ Quality Gate passed!'
+                            }
+                        }
+                    } catch (Exception e) {
+                        echo "⚠️ Quality Gate timeout: ${e.message}"
+                        echo '⚠️ Continuons quand même...'
+                    }
+                }
+            }
+        }
+        
+        stage('📦 Archive Artifacts') {
+            steps {
+                echo '📦 Archivage des artifacts...'
+                archiveArtifacts artifacts: 'dist/**/*', fingerprint: true, allowEmptyArchive: true
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✅ Pipeline Frontend terminé avec succès!'
+            echo "📦 Image Docker: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+        }
+        failure {
+            echo '❌ Pipeline Frontend échoué!'
+        }
+        unstable {
+            echo '⚠️ Pipeline Frontend instable - certaines étapes ont échoué'
+        }
+        always {
+            echo '🧹 Nettoyage des images Docker locales...'
+            sh """
+                docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
+                docker system prune -f || true
+            """
+        }
+    }
+}

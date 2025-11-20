@@ -56,27 +56,14 @@ $content-padding: 20px;
 .layout-sidebar {
   grid-area: sidebar;
   background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 25%, #7986cb 50%, #9fa8da 75%, #c5cae9 100%);
-  overflow-y: auto;
+  overflow-y: hidden; // Masquer le scroll
   overflow-x: hidden;
   position: relative;
   z-index: 999;
   
-  // Scrollbar personnalisée pour la sidebar
+  // Scrollbar masquée complètement
   &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
+    display: none; // Masquer la scrollbar
   }
   
   // Mode collapsed

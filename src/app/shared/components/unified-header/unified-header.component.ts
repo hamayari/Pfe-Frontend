@@ -73,28 +73,10 @@ import { MatDividerModule } from '@angular/material/divider';
           <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
 
-        <!-- Notifications -->
-        <button mat-icon-button [matMenuTriggerFor]="notifMenu">
-          <mat-icon [matBadge]="notificationCount" matBadgeColor="warn">notifications</mat-icon>
-        </button>
-        <mat-menu #notifMenu="matMenu">
-          <div class="notification-header">
-            <h3>Notifications</h3>
-          </div>
-          <button mat-menu-item>
-            <mat-icon>info</mat-icon>
-            <span>Nouvelle convention signée</span>
-          </button>
-          <button mat-menu-item>
-            <mat-icon>warning</mat-icon>
-            <span>Facture en retard</span>
-          </button>
-        </mat-menu>
-
-        <!-- Messages -->
-        <button mat-icon-button routerLink="/messaging">
+        <!-- Messages (masqués pour admin) -->
+        <!-- <button mat-icon-button routerLink="/messaging">
           <mat-icon [matBadge]="messageCount" matBadgeColor="accent">mail</mat-icon>
-        </button>
+        </button> -->
 
         <!-- Profil -->
         <button mat-button [matMenuTriggerFor]="profileMenu" class="profile-button">
@@ -243,7 +225,6 @@ import { MatDividerModule } from '@angular/material/divider';
   `]
 })
 export class UnifiedHeaderComponent implements OnInit {
-  notificationCount = 3;
   messageCount = 5;
   searchQuery = '';
   searchResults: any[] = [];

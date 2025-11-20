@@ -36,11 +36,17 @@ export class NavigationService {
 
     // Priorité des rôles pour la redirection
     const rolePriority = [
+      'ROLE_SUPER_ADMIN',
       'SUPER_ADMIN',
+      'ROLE_ADMIN',
       'ADMIN', 
+      'ROLE_COMMERCIAL',
       'COMMERCIAL',
+      'ROLE_DECISION_MAKER',
       'DECIDEUR',
+      'ROLE_PROJECT_MANAGER',
       'PROJECT_MANAGER',
+      'ROLE_USER',
       'USER'
     ];
 
@@ -59,15 +65,21 @@ export class NavigationService {
    */
   private getDashboardByRole(role: string): string {
     switch (role) {
+      case 'ROLE_SUPER_ADMIN':
       case 'SUPER_ADMIN':
+      case 'ROLE_ADMIN':
       case 'ADMIN':
         return '/admin-dashboard';
+      case 'ROLE_COMMERCIAL':
       case 'COMMERCIAL':
         return '/commercial-dashboard';
+      case 'ROLE_DECISION_MAKER':
       case 'DECIDEUR':
         return '/decision-maker-dashboard';
+      case 'ROLE_PROJECT_MANAGER':
       case 'PROJECT_MANAGER':
         return '/project-manager-dashboard';
+      case 'ROLE_USER':
       case 'USER':
         return '/user-dashboard';
       default:
@@ -86,11 +98,11 @@ export class NavigationService {
 
     // Logique de vérification des permissions par route
     const routePermissions: { [key: string]: string[] } = {
-      '/admin-dashboard': ['SUPER_ADMIN', 'ADMIN'],
-      '/commercial-dashboard': ['SUPER_ADMIN', 'ADMIN', 'COMMERCIAL'],
-      '/decision-maker-dashboard': ['SUPER_ADMIN', 'ADMIN', 'DECIDEUR'],
-      '/project-manager-dashboard': ['SUPER_ADMIN', 'ADMIN', 'PROJECT_MANAGER'],
-      '/user-dashboard': ['SUPER_ADMIN', 'ADMIN', 'USER']
+      '/admin-dashboard': ['ROLE_SUPER_ADMIN', 'SUPER_ADMIN', 'ROLE_ADMIN', 'ADMIN'],
+      '/commercial-dashboard': ['ROLE_SUPER_ADMIN', 'SUPER_ADMIN', 'ROLE_ADMIN', 'ADMIN', 'ROLE_COMMERCIAL', 'COMMERCIAL'],
+      '/decision-maker-dashboard': ['ROLE_SUPER_ADMIN', 'SUPER_ADMIN', 'ROLE_ADMIN', 'ADMIN', 'ROLE_DECISION_MAKER', 'DECIDEUR'],
+      '/project-manager-dashboard': ['ROLE_SUPER_ADMIN', 'SUPER_ADMIN', 'ROLE_ADMIN', 'ADMIN', 'ROLE_PROJECT_MANAGER', 'PROJECT_MANAGER'],
+      '/user-dashboard': ['ROLE_SUPER_ADMIN', 'SUPER_ADMIN', 'ROLE_ADMIN', 'ADMIN', 'ROLE_USER', 'USER']
     };
 
     for (const [routePrefix, allowedRoles] of Object.entries(routePermissions)) {
@@ -185,19 +197,19 @@ export class NavigationService {
       );
     }
 
-    if (user.roles.includes('PROJECT_MANAGER')) {
+    if (user.roles.includes('ROLE_PROJECT_MANAGER') || user.roles.includes('PROJECT_MANAGER')) {
       items.push(
         {
           label: 'Tableau de bord Projet',
           icon: 'project',
           route: '/project-manager-dashboard',
-          roles: ['PROJECT_MANAGER']
+          roles: ['ROLE_PROJECT_MANAGER', 'PROJECT_MANAGER']
         },
         {
           label: 'Gestion des projets',
           icon: 'folder',
           route: '/project-manager/projects',
-          roles: ['PROJECT_MANAGER']
+          roles: ['ROLE_PROJECT_MANAGER', 'PROJECT_MANAGER']
         }
       );
     }

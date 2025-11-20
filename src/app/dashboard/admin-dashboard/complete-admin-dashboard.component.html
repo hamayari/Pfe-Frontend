@@ -2092,6 +2092,44 @@
     </div>
   </div>
 
+  <!-- Modale Édition Application -->
+  <div class="modal-overlay" *ngIf="showEditApplicationModal" (click)="closeEditApplicationModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Modifier l'Application</h3>
+        <button class="modal-close" (click)="closeEditApplicationModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitEditApplicationForm()">
+          <div class="form-group">
+            <label for="editApplicationCode">Code *</label>
+            <input type="text" id="editApplicationCode" [(ngModel)]="applicationForm.code" name="code" required>
+          </div>
+          <div class="form-group">
+            <label for="editApplicationLibelle">Libellé *</label>
+            <input type="text" id="editApplicationLibelle" [(ngModel)]="applicationForm.libelle" name="libelle" required>
+          </div>
+          <div class="form-group">
+            <label for="editApplicationDescription">Description</label>
+            <textarea id="editApplicationDescription" [(ngModel)]="applicationForm.description" name="description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="applicationForm.actif" name="actif">
+              Application active
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeEditApplicationModal()">Annuler</button>
+            <button type="submit" class="btn btn-primary">Modifier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Modale Ajout Zone Géographique -->
   <div class="modal-overlay" *ngIf="showAddZoneModal" (click)="closeAddZoneModal()">
     <div class="modal" (click)="$event.stopPropagation()">

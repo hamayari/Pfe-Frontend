@@ -127,60 +127,18 @@ interface Notification {
             </button>
           </div>
 
-          <!-- Notifications -->
-          <div class="notifications">
-            <button mat-icon-button 
-                    class="notification-btn"
-                    (click)="toggleNotificationMenu()"
-                    [matBadge]="unreadNotifications"
-                    [matBadgeHidden]="unreadNotifications === 0"
-                    matBadgeColor="warn"
-                    matTooltip="Notifications"
-                    [matTooltipPosition]="'below'">
-              <mat-icon>notifications</mat-icon>
-            </button>
-
-            <!-- Menu des notifications -->
-            <div class="notification-menu" 
-                 *ngIf="showNotificationMenu"
-                 [@slideDown]>
-              <div class="notification-header">
-                <h3>Notifications</h3>
-                <button mat-button 
-                        color="primary" 
-                        (click)="markAllAsRead()"
-                        *ngIf="unreadNotifications > 0">
-                  Tout marquer comme lu
-                </button>
-              </div>
-
-              <div class="notification-list">
-                <div class="notification-item" 
-                     *ngFor="let notification of notifications.slice(0, 5)"
-                     [class.unread]="!notification.read"
-                     (click)="onNotificationClick(notification)">
-                  
-                  <div class="notification-icon" [class]="notification.type">
-                    <mat-icon>{{ getNotificationIcon(notification.type) }}</mat-icon>
-                  </div>
-                  
-                  <div class="notification-content">
-                    <h4 class="notification-title">{{ notification.title }}</h4>
-                    <p class="notification-message">{{ notification.message }}</p>
-                    <span class="notification-time">{{ getTimeAgo(notification.timestamp) }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="notification-footer">
-                <button mat-button 
-                        color="primary" 
-                        (click)="viewAllNotifications()">
-                  Voir toutes les notifications
-                </button>
-              </div>
-            </div>
-          </div>
+          <!-- Notifications (masquées pour admin) -->
+          <!-- <button mat-icon-button 
+                  [matMenuTriggerFor]="notificationMenu"
+                  class="notification-btn"
+                  matTooltip="Notifications"
+                  [matTooltipPosition]="'below'">
+            <mat-icon [matBadge]="unreadNotifications" 
+                      [matBadgeHidden]="unreadNotifications === 0" 
+                      matBadgeColor="warn">
+              notifications
+            </mat-icon>
+          </button> -->
 
           <!-- Menu utilisateur -->
           <div class="user-menu">
@@ -319,11 +277,6 @@ export class ModernHeaderComponent implements OnInit {
     // Fermer les suggestions de recherche
     if (!target.closest('.search-container')) {
       this.showSearchSuggestions = false;
-    }
-    
-    // Fermer le menu des notifications
-    if (!target.closest('.notifications')) {
-      this.showNotificationMenu = false;
     }
   }
 

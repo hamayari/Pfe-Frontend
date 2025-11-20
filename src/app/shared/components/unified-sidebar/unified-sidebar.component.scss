@@ -66,7 +66,7 @@
 .sidebar-nav {
   padding: 8px 0;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
 
   .section-header {
     padding: 16px 16px 8px 16px;
@@ -241,23 +241,23 @@
   }
 }
 
-// Custom scrollbar
-.sidebar-nav::-webkit-scrollbar {
-  width: 4px;
-}
+// Custom scrollbar désactivé
+// .sidebar-nav::-webkit-scrollbar {
+//   width: 4px;
+// }
 
-.sidebar-nav::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-}
+// .sidebar-nav::-webkit-scrollbar-track {
+//   background: rgba(255, 255, 255, 0.1);
+// }
 
-.sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-}
+// .sidebar-nav::-webkit-scrollbar-thumb {
+//   background: rgba(255, 255, 255, 0.3);
+//   border-radius: 2px;
+// }
 
-.sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
+// .sidebar-nav::-webkit-scrollbar-thumb:hover {
+//   background: rgba(255, 255, 255, 0.5);
+// }
 
 
 

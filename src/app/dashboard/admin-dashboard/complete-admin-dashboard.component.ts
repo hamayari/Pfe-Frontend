@@ -123,10 +123,10 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
   
   // Header et navigation
   searchQuery = '';
-  hasNotifications = true;
-  notificationCount = 3;
-  hasMessages = true;
-  messageCount = 2;
+  hasNotifications = false; // Masqué pour admin
+  notificationCount = 0; // Masqué pour admin
+  hasMessages = false; // Masqué pour admin
+  messageCount = 0; // Masqué pour admin
   
   // Menu utilisateur
   userMenuOpen = false;
@@ -1072,6 +1072,64 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
       createdBy: '',
       lastModifiedBy: ''
     };
+  }
+
+  /**
+   * Fermer la modal d'édition d'application
+   */
+  closeEditApplicationModal(): void {
+    this.showEditApplicationModal = false;
+    this.editingApplication = null;
+    this.resetApplicationForm();
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Soumettre le formulaire d'édition d'application
+   */
+  submitEditApplicationForm(): void {
+    console.log('✅ Application à modifier:', this.applicationForm);
+    
+    // Validation du formulaire
+    if (!this.applicationForm.code || !this.applicationForm.libelle) {
+      this.showErrorAlert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    if (!this.editingApplication) {
+      this.showErrorAlert('Erreur: Aucune application sélectionnée');
+      return;
+    }
+
+    // Préparer les données pour l'API
+    const applicationData = {
+      ...this.applicationForm,
+      lastModifiedBy: this.getCurrentUsername()
+    };
+    
+    console.log('📤 Données à envoyer:', applicationData);
+    
+    // Appel à l'API pour modifier l'application
+    this.applicationService.updateApplication(this.editingApplication.id, applicationData).subscribe({
+      next: (response) => {
+        console.log('✅ Application modifiée avec succès:', response);
+        this.closeEditApplicationModal();
+        this.showSuccessAlert('Application modifiée avec succès !');
+        this.loadApplications();
+      },
+      error: (error) => {
+        console.error('❌ Erreur lors de la modification:', error);
+        let errorMessage = 'Erreur lors de la modification de l\'application';
+        if (error.status === 400) {
+          errorMessage = 'Données invalides';
+        } else if (error.status === 401) {
+          errorMessage = 'Non autorisé';
+        } else if (error.status === 404) {
+          errorMessage = 'Application non trouvée';
+        }
+        this.showErrorAlert(errorMessage);
+      }
+    });
   }
 
   // Gestion des utilisateurs
@@ -2256,8 +2314,24 @@ export class CompleteAdminDashboardComponent implements OnInit, OnDestroy, After
   }
 
   editApplication(app: Application): void {
+    console.log('✏️ Édition de l\'application:', app);
+    
+    // Pré-remplir le formulaire avec les données de l'application
+    this.applicationForm = {
+      code: app.code,
+      libelle: app.libelle,
+      description: app.description || '',
+      actif: app.actif,
+      createdBy: app.createdBy || '',
+      lastModifiedBy: this.getCurrentUsername()
+    };
+    
+    // Stocker l'application en cours d'édition
     this.editingApplication = app;
+    
+    // Ouvrir la modal en mode édition
     this.showEditApplicationModal = true;
+    this.cdr.detectChanges();
   }
 
   deleteApplication(app: Application): void {
