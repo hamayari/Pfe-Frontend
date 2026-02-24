@@ -1,31 +1,38 @@
+# Tests
+*.spec.ts
+*.spec.js
+*.test.ts
+*.test.js
+**/*.spec.ts
+**/*.spec.js
+**/*.test.ts
+**/*.test.js
+
+# Markdown (except README)
+*.md
+!README.md
+
 # Dependencies
-/node_modules/
-
-# Build outputs
-/dist/
-/build/
-
-# Angular cache and local history
-/.angular/
-/.history/
-
-# Env and sensitive files
-.env
-.env.*
-*.env
-*.pem
-*.key
-*.crt
-
-# IDE/editor
-.idea/
-.vscode/
-*.iml
-
-# Logs
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Keep src and assets (tracked)
-# No ignore rules necessary for src/ or src/assets/
+# Build
+dist/
+.angular/
+coverage/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
