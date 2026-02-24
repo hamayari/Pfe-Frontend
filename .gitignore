@@ -29,6 +29,18 @@ coverage/
 *.swp
 *.swo
 
+# Monitoring & Config files
+alert_rules.yml
+alertmanager.yml
+docker-compose.monitoring.yml
+prometheus.yml
+proxy.conf.json
+
+# Environment
+.env
+.env.local
+.env.*.local
+
 # OS
 .DS_Store
 Thumbs.db
