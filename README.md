@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🎨 Frontend - Gestion Pro
+# 🎨 Gestion Pro - Frontend
 
-### Interface Web Moderne pour la Gestion Commerciale & Facturation
+### Application Web Moderne pour la Gestion Commerciale & Facturation
 
 [![Angular](https://img.shields.io/badge/Angular-15.2.10-red.svg)](https://angular.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue.svg)](https://www.typescriptlang.org/)
@@ -19,7 +19,7 @@ Application web moderne et responsive construite avec Angular 15, offrant une ex
 
 ---
 
-## ✨ Fonctionnalités Clés
+## ✨ Fonctionnalités Principales
 
 ### 🔐 Authentification & Sécurité
 - 🔑 **Connexion JWT** - Authentification sécurisée avec tokens
@@ -30,14 +30,50 @@ Application web moderne et responsive construite avec Angular 15, offrant une ex
 - 🛡️ **Intercepteurs HTTP** - Injection automatique des tokens
 - 📊 **Audit Trail** - Historique complet des connexions
 
-### 📊 Dashboards Spécialisés
-- 👨‍💼 **Admin Dashboard** - Monitoring système, gestion utilisateurs, statistiques globales
-- 💼 **Commercial Dashboard** - Pipeline ventes, revenus, objectifs, graphiques interactifs
-- 🎯 **Décideur Dashboard** - KPIs stratégiques, heatmaps régionales, analytics avancés
-- 📋 **Chef de Projet Dashboard** - Suivi projets, tâches, équipes, calendrier
+### 📊 Dashboards Spécialisés par Rôle
+
+#### 👨‍💼 Dashboard Administrateur
+- 📈 Monitoring système en temps réel
+- 👥 Gestion complète des utilisateurs
+- 📊 Statistiques globales et KPIs
+- 🔧 Configuration des nomenclatures
+- 📝 Logs d'audit et traçabilité
+- ⚙️ Paramètres système
+
+#### 💼 Dashboard Commercial
+- 📊 Pipeline de ventes interactif
+- 💰 Suivi des revenus et objectifs
+- 📈 Graphiques de performance
+- 🎯 Indicateurs de conversion
+- 📅 Calendrier des échéances
+- 🏆 Classement des performances
+
+#### 🎯 Dashboard Décideur
+- 📊 KPIs stratégiques en temps réel
+- 🗺️ Heatmaps régionales interactives
+- 📈 Analytics avancés et tendances
+- 🤖 Chatbot IA pour analyses
+- 📉 Graphiques prédictifs
+- 💡 Insights et recommandations
+
+#### 📋 Dashboard Chef de Projet
+- 📋 Suivi des projets en cours
+- ✅ Gestion des tâches et priorités
+- 👥 Vue d'ensemble des équipes
+- 📅 Calendrier partagé
+- 📊 Métriques de productivité
+- 🔄 Workflow de validation
 
 ### 📝 Gestion des Conventions
-- ✅ **Interface CRUD Complète** - Création, édition, suppression avec validation
+
+#### Interface CRUD Complète
+- ✏️ **Création Intuitive** - Formulaires guidés avec validation
+- 📋 **Liste Paginée** - Tri, filtrage et recherche avancée
+- 👁️ **Vue Détaillée** - Toutes les informations en un coup d'œil
+- ✏️ **Édition Rapide** - Modification en ligne
+- 🗑️ **Suppression Sécurisée** - Confirmation avant suppression
+
+#### Fonctionnalités Avancées
 - 🔄 **Workflow Visuel** - Suivi du cycle de vie avec badges colorés
 - 📅 **Calendrier Intégré** - Vue chronologique des échéances
 - 🗺️ **Sélection Géographique** - Zones et gouvernorats avec autocomplete
@@ -47,83 +83,137 @@ Application web moderne et responsive construite avec Angular 15, offrant une ex
 - 📊 **Export de Données** - PDF, Excel, CSV
 
 ### 💳 Facturation Intelligente
-- 🤖 **Génération Automatique** - Création de factures depuis conventions
-- 📸 **Upload Preuves** - Drag & drop avec prévisualisation
-- ✅ **Validation OCR** - Extraction automatique des données de paiement
+
+#### Génération & Gestion
+- 🤖 **Génération Automatique** - Création depuis conventions
+- 📄 **Numérotation Auto** - Séquence personnalisable
 - 💵 **Paiements Partiels** - Suivi des montants et soldes
-- 📧 **Rappels Visuels** - Indicateurs de retard avec couleurs
 - 📊 **Dashboard Factures** - Vue d'ensemble des statuts
 - 📄 **Prévisualisation PDF** - Génération et téléchargement
-- 🔔 **Notifications Temps Réel** - Alertes sur nouveaux paiements
+
+#### Validation OCR
+- 📸 **Upload Preuves** - Drag & drop avec prévisualisation
+- 🔍 **Extraction OCR** - Lecture automatique des données
+- ✅ **Validation Auto** - Matching intelligent
+- 📧 **Rappels Visuels** - Indicateurs de retard avec couleurs
+- 🔔 **Notifications** - Alertes sur nouveaux paiements
 
 ### 🔔 Centre de Notifications
-- 📬 **Inbox Unifié** - Toutes les notifications en un seul endroit
-- 🔔 **Notifications Push** - Alertes navigateur en temps réel
-- 📱 **Badge de Compteur** - Nombre de notifications non lues
-- ⚙️ **Préférences Personnalisables** - Configuration par canal et type
+
+#### Gestion Unifiée
+- 📬 **Inbox Unifié** - Toutes les notifications centralisées
+- 🔔 **Push Navigateur** - Alertes en temps réel
+- 📱 **Badge Compteur** - Nombre de non lues
+- ⚙️ **Préférences** - Configuration par canal et type
 - 🔍 **Filtrage Avancé** - Par type, date, statut
-- ✅ **Actions Rapides** - Marquer comme lu, archiver, supprimer
-- 🎨 **Icônes Contextuelles** - Visuels adaptés au type de notification
-- 📊 **Historique Complet** - Archive consultable
+- ✅ **Actions Rapides** - Marquer, archiver, supprimer
+
+#### Types de Notifications
+- 📧 **Email** - Notifications importantes
+- 📱 **SMS** - Alertes urgentes
+- 🔔 **In-App** - Notifications intégrées
+- 💬 **Push Web** - Alertes navigateur
+- 🎨 **Icônes Contextuelles** - Visuels adaptés
+- 📊 **Historique** - Archive consultable
 
 ### 💬 Messagerie Temps Réel
+
+#### Interface Type Slack
 - 🔌 **WebSocket Live** - Communication instantanée
-- 💬 **Interface Type Slack** - Conversations, threads, mentions
+- 💬 **Conversations** - Discussions organisées
 - 📎 **Pièces Jointes** - Upload et partage de fichiers
 - 👍 **Réactions Emoji** - Interactions rapides
-- 📌 **Messages Épinglés** - Mise en avant des messages importants
+- 📌 **Messages Épinglés** - Mise en avant
 - ⌨️ **Indicateurs de Frappe** - "X est en train d'écrire..."
-- 🔍 **Recherche Messages** - Full-text search dans l'historique
+
+#### Fonctionnalités Avancées
+- 🔍 **Recherche Messages** - Full-text search
 - 👥 **Présence Utilisateurs** - Statuts en ligne/hors ligne
 - 🔊 **Notifications Sonores** - Alertes audio personnalisables
+- 📝 **Threads** - Réponses organisées
+- @ **Mentions** - Notifications ciblées
+- 📜 **Historique** - Conversations sauvegardées
 
 ### 📈 KPI & Alertes
-- 📊 **Widgets Interactifs** - Graphiques Chart.js et D3.js
-- 🚨 **Alertes Visuelles** - Notifications sur dépassement de seuils
-- 🔄 **Délégation d'Alertes** - Assignation et escalade
-- 📉 **Graphiques Temps Réel** - Mise à jour automatique
-- 💻 **Monitoring Système** - CPU, RAM, Disque en direct
-- 📧 **Configuration Alertes** - Seuils et destinataires personnalisables
-- 🎯 **Tableaux de Bord** - Métriques business et techniques
-- 📱 **Responsive Design** - Adapté mobile et tablette
+
+#### Widgets Interactifs
+- 📊 **Graphiques Chart.js** - Lignes, barres, camemberts
+- 📉 **Graphiques D3.js** - Visualisations personnalisées
+- 🚨 **Alertes Visuelles** - Dépassement de seuils
+- 🔄 **Délégation** - Assignation et escalade
+- 📉 **Temps Réel** - Mise à jour automatique
+- 💻 **Monitoring Système** - CPU, RAM, Disque
+
+#### Configuration
+- 🎯 **Seuils Personnalisables** - Définition des limites
+- 📧 **Destinataires** - Configuration des alertes
+- 📱 **Multi-Canal** - Email, SMS, Push
+- 📊 **Tableaux de Bord** - Métriques business et techniques
+- 🔔 **Historique Alertes** - Suivi des déclenchements
 
 ### 🤖 Chatbot IA Intégré
-- 🧠 **Assistant Intelligent** - Powered by Gemini AI
+
+#### Assistant Intelligent
+- 🧠 **Powered by Gemini AI** - Intelligence artificielle avancée
 - 💬 **Interface Conversationnelle** - Chat naturel et intuitif
 - 📊 **Génération de Rapports** - Demandes en langage naturel
 - 🔮 **Analyses Prédictives** - Insights et recommandations
 - 📈 **Visualisations Dynamiques** - Graphiques générés à la volée
+
+#### Capacités
 - 🎯 **Actions Contextuelles** - Boutons d'action rapide
 - 📝 **Historique Conversations** - Sauvegarde et reprise
+- 🔍 **Recherche Intelligente** - Compréhension du contexte
+- 💡 **Suggestions Proactives** - Recommandations automatiques
+- 🌐 **Multi-Langues** - Support FR/EN
 
 ### 🎨 Interface Utilisateur
+
+#### Design & UX
 - 🎨 **Material Design 3** - Composants modernes et élégants
 - 🌓 **Mode Sombre** - Thème clair/sombre avec switch
 - 📱 **Responsive** - Adapté mobile, tablette, desktop
 - ♿ **Accessible** - ARIA labels et navigation clavier
 - 🎭 **Animations Fluides** - Transitions et micro-interactions
+
+#### Personnalisation
 - 🎯 **UX Optimisée** - Feedback visuel et états de chargement
 - 🌈 **Thèmes Personnalisables** - Couleurs et styles configurables
 - 🔤 **Internationalisation** - Support multi-langues (FR/EN)
+- 🎨 **Palette de Couleurs** - Cohérence visuelle
+- 📐 **Layout Flexible** - Adaptation automatique
 
 ### 📊 Visualisations & Rapports
+
+#### Graphiques Interactifs
 - 📈 **Chart.js** - Graphiques interactifs (lignes, barres, camemberts)
 - 🗺️ **Heatmaps** - Visualisation géographique des données
 - 📊 **Tableaux Avancés** - Tri, filtrage, pagination, export
-- 📉 **Graphiques Temps Réel** - Mise à jour automatique via WebSocket
+- 📉 **Temps Réel** - Mise à jour automatique via WebSocket
 - 📄 **Export Multi-Format** - PDF, Excel, CSV, PNG
-- 🎯 **Indicateurs Visuels** - Jauges, compteurs, badges
-- 📱 **Graphiques Responsives** - Adaptation automatique à l'écran
+
+#### Indicateurs Visuels
+- 🎯 **Jauges** - Indicateurs de progression
+- 🔢 **Compteurs** - Métriques en temps réel
+- 🏷️ **Badges** - Statuts et notifications
+- 📊 **Sparklines** - Mini-graphiques
+- 📱 **Responsive** - Adaptation automatique à l'écran
 
 ### 🔧 Fonctionnalités Avancées
+
+#### Gestion Complète
 - 📅 **Calendrier Intégré** - Gestion d'événements et rappels
 - ✅ **Gestion de Tâches** - Todo lists avec priorités
 - 👥 **Gestion Utilisateurs** - CRUD complet avec permissions
 - 🏢 **Nomenclatures** - Configuration des structures et zones
 - 📝 **Audit Logs** - Historique des actions utilisateurs
+
+#### Optimisations
 - 🔍 **Recherche Globale** - Recherche cross-module
 - 💾 **Cache Intelligent** - Optimisation des performances
 - 🔄 **Auto-Save** - Sauvegarde automatique des formulaires
+- ⚡ **Lazy Loading** - Chargement à la demande
+- 🎯 **Virtual Scrolling** - Listes optimisées
 
 ---
 
@@ -178,29 +268,24 @@ Application web moderne et responsive construite avec Angular 15, offrant une ex
 🚫 XSS Prevention
 ```
 
-### DevOps & Qualité
-```
-🐳 Docker + Nginx
-🔄 Jenkins CI/CD
-✅ Jasmine + Karma
-🧪 E2E Testing (Cypress)
-📊 SonarQube
-📚 Compodoc (Docs)
-```
-
 ---
 
-## 📁 Architecture
+## 📁 Architecture du Projet
 
 ```
 src/
 ├── 📂 app/
-│   ├── 📂 auth/                    # Authentification (Login, 2FA, Reset)
-│   ├── 📂 dashboard/               # 4 Dashboards spécialisés
-│   │   ├── admin-dashboard/
-│   │   ├── commercial-dashboard/
-│   │   ├── decision-maker-dashboard/
-│   │   └── project-manager-dashboard/
+│   ├── 📂 auth/                    # Authentification
+│   │   ├── login/                  # Page de connexion
+│   │   ├── forgot-password/        # Réinitialisation
+│   │   └── reset-password/         # Nouveau mot de passe
+│   │
+│   ├── 📂 dashboard/               # Dashboards par rôle
+│   │   ├── admin-dashboard/        # Dashboard Admin
+│   │   ├── commercial-dashboard/   # Dashboard Commercial
+│   │   ├── decision-maker-dashboard/ # Dashboard Décideur
+│   │   └── project-manager-dashboard/ # Dashboard Chef de Projet
+│   │
 │   ├── 📂 features/                # Modules fonctionnels
 │   │   ├── convention-management/  # Gestion conventions
 │   │   ├── invoice-management/     # Gestion factures
@@ -213,34 +298,66 @@ src/
 │   │   ├── payment-proofs/         # Preuves de paiement
 │   │   ├── reports/                # Génération rapports
 │   │   └── predictive-analytics/   # Analytics prédictifs
-│   ├── 📂 services/                # 60+ services
-│   │   ├── auth.service.ts
-│   │   ├── convention.service.ts
-│   │   ├── invoice.service.ts
-│   │   ├── messaging.service.ts
-│   │   ├── websocket.service.ts
-│   │   ├── notification.service.ts
-│   │   ├── chatbot.service.ts
-│   │   ├── kpi-alert.service.ts
-│   │   └── ...
-│   ├── 📂 guards/                  # Route guards par rôle
+│   │
+│   ├── 📂 services/                # Services (60+)
+│   │   ├── auth.service.ts         # Authentification
+│   │   ├── convention.service.ts   # Conventions
+│   │   ├── invoice.service.ts      # Factures
+│   │   ├── messaging.service.ts    # Messagerie
+│   │   ├── websocket.service.ts    # WebSocket
+│   │   ├── notification.service.ts # Notifications
+│   │   ├── chatbot.service.ts      # Chatbot
+│   │   ├── kpi-alert.service.ts    # KPI & Alertes
+│   │   └── ...                     # Autres services
+│   │
+│   ├── 📂 guards/                  # Route guards
+│   │   ├── auth.guard.ts           # Protection authentification
+│   │   ├── admin.guard.ts          # Protection admin
+│   │   ├── commercial.guard.ts     # Protection commercial
+│   │   ├── decision-maker.guard.ts # Protection décideur
+│   │   └── project-manager.guard.ts# Protection chef de projet
+│   │
 │   ├── 📂 models/                  # Interfaces TypeScript
+│   │   ├── user.model.ts           # Modèle utilisateur
+│   │   ├── convention.model.ts     # Modèle convention
+│   │   ├── invoice.model.ts        # Modèle facture
+│   │   ├── message.model.ts        # Modèle message
+│   │   └── ...                     # Autres modèles
+│   │
 │   ├── 📂 shared/                  # Composants réutilisables
-│   │   ├── components/
-│   │   ├── pipes/
-│   │   └── modules/
-│   ├── 📂 core/                    # Services core & interceptors
-│   │   ├── interceptors/
-│   │   └── services/
-│   └── 📂 layouts/                 # Layouts (Admin, Dashboard, Unified)
-├── 📂 assets/                      # Images, icons, i18n
-├── 📂 environments/                # Configuration par environnement
-└── 📂 styles/                      # Styles globaux et thèmes
+│   │   ├── components/             # Composants partagés
+│   │   ├── pipes/                  # Pipes personnalisés
+│   │   └── modules/                # Modules partagés
+│   │
+│   ├── 📂 core/                    # Services core
+│   │   ├── interceptors/           # HTTP interceptors
+│   │   │   ├── jwt.interceptor.ts  # Injection JWT
+│   │   │   └── error.interceptor.ts# Gestion erreurs
+│   │   └── services/               # Services core
+│   │
+│   └── 📂 layouts/                 # Layouts
+│       ├── admin-layout/           # Layout admin
+│       ├── dashboard/              # Layout dashboard
+│       └── unified-layout/         # Layout unifié
+│
+├── 📂 assets/                      # Ressources statiques
+│   ├── images/                     # Images
+│   ├── icons/                      # Icônes
+│   └── i18n/                       # Traductions
+│
+├── 📂 environments/                # Configuration
+│   ├── environment.ts              # Dev
+│   └── environment.prod.ts         # Production
+│
+└── 📂 styles/                      # Styles globaux
+    ├── _variables.scss             # Variables
+    ├── _themes.scss                # Thèmes
+    └── styles.scss                 # Styles principaux
 ```
 
 ---
 
-## 🚀 Démarrage Rapide
+## 🚀 Installation & Démarrage
 
 ### Prérequis
 - Node.js 18+ et npm 9+
@@ -273,11 +390,13 @@ npm run build
 npm run build:stats
 ```
 
+Les fichiers de production seront dans le dossier `dist/`
+
 ---
 
 ## ⚙️ Configuration
 
-### environment.ts
+### Fichier environment.ts
 
 ```typescript
 export const environment = {
@@ -285,11 +404,11 @@ export const environment = {
   apiUrl: 'http://localhost:8080/api',
   wsUrl: 'ws://localhost:8080/ws',
   
-  // JWT
+  // JWT Configuration
   tokenKey: 'auth_token',
   refreshTokenKey: 'refresh_token',
   
-  // Features
+  // Features Flags
   enableChatbot: true,
   enableNotifications: true,
   enableWebSocket: true,
@@ -302,6 +421,10 @@ export const environment = {
   metricsInterval: 30000
 };
 ```
+
+### Configuration Backend
+
+Assurez-vous que le backend est configuré et accessible sur `http://localhost:8080`
 
 ---
 
@@ -316,19 +439,10 @@ npm run start:prod           # Mode production local
 npm run build                # Build production
 npm run build:stats          # Build avec analyse bundle
 
-# Tests
-npm test                     # Tests unitaires (Karma)
-npm run test:coverage        # Tests avec couverture
-npm run e2e                  # Tests E2E (Cypress)
-
 # Qualité
 npm run lint                 # ESLint
 npm run lint:fix             # Fix automatique
 npm run format               # Prettier
-
-# Documentation
-npm run compodoc             # Générer documentation
-npm run compodoc:serve       # Servir documentation
 ```
 
 ---
@@ -356,7 +470,7 @@ $warn: mat.define-palette(mat.$red-palette);
 
 ---
 
-## 👥 Rôles & Accès
+## 👥 Rôles & Permissions
 
 | Rôle | Route | Fonctionnalités |
 |------|-------|-----------------|
@@ -401,38 +515,6 @@ connect() {
 
 ---
 
-## 🧪 Tests
-
-### Tests Unitaires
-
-```bash
-# Lancer tous les tests
-npm test
-
-# Tests avec couverture
-npm run test:coverage
-
-# Tests en mode watch
-npm run test:watch
-```
-
-### Tests E2E
-
-```bash
-# Lancer Cypress
-npm run e2e
-
-# Cypress en mode interactif
-npm run e2e:open
-```
-
-### Couverture de Code
-- Tests unitaires: 85%+ de couverture
-- Tests E2E: Scénarios critiques couverts
-- Rapport: `coverage/index.html`
-
----
-
 ## 📊 Performance
 
 ### Optimisations Implémentées
@@ -446,7 +528,7 @@ npm run e2e:open
 - ✅ Tree shaking
 - ✅ AOT Compilation
 
-### Métriques
+### Métriques Cibles
 - First Contentful Paint: < 1.5s
 - Time to Interactive: < 3.5s
 - Lighthouse Score: 90+
@@ -556,14 +638,6 @@ Les contributions sont les bienvenues! Veuillez suivre ces étapes:
 
 ---
 
-## 📞 Support
-
-- 📧 Email: support@gestionpro.com
-- 📚 Documentation: [docs.gestionpro.com](https://docs.gestionpro.com)
-- 🐛 Issues: [GitHub Issues](../../issues)
-
----
-
 ## 📄 License
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
@@ -574,6 +648,6 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ### ⭐ Si ce projet vous aide, n'hésitez pas à lui donner une étoile!
 
-**Développé avec ❤️ par l'équipe Gestion Pro**
+**Développé avec ❤️ pour une gestion commerciale moderne et efficace**
 
 </div>
