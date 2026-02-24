@@ -23,6 +23,14 @@ Jenkinsfile*
 *.ps1
 test-pipeline.*
 
+# Git Hooks & Local Config
+.husky/
+.editorconfig
+.linstagedrc.json
+
+# Monitoring Dashboards
+grafana-dashboards/
+
 # Linting & Formatting
 .eslintrc.json
 .prettierrc
