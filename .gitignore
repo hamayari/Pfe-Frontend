@@ -7,6 +7,25 @@
 **/*.spec.js
 **/*.test.ts
 **/*.test.js
+tsconfig.spec.json
+
+# Test Coverage & Reports
+coverage/
+*.js
+!karma.conf.js
+
+# Database scripts
+database/
+
+# CI/CD & Scripts
+Jenkinsfile*
+*.bat
+*.ps1
+test-pipeline.*
+
+# Linting & Formatting
+.eslintrc.json
+.prettierrc
 
 # Markdown (except README)
 *.md
