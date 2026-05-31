@@ -1,451 +1,240 @@
-📋 Overview
-A modern, responsive web application built with Angular 15, offering a smooth and intuitive user experience for complete commercial management. Material Design interface with 50+ reusable components and 4 role-based specialized dashboards.
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4F46E5,100:7C3AED&height=200&section=header&text=Gestion%20Pro%20—%20Frontend&fontSize=42&fontColor=ffffff&fontAlignY=38&desc=Enterprise%20Commercial%20Management%20Platform&descAlignY=58&descSize=18" width="100%"/>
 
-✨ Main Features
-🔐 Authentication & Security
 
-🔑 JWT Login - Secure token-based authentication
-📱 Integrated 2FA - QR code scan and TOTP validation
-🔒 Angular Guards - Role-based route protection
-👤 Session Management - Auto token refresh and automatic logout
-🔐 Forgot Password - Email-based password reset
-🛡️ HTTP Interceptors - Automatic token injection
-📊 Audit Trail - Complete login history
+Full-stack enterprise platform built with Angular 15 · Spring Boot 3 · MongoDB · Gemini AI
+Developed as a Final Year Engineering Project at the Centre National d'Informatique (CNI), Tunisia
 
-📊 Role-Based Dashboards
+<br/>
+🚀 Live Demo · 📖 Backend Repo · 📬 Contact
+</div>
+
+<div align="center">
+📌 Table of Contents
+Overview · Features · Tech Stack · Architecture · Installation · Roles · Performance · Security · Deployment
+</div>
+
+🌐 Overview
+<table>
+<tr>
+<td width="60%">
+Gestion Pro is a production-grade, full-stack commercial management platform. It handles the full lifecycle of conventions and invoicing, provides role-based analytical dashboards, real-time team messaging, and an AI-powered decision-support chatbot — all in a single, unified interface.
+This project was built from scratch during a 6-month internship at a national public institution, applying real-world Agile Scrum methodology with full CI/CD pipelines.
+</td>
+<td width="40%" align="center">
+MetricValue📦 REST Endpoints70+🗄️ MongoDB Entities44⚙️ Backend Services95+🧩 Angular Components50+🔐 User Roles6🧪 Unit Tests95+
+</td>
+</tr>
+</table>
+
+✨ Features
+<details>
+<summary><b>🔐 Authentication & Security</b></summary>
+<br/>
+FeatureDescriptionJWT LoginSecure token-based authentication with auto-refresh2FA (TOTP)QR code scan + time-based one-time password validationAngular GuardsRole-based route protection for all pagesSession ManagementAutomatic token refresh and logout on expiryPassword RecoveryEmail-based secure reset flowHTTP InterceptorsAutomatic token injection on every requestAudit TrailComplete login and action history per user
+</details>
+<details>
+<summary><b>📊 Role-Based Dashboards (4 specialized views)</b></summary>
+<br/>
 👨‍💼 Admin Dashboard
 
-📈 Real-time system monitoring
-👥 Complete user management
-📊 Global statistics & KPIs
-🔧 Nomenclature configuration
-📝 Audit logs & traceability
-⚙️ System settings
+Real-time system monitoring (CPU, RAM, Disk)
+Full user CRUD with role assignment
+Global KPIs and statistics
+Nomenclature configuration
+Full audit logs and traceability
 
 💼 Commercial Dashboard
 
-📊 Interactive sales pipeline
-💰 Revenue & target tracking
-📈 Performance charts
-🎯 Conversion indicators
-📅 Payment deadline calendar
-🏆 Performance leaderboard
+Interactive sales pipeline
+Revenue and target tracking
+Performance charts and conversion indicators
+Payment deadline calendar
 
 🎯 Decision Maker Dashboard
 
-📊 Real-time strategic KPIs
-🗺️ Interactive regional heatmaps
-📈 Advanced analytics & trends
-🤖 AI Chatbot for data analysis
-📉 Predictive charts
-💡 Insights & recommendations
+Real-time strategic KPIs
+Interactive regional heatmaps
+Predictive analytics with trend detection
+AI Chatbot powered by Gemini AI
 
 📋 Project Manager Dashboard
 
-📋 Active project tracking
-✅ Task & priority management
-👥 Team overview
-📅 Shared calendar
-📊 Productivity metrics
-🔄 Validation workflow
+Active project and task tracking
+Team overview and shared calendar
+Productivity metrics and validation workflow
 
-📝 Convention Management
-Full CRUD Interface
+</details>
+<details>
+<summary><b>📝 Convention Management</b></summary>
+<br/>
 
-✏️ Intuitive Creation - Guided forms with validation
-📋 Paginated List - Sorting, filtering & advanced search
-👁️ Detailed View - All information at a glance
-✏️ Quick Edit - Inline modification
-🗑️ Safe Deletion - Confirmation before deleting
+Full CRUD with guided forms and validation
+Advanced search with multi-filter and dynamic sorting
+Geographic zone/region selection with autocomplete
+Visual lifecycle workflow with colored status badges
+Modification timeline with full versioning history
+Data export to PDF, Excel, CSV
 
-Advanced Features
+</details>
+<details>
+<summary><b>💳 Smart Billing & OCR Validation</b></summary>
+<br/>
 
-🔄 Visual Workflow - Lifecycle tracking with colored badges
-📅 Integrated Calendar - Chronological deadline view
-🗺️ Geographic Selection - Zones & regions with autocomplete
-💰 Payment Configuration - Customizable terms and conditions
-📜 Detailed History - Modification timeline with versioning
-🔍 Advanced Search - Multi-filter & dynamic sorting
-📊 Data Export - PDF, Excel, CSV
+Automatic invoice generation directly from conventions
+Customizable auto-numbering sequences
+Partial payment tracking with balance management
+Tesseract OCR — automatic data extraction from payment proofs
+Smart auto-matching of uploaded proofs to invoices
+Color-coded delay indicators and payment alerts
 
-💳 Smart Billing
-Generation & Management
+</details>
+<details>
+<summary><b>💬 Real-Time Messaging (Slack-style)</b></summary>
+<br/>
 
-🤖 Automatic Generation - Invoice creation from conventions
-📄 Auto Numbering - Customizable sequences
-💵 Partial Payments - Amount & balance tracking
-📊 Invoice Dashboard - Status overview
-📄 PDF Preview - Generation & download
+Live bidirectional WebSocket communication (STOMP protocol)
+File attachments, emoji reactions, pinned messages
+Typing indicators ("X is typing...")
+Full-text message search
+User online/offline presence
+Threaded replies and @mentions
 
-OCR Validation
+</details>
+<details>
+<summary><b>🤖 Integrated AI Chatbot (Gemini AI)</b></summary>
+<br/>
 
-📸 Proof Upload - Drag & drop with preview
-🔍 OCR Extraction - Automatic data reading
-✅ Auto Validation - Smart matching
-📧 Visual Reminders - Color-coded delay indicators
-🔔 Notifications - New payment alerts
+Natural language report generation
+Predictive analytics and business recommendations
+Dynamic on-the-fly chart generation
+Context-aware intelligent search
+Conversation history — save and resume sessions
+FR/EN multilingual support
 
-🔔 Notification Center
-Unified Management
+</details>
+<details>
+<summary><b>🔔 Notification Center & KPI Alerts</b></summary>
+<br/>
 
-📬 Unified Inbox - All notifications centralized
-🔔 Browser Push - Real-time alerts
-📱 Unread Badge - Unread count indicator
-⚙️ Preferences - Per-channel and per-type settings
-🔍 Advanced Filtering - By type, date, status
-✅ Quick Actions - Mark as read, archive, delete
+Unified inbox for all notification types
+Multi-channel delivery: Email · SMS (Twilio) · In-App · Web Push
+Configurable thresholds with automatic alert triggering
+Alert delegation and escalation workflows
+Real-time browser push notifications
 
-Notification Types
-
-📧 Email - Important notifications
-📱 SMS - Urgent alerts
-🔔 In-App - Integrated notifications
-💬 Web Push - Browser alerts
-🎨 Contextual Icons - Adapted visuals
-📊 History - Consultable archive
-
-💬 Real-Time Messaging
-Slack-style Interface
-
-🔌 Live WebSocket - Instant communication
-💬 Conversations - Organized discussions
-📎 Attachments - File upload & sharing
-👍 Emoji Reactions - Quick interactions
-📌 Pinned Messages - Highlighted messages
-⌨️ Typing Indicators - "X is typing..."
-
-Advanced Features
-
-🔍 Message Search - Full-text search
-👥 User Presence - Online/offline status
-🔊 Sound Notifications - Customizable audio alerts
-📝 Threads - Organized replies
-@ Mentions - Targeted notifications
-📜 History - Saved conversations
-
-📈 KPI & Alerts
-Interactive Widgets
-
-📊 Chart.js Graphs - Lines, bars, pie charts
-📉 D3.js Graphs - Custom visualizations
-🚨 Visual Alerts - Threshold breach notifications
-🔄 Delegation - Assignment & escalation
-📉 Real-Time - Automatic updates
-💻 System Monitoring - CPU, RAM, Disk
-
-Configuration
-
-🎯 Custom Thresholds - Define alert limits
-📧 Recipients - Alert configuration
-📱 Multi-Channel - Email, SMS, Push
-📊 Dashboards - Business & technical metrics
-🔔 Alert History - Trigger tracking
-
-🤖 Integrated AI Chatbot
-Intelligent Assistant
-
-🧠 Powered by Gemini AI - Advanced artificial intelligence
-💬 Conversational Interface - Natural, intuitive chat
-📊 Report Generation - Natural language requests
-🔮 Predictive Analytics - Insights & recommendations
-📈 Dynamic Visualizations - On-the-fly chart generation
-
-Capabilities
-
-🎯 Contextual Actions - Quick action buttons
-📝 Conversation History - Save & resume sessions
-🔍 Smart Search - Context-aware understanding
-💡 Proactive Suggestions - Automatic recommendations
-🌐 Multilingual - FR/EN support
-
-🎨 User Interface
-Design & UX
-
-🎨 Material Design 3 - Modern and elegant components
-🌓 Dark Mode - Light/dark theme toggle
-📱 Responsive - Mobile, tablet, desktop adapted
-♿ Accessible - ARIA labels and keyboard navigation
-🎭 Smooth Animations - Transitions and micro-interactions
-
-Customization
-
-🎯 Optimized UX - Visual feedback and loading states
-🌈 Customizable Themes - Configurable colors and styles
-🔤 Internationalization - Multilingual support (FR/EN)
-🎨 Color Palette - Visual consistency
-📐 Flexible Layout - Automatic adaptation
-
-📊 Visualizations & Reports
-Interactive Charts
-
-📈 Chart.js - Interactive graphs (lines, bars, pie charts)
-🗺️ Heatmaps - Geographic data visualization
-📊 Advanced Tables - Sorting, filtering, pagination, export
-📉 Real-Time - Automatic updates via WebSocket
-📄 Multi-Format Export - PDF, Excel, CSV, PNG
-
-Visual Indicators
-
-🎯 Gauges - Progress indicators
-🔢 Counters - Real-time metrics
-🏷️ Badges - Statuses and notifications
-📊 Sparklines - Mini charts
-📱 Responsive - Automatic screen adaptation
-
-🔧 Advanced Features
-Complete Management
-
-📅 Integrated Calendar - Event management & reminders
-✅ Task Management - Priority todo lists
-👥 User Management - Full CRUD with permissions
-🏢 Nomenclatures - Structure & zone configuration
-📝 Audit Logs - User action history
-
-Optimizations
-
-🔍 Global Search - Cross-module search
-💾 Smart Cache - Performance optimization
-🔄 Auto-Save - Automatic form saving
-⚡ Lazy Loading - On-demand loading
-🎯 Virtual Scrolling - Optimized lists
-
+</details>
 
 🛠️ Tech Stack
-Core Framework
-🅰️ Angular 15.2.10
-📘 TypeScript 4.9.4
-🎨 Angular Material 15.2.9
-🔧 RxJS 7.8.0
-UI & Styling
-🎨 Material Design 3
-💅 SCSS/SASS
-🎭 Angular Animations
-📱 Flex Layout
-🌈 Custom Theming
-Charts & Visualization
-📊 Chart.js 4.4.0
-📈 ng2-charts 4.1.1
-🗺️ Leaflet (Heatmaps)
-🎯 D3.js (Custom viz)
-Communication
-🔌 WebSocket (STOMP)
-🌐 HttpClient
-📡 RxJS Observables
-🔄 Real-time Updates
-Forms & Validation
-📝 Reactive Forms
-✅ Custom Validators
-🎯 Angular Material Forms
-🔍 Input Masking
-Security
-🔐 JWT Interceptors
-🛡️ Route Guards
-🔒 CSRF Protection
-🚫 XSS Prevention
+<div align="center">
+Frontend
+LayerTechnologyVersionFrameworkAngular15.2.10LanguageTypeScript4.9.4UI LibraryAngular Material15.2.9Reactive ProgrammingRxJS7.8.0ChartingChart.js + ng2-charts4.4.0 / 4.1.1Maps & HeatmapsLeafletLatestCustom VizD3.jsLatestReal-TimeWebSocket (STOMP)—StylingSCSS / Material Design 3—PWAService Workers—
+Backend (see Pfe-Backend)
+LayerTechnologyVersionFrameworkSpring Boot3.2.0LanguageJava17DatabaseMongoDB7.0AIGemini AI API—OCRTesseract5.4.0EmailBrevo (SMTP)—SMSTwilio SDK8.31.1PaymentsStripe Java24.6.0CI/CDJenkins + Docker—API DocsSwagger / OpenAPI 3.0—MonitoringPrometheus + Grafana—
+</div>
 
-📁 Project Architecture
+📁 Architecture
 src/
-├── 📂 app/
-│   ├── 📂 auth/                    # Authentication
-│   │   ├── login/                  # Login page
-│   │   ├── forgot-password/        # Password reset
-│   │   └── reset-password/         # New password
-│   │
-│   ├── 📂 dashboard/               # Role-based dashboards
-│   │   ├── admin-dashboard/        # Admin Dashboard
-│   │   ├── commercial-dashboard/   # Commercial Dashboard
-│   │   ├── decision-maker-dashboard/ # Decision Maker Dashboard
-│   │   └── project-manager-dashboard/ # Project Manager Dashboard
-│   │
-│   ├── 📂 features/                # Feature modules
-│   │   ├── convention-management/  # Convention management
-│   │   ├── invoice-management/     # Invoice management
-│   │   ├── messaging-page/         # Real-time messaging
-│   │   ├── chatbot-decideur/       # AI Chatbot
-│   │   ├── monitoring-system/      # Monitoring & KPIs
-│   │   ├── user-management/        # User management
-│   │   ├── nomenclature-management/# Nomenclatures
-│   │   ├── notification-settings/  # Notification preferences
-│   │   ├── payment-proofs/         # Payment proofs
-│   │   ├── reports/                # Report generation
-│   │   └── predictive-analytics/   # Predictive analytics
-│   │
-│   ├── 📂 services/                # Services (60+)
-│   │   ├── auth.service.ts         # Authentication
-│   │   ├── convention.service.ts   # Conventions
-│   │   ├── invoice.service.ts      # Invoices
-│   │   ├── messaging.service.ts    # Messaging
-│   │   ├── websocket.service.ts    # WebSocket
-│   │   ├── notification.service.ts # Notifications
-│   │   ├── chatbot.service.ts      # Chatbot
-│   │   ├── kpi-alert.service.ts    # KPI & Alerts
-│   │   └── ...                     # Other services
-│   │
-│   ├── 📂 guards/                  # Route guards
-│   │   ├── auth.guard.ts           # Authentication guard
-│   │   ├── admin.guard.ts          # Admin guard
-│   │   ├── commercial.guard.ts     # Commercial guard
-│   │   ├── decision-maker.guard.ts # Decision maker guard
-│   │   └── project-manager.guard.ts# Project manager guard
-│   │
-│   ├── 📂 models/                  # TypeScript interfaces
-│   │   ├── user.model.ts           # User model
-│   │   ├── convention.model.ts     # Convention model
-│   │   ├── invoice.model.ts        # Invoice model
-│   │   ├── message.model.ts        # Message model
-│   │   └── ...                     # Other models
-│   │
-│   ├── 📂 shared/                  # Reusable components
-│   │   ├── components/             # Shared components
-│   │   ├── pipes/                  # Custom pipes
-│   │   └── modules/                # Shared modules
-│   │
-│   ├── 📂 core/                    # Core services
-│   │   ├── interceptors/           # HTTP interceptors
-│   │   │   ├── jwt.interceptor.ts  # JWT injection
-│   │   │   └── error.interceptor.ts# Error handling
-│   │   └── services/               # Core services
-│   │
-│   └── 📂 layouts/                 # Layouts
-│       ├── admin-layout/           # Admin layout
-│       ├── dashboard/              # Dashboard layout
-│       └── unified-layout/         # Unified layout
-│
-├── 📂 assets/                      # Static resources
-│   ├── images/                     # Images
-│   ├── icons/                      # Icons
-│   └── i18n/                       # Translation files
-│
-├── 📂 environments/                # Configuration
-│   ├── environment.ts              # Dev
-│   └── environment.prod.ts         # Production
-│
-└── 📂 styles/                      # Global styles
-    ├── _variables.scss             # Variables
-    ├── _themes.scss                # Themes
-    └── styles.scss                 # Main styles
+├── app/
+│   ├── auth/                        # Authentication (login, 2FA, reset)
+│   ├── dashboard/                   # 4 role-based dashboards
+│   │   ├── admin-dashboard/
+│   │   ├── commercial-dashboard/
+│   │   ├── decision-maker-dashboard/
+│   │   └── project-manager-dashboard/
+│   ├── features/                    # Feature modules
+│   │   ├── convention-management/
+│   │   ├── invoice-management/
+│   │   ├── messaging-page/          # Real-time chat (WebSocket)
+│   │   ├── chatbot-decideur/        # Gemini AI chatbot
+│   │   ├── monitoring-system/       # KPI monitoring
+│   │   ├── payment-proofs/          # OCR validation
+│   │   ├── reports/
+│   │   └── predictive-analytics/
+│   ├── services/                    # 60+ Angular services
+│   ├── guards/                      # Role-based route guards
+│   ├── models/                      # TypeScript interfaces
+│   ├── shared/                      # Reusable components & pipes
+│   └── core/                        # JWT interceptors, error handling
+├── assets/
+│   ├── i18n/                        # Translation files (FR / EN)
+│   └── icons/
+└── environments/                    # Dev / Production config
 
-🚀 Installation & Setup
+🚀 Installation
 Prerequisites
 
 Node.js 18+ and npm 9+
 Angular CLI 15.2.10
 Git
 
-Installation
-bash# Clone the repository
+Quick Start
+bash# 1. Clone the repository
 git clone https://github.com/hamayari/Pfe-Frontend.git
 cd Pfe-Frontend
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Start development server
+# 3. Start the development server
 npm start
-The app will be available at http://localhost:4200
-Production Build
-bash# Optimized build
-npm run build
 
-# Build with bundle analysis
-npm run build:stats
-Output files will be in the dist/ folder.
+The app runs at http://localhost:4200
+Make sure the backend is running at http://localhost:8080
 
-⚙️ Configuration
-environment.ts
-typescriptexport const environment = {
+Environment Configuration
+typescript// src/environments/environment.ts
+export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080/api',
   wsUrl: 'ws://localhost:8080/ws',
-
-  // JWT Configuration
   tokenKey: 'auth_token',
   refreshTokenKey: 'refresh_token',
-
-  // Feature Flags
   enableChatbot: true,
   enableNotifications: true,
   enableWebSocket: true,
-
-  // Gemini AI
-  geminiApiKey: 'YOUR_GEMINI_API_KEY',
-
-  // Monitoring
+  geminiApiKey: 'YOUR_GEMINI_API_KEY',   // ← Replace with your key
   enableMonitoring: true,
   metricsInterval: 30000
 };
-Backend Configuration
-Make sure the backend is configured and running at http://localhost:8080
-
-📚 Available Scripts
-bash# Development
-npm start                    # Dev server on port 4200
-npm run start:prod           # Local production mode
-
-# Build
-npm run build                # Production build
-npm run build:stats          # Build with bundle analysis
-
-# Quality
-npm run lint                 # ESLint
-npm run lint:fix             # Auto-fix lint issues
-npm run format               # Prettier formatting
-
-🎨 Themes & Customization
-Toggle Theme
-typescript// In app.component.ts
-toggleTheme() {
-  this.isDarkMode = !this.isDarkMode;
-  document.body.classList.toggle('dark-theme');
-}
-Custom Colors
-scss// In styles/themes.scss
-$primary: mat.define-palette(mat.$indigo-palette);
-$accent: mat.define-palette(mat.$pink-palette);
-$warn: mat.define-palette(mat.$red-palette);
+Available Scripts
+bashnpm start              # Development server (port 4200)
+npm run build          # Production build → dist/
+npm run build:stats    # Production build + bundle analysis
+npm run lint           # ESLint check
+npm run lint:fix       # Auto-fix lint issues
+npm run format         # Prettier formatting
 
 👥 Roles & Permissions
-RoleRouteCapabilities🔴 SUPER_ADMIN/adminFull access, system monitoring🟠 ADMIN/adminUser management, nomenclatures🟢 COMMERCIAL/commercialConventions, invoices, clients🔵 DECISION_MAKER/decideurAnalytics, KPIs, AI chatbot🟣 PROJECT_MANAGER/project-managerProjects, tasks, teams⚪ USER/homeRead-only view
-
-🔌 Backend Integration
-API Configuration
-typescript// In core/services/api.service.ts
-private readonly API_URL = environment.apiUrl;
-
-// Main endpoints
-AUTH_ENDPOINT = `${this.API_URL}/auth`;
-CONVENTIONS_ENDPOINT = `${this.API_URL}/conventions`;
-INVOICES_ENDPOINT = `${this.API_URL}/invoices`;
-NOTIFICATIONS_ENDPOINT = `${this.API_URL}/notifications`;
-MESSAGES_ENDPOINT = `${this.API_URL}/messages`;
-WebSocket Connection
-typescript// In services/websocket.service.ts
-connect() {
-  const socket = new SockJS(`${environment.wsUrl}/chat`);
-  this.stompClient = Stomp.over(socket);
-
-  this.stompClient.connect({}, () => {
-    this.subscribeToTopics();
-  });
-}
+<div align="center">
+RoleRouteAccess Level🔴 SUPER_ADMIN/adminFull system access + monitoring🟠 ADMIN/adminUser management + nomenclatures🟢 COMMERCIAL/commercialConventions + invoices + clients🔵 DECISION_MAKER/decideurAnalytics + KPIs + AI chatbot🟣 PROJECT_MANAGER/project-managerProjects + tasks + teams⚪ USER/homeRead-only view
+</div>
 
 📊 Performance
-Implemented Optimizations
+<div align="center">
+MetricTargetFirst Contentful Paint< 1.5sTime to Interactive< 3.5sLighthouse Score90+
+</div>
+Optimizations implemented:
 
-✅ Lazy loading of all modules
-✅ OnPush Change Detection
-✅ TrackBy in all ngFor loops
+✅ Lazy loading of all feature modules
+✅ OnPush Change Detection strategy
+✅ TrackBy in all *ngFor loops
 ✅ Virtual Scrolling for large lists
 ✅ Image lazy loading
-✅ Service Workers (PWA ready)
-✅ Bundle optimization & Tree shaking
-✅ AOT Compilation
+✅ Service Workers (PWA-ready)
+✅ Bundle optimization, Tree shaking, AOT Compilation
 
-Target Metrics
 
-First Contentful Paint: < 1.5s
-Time to Interactive: < 3.5s
-Lighthouse Score: 90+
+🔒 Security
+
+✅ JWT with auto-refresh and expiry management
+✅ Route guards on every protected page
+✅ Input sanitization via DomSanitizer
+✅ CSRF token protection
+✅ Content Security Policy headers
+✅ XSS Prevention
+✅ Secure HTTP headers
+✅ Client-side input validation on all forms
 
 
 🐳 Deployment
@@ -469,71 +258,31 @@ COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
-🔒 Security
-Implemented Best Practices
-
-✅ JWT with auto-refresh
-✅ Route guards on all protected pages
-✅ Input sanitization (DomSanitizer)
-✅ CSRF tokens
-✅ Content Security Policy
-✅ XSS Prevention
-✅ Secure HTTP headers
-✅ Client-side input validation
-
-
 ♿ Accessibility
-Respected Standards
 
 ✅ ARIA labels on all interactive components
-✅ Full keyboard navigation
-✅ WCAG AA color contrast
-✅ Visible focus indicators
+✅ Full keyboard navigation support
+✅ WCAG AA color contrast compliance
 ✅ Screen reader friendly
-✅ Semantic HTML
-✅ Alt text on all images
-
-
-🌍 Internationalization
-Supported Languages
-
-🇫🇷 French (default)
-🇬🇧 English
-
-Adding a Language
-typescript// In assets/i18n/
-// Create fr.json and en.json
-{
-  "COMMON": {
-    "SAVE": "Save",
-    "CANCEL": "Cancel"
-  }
-}
-
-📱 Progressive Web App
-PWA Features
-
-✅ Service Worker
-✅ Manifest.json
-✅ Offline mode
-✅ Install prompt
-✅ Push notifications
-✅ App icons
+✅ Semantic HTML throughout
 
 
 🤝 Contributing
+bash# 1. Fork the project
+# 2. Create your feature branch
+git checkout -b feature/YourFeature
 
-Fork the project
-Create your feature branch (git checkout -b feature/AmazingFeature)
-Commit your changes (git commit -m 'Add AmazingFeature')
-Push to the branch (git push origin feature/AmazingFeature)
-Open a Pull Request
+# 3. Commit your changes
+git commit -m "feat: add YourFeature"
 
+# 4. Push and open a Pull Request
+git push origin feature/YourFeature
 
 📄 License
-This project is licensed under the MIT License. See the LICENSE file for details.
+Distributed under the MIT License. See LICENSE for details.
 
 <div align="center">
-⭐ If this project helped you, please give it a star!
-Developed with ❤️ for modern and efficient commercial management
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4F46E5,100:7C3AED&height=100&section=footer" width="100%"/>
+Made with ❤️ by Mohamed Amine Ayari
+⭐ If this project helped you, please give it a star — it means a lot!
 </div>
