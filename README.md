@@ -1,4 +1,4 @@
-div align="center">
+<div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:8B5CF6,100:A855F7&height=180&section=header&text=Gestion%20Pro%20%E2%80%94%20Frontend&fontSize=38&fontColor=ffffff&fontAlignY=40&desc=Enterprise%20Commercial%20Management%20Platform&descSize=16&descAlignY=62&descColor=e0d7ff" width="100%" />
 </div>
 <br/>
@@ -9,9 +9,9 @@ div align="center">
 <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white"/></a> 
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge"/></a>
 <br/><br/>
-  <p><b>Full-stack enterprise platform</b> — Angular 15 · Spring Boot 3 · MongoDB · Gemini AI</p>
-  <p>Final Year Engineering Project @ <b>Centre National d'Informatique (CNI), Tunisia</b></p>
-  <br/>
+<p><b>Full-stack enterprise platform</b> — Angular 15 · Spring Boot 3 · MongoDB · Gemini AI</p>
+<p>Final Year Engineering Project @ <b>Centre National d'Informatique (CNI), Tunisia</b></p>
+<br/>
 <a href="#">🚀 Live Demo</a>  · 
 <a href="https://github.com/hamayari/Pfe-Backend">📦 Backend Repo</a>  · 
 <a href="mailto:hamayari71@gmail.com">📬 Contact</a>
@@ -37,7 +37,8 @@ Built from scratch over 6 months at a national public institution using Agile Sc
 
 📊 Key Metrics
 <div align="center">
-🔗 70+ REST Endpoints🗄️ 44 MongoDB Entities⚙️ 95+ Backend Services🧩 50+ Angular Components🔐 6 User Roles🧪 95+ Unit Tests🐳 Docker + Jenkins CI/CD📊 Prometheus + Grafana
+🔗 REST Endpoints🗄️ MongoDB Entities⚙️ Backend Services🧩 Angular Components70+4495+50+
+🔐 User Roles🧪 Unit Tests🐳 DevOps📊 Monitoring695+Jenkins + DockerPrometheus + Grafana
 </div>
 
 ✨ Features
@@ -62,19 +63,16 @@ Audit Trail — Complete login and action history per user
 Real-time system monitoring (CPU, RAM, Disk via Prometheus)
 Full user CRUD with role assignment
 Global KPIs, statistics, and nomenclature configuration
-Complete audit logs and traceability
 
 💼 Commercial Dashboard
 
 Interactive sales pipeline and revenue tracking
-Performance charts and conversion indicators
-Payment deadline calendar and leaderboard
+Performance charts, conversion indicators, payment deadline calendar
 
 🎯 Decision Maker Dashboard
 
-Real-time strategic KPIs and heatmaps
-Advanced analytics and trend detection
-AI Chatbot (Gemini AI) for natural language data analysis
+Real-time strategic KPIs and regional heatmaps
+AI Chatbot (Gemini AI) for natural language data analysis and predictions
 
 📋 Project Manager Dashboard
 
@@ -86,21 +84,21 @@ Team overview, shared calendar, and validation workflow
 <summary>&nbsp;<b>📝 Convention Management</b></summary>
 <br/>
 
-Full CRUD with guided forms, inline editing, and validation
+Full CRUD with guided forms, inline editing, and field validation
 Paginated list with multi-filter, sorting, and advanced search
-Geographic zone/region selection with autocomplete
+Geographic zone/region autocomplete selection
 Visual lifecycle workflow with colored status badges
 Full modification timeline with versioning history
-Data export to PDF, Excel, CSV
+Data export: PDF · Excel · CSV
 
 </details>
 <details>
 <summary>&nbsp;<b>💳 Smart Billing & OCR Validation</b></summary>
 <br/>
 
-Automatic invoice generation directly from conventions
+Automatic invoice generation from conventions
 Partial payment tracking with balance management
-Tesseract OCR — automatic data extraction from uploaded payment proofs
+Tesseract OCR — auto data extraction from uploaded payment proofs
 Smart auto-matching of proofs to invoices
 Color-coded delay indicators and multi-channel payment alerts
 
@@ -116,13 +114,13 @@ Full-text message search, threaded replies, @mentions
 
 </details>
 <details>
-<summary>&nbsp;<b>🤖 AI Chatbot — Powered by Gemini AI</b></summary>
+<summary>&nbsp;<b>🤖 AI Chatbot — Gemini AI</b></summary>
 <br/>
 
 Natural language report generation and business queries
 Predictive analytics and strategic recommendations
 Dynamic on-the-fly chart generation
-Context-aware intelligent search with conversation history
+Conversation history with context-aware search
 FR/EN multilingual support
 
 </details>
@@ -131,95 +129,99 @@ FR/EN multilingual support
 <br/>
 
 Unified inbox for all notification types
-Multi-channel delivery: Email (Brevo) · SMS (Twilio) · In-App · Web Push
+Multi-channel: Email (Brevo) · SMS (Twilio) · In-App · Web Push
 Configurable thresholds with automatic alert triggering and escalation
-Real-time browser push notifications with unread badge counter
 
 </details>
 
 🛠️ Tech Stack
-Frontend
+<div align="center">
+🖥️ Frontend
 CategoryTechnologyVersionFrameworkAngular15.2.10LanguageTypeScript4.9.4UI LibraryAngular Material15.2.9Reactive ProgrammingRxJS7.8.0ChartingChart.js + ng2-charts4.4.0 / 4.1.1Maps & HeatmapsLeafletLatestCustom VisualizationD3.jsLatestReal-TimeWebSocket / STOMP—StylingSCSS / Material Design 3—PWAService Workers—
-Backend (see Pfe-Backend)
-CategoryTechnologyVersionFrameworkSpring Boot3.2.0LanguageJava17DatabaseMongoDB7.0AIGemini AI API—OCRTesseract5.4.0EmailBrevo / SMTP—SMSTwilio SDK8.31.1PaymentsStripe Java24.6.0CI/CDJenkins + Docker—API DocsSwagger / OpenAPI 3.0—MonitoringPrometheus + Grafana—TestingJUnit + Mockito + JaCoCo—
+<br/>
+⚙️ Backend  (see Pfe-Backend)
+CategoryTechnologyVersionFrameworkSpring Boot3.2.0LanguageJava17DatabaseMongoDB7.0AIGemini AI API—OCRTesseract5.4.0EmailBrevo / SMTP—SMSTwilio SDK8.31.1PaymentsStripe Java24.6.0CI/CDJenkins + Docker—API DocsSwagger / OpenAPI3.0MonitoringPrometheus + Grafana—TestingJUnit + Mockito + JaCoCo—
+</div>
 
 📁 Architecture
 src/
+│
 ├── app/
-│   ├── auth/                        # Authentication (login, 2FA, password reset)
-│   ├── dashboard/
-│   │   ├── admin-dashboard/
-│   │   ├── commercial-dashboard/
-│   │   ├── decision-maker-dashboard/
-│   │   └── project-manager-dashboard/
-│   ├── features/
-│   │   ├── convention-management/
-│   │   ├── invoice-management/
-│   │   ├── messaging-page/          # Real-time chat (WebSocket + STOMP)
-│   │   ├── chatbot-decideur/        # Gemini AI chatbot
-│   │   ├── monitoring-system/       # KPI monitoring
-│   │   ├── payment-proofs/          # OCR validation
-│   │   ├── reports/
-│   │   └── predictive-analytics/
-│   ├── services/                    # 60+ Angular services
-│   ├── guards/                      # Role-based route guards
-│   ├── models/                      # TypeScript interfaces
-│   ├── shared/                      # Reusable components & pipes
-│   └── core/                        # JWT interceptors, error handling
+│   │
+│   ├── 🔐 auth/                       # Login · 2FA · Password reset
+│   │
+│   ├── 📊 dashboard/
+│   │   ├── admin-dashboard/           # System monitoring + user mgmt
+│   │   ├── commercial-dashboard/      # Sales pipeline + revenue
+│   │   ├── decision-maker-dashboard/  # KPIs + heatmaps + AI chatbot
+│   │   └── project-manager-dashboard/ # Tasks + teams + calendar
+│   │
+│   ├── 🧩 features/
+│   │   ├── convention-management/     # Convention lifecycle (CRUD)
+│   │   ├── invoice-management/        # Billing + partial payments
+│   │   ├── messaging-page/            # Real-time chat (WebSocket)
+│   │   ├── chatbot-decideur/          # Gemini AI assistant
+│   │   ├── monitoring-system/         # KPI widgets + alerts
+│   │   ├── payment-proofs/            # OCR upload & validation
+│   │   ├── reports/                   # Report generation
+│   │   └── predictive-analytics/      # Forecasting & trends
+│   │
+│   ├── ⚙️  services/                  # 60+ Angular services
+│   ├── 🛡️  guards/                    # Role-based route guards
+│   ├── 📐 models/                     # TypeScript interfaces
+│   ├── 🔁 shared/                     # Reusable components & pipes
+│   └── 🔩 core/                       # JWT interceptors + error handling
+│
 ├── assets/
-│   └── i18n/                        # Translation files (FR / EN)
-└── environments/                    # Dev / Production config
+│   └── i18n/                          # Translations — FR / EN
+│
+└── environments/                      # Dev / Production config
 
 🚀 Installation
 Prerequisites
-
-Node.js 18+ and npm 9+
-Angular CLI 15.2.10
-Git
-
+ToolVersionNode.js + npm18+ / 9+Angular CLI15.2.10GitLatest
 Quick Start
-bash# 1. Clone the repository
+bash# Clone the repository
 git clone https://github.com/hamayari/gestion-pro-frontend.git
 cd gestion-pro-frontend
 
-# 2. Install dependencies
+# Install dependencies
 npm install
 
-# 3. Start the development server
+# Start the development server
 npm start
 
-App runs at http://localhost:4200
-Backend must be running at http://localhost:8080
+✅ App runs at http://localhost:4200
+⚠️ Backend must be running at http://localhost:8080
 
 Environment Configuration
 typescript// src/environments/environment.ts
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080/api',
-  wsUrl: 'ws://localhost:8080/ws',
+  wsUrl:  'ws://localhost:8080/ws',
   tokenKey: 'auth_token',
   refreshTokenKey: 'refresh_token',
   enableChatbot: true,
   enableNotifications: true,
   enableWebSocket: true,
-  geminiApiKey: 'YOUR_GEMINI_API_KEY',
+  geminiApiKey: 'YOUR_GEMINI_API_KEY',   // ← replace with your key
   enableMonitoring: true,
   metricsInterval: 30000
 };
-Available Scripts
-bashnpm start              # Dev server — http://localhost:4200
-npm run build          # Production build → dist/
-npm run build:stats    # Build + bundle analyzer
-npm run lint           # ESLint check
-npm run lint:fix       # Auto-fix lint issues
-npm run format         # Prettier formatting
+Scripts
+CommandDescriptionnpm startDev server → http://localhost:4200npm run buildProduction build → dist/npm run build:statsBuild + bundle analyzernpm run lintESLint checknpm run lint:fixAuto-fix lint issuesnpm run formatPrettier formatting
 
 👥 Roles & Permissions
+<div align="center">
 RoleRouteAccess🔴 SUPER_ADMIN/adminFull system access + monitoring🟠 ADMIN/adminUser management + nomenclatures🟢 COMMERCIAL/commercialConventions + invoices + clients🔵 DECISION_MAKER/decideurAnalytics + KPIs + AI chatbot🟣 PROJECT_MANAGER/project-managerProjects + tasks + teams⚪ USER/homeRead-only view
+</div>
 
 📈 Performance
+<div align="center">
 MetricTargetFirst Contentful Paint< 1.5sTime to Interactive< 3.5sLighthouse Score90+
-Implemented optimizations:
+</div>
+Optimizations implemented:
 
 ✅ Lazy loading of all feature modules
 ✅ OnPush Change Detection strategy
@@ -227,7 +229,7 @@ Implemented optimizations:
 ✅ Virtual Scrolling for large datasets
 ✅ Image lazy loading
 ✅ Service Workers (PWA-ready)
-✅ Bundle optimization, Tree shaking, AOT Compilation
+✅ Bundle optimization · Tree shaking · AOT Compilation
 
 
 🔒 Security
@@ -237,8 +239,7 @@ Implemented optimizations:
 ✅ Input sanitization via DomSanitizer
 ✅ CSRF token protection
 ✅ Content Security Policy headers
-✅ XSS Prevention
-✅ Secure HTTP headers
+✅ XSS Prevention · Secure HTTP headers
 ✅ Client-side input validation on all forms
 
 
@@ -266,16 +267,15 @@ CMD ["nginx", "-g", "daemon off;"]
 ♿ Accessibility
 
 ✅ ARIA labels on all interactive components
-✅ Full keyboard navigation support
-✅ WCAG AA color contrast compliance
+✅ Full keyboard navigation · WCAG AA color contrast
 ✅ Screen reader friendly · Semantic HTML throughout
 
 
 🤝 Contributing
-bash# Fork → branch → commit → pull request
-git checkout -b feature/YourFeature
+bashgit checkout -b feature/YourFeature
 git commit -m "feat: add YourFeature"
 git push origin feature/YourFeature
+# → Open a Pull Request
 
 📄 License
 Distributed under the MIT License — see LICENSE for details.
