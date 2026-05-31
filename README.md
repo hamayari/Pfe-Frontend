@@ -1,151 +1,161 @@
-<div align="center">
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4F46E5,100:7C3AED&height=200&section=header&text=Gestion%20Pro%20—%20Frontend&fontSize=42&fontColor=ffffff&fontAlignY=38&desc=Enterprise%20Commercial%20Management%20Platform&descAlignY=58&descSize=18" width="100%"/>
-
-
-Full-stack enterprise platform built with Angular 15 · Spring Boot 3 · MongoDB · Gemini AI
-Developed as a Final Year Engineering Project at the Centre National d'Informatique (CNI), Tunisia
-
+div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:8B5CF6,100:A855F7&height=180&section=header&text=Gestion%20Pro%20%E2%80%94%20Frontend&fontSize=38&fontColor=ffffff&fontAlignY=40&desc=Enterprise%20Commercial%20Management%20Platform&descSize=16&descAlignY=62&descColor=e0d7ff" width="100%" />
+</div>
 <br/>
-🚀 Live Demo · 📖 Backend Repo · 📬 Contact
+<div align="center">
+<a href="https://angular.io/"><img src="https://img.shields.io/badge/Angular-15.2.10-DD0031?style=for-the-badge&logo=angular&logoColor=white"/></a> 
+<a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-4.9.4-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/></a> 
+<a href="https://material.angular.io/"><img src="https://img.shields.io/badge/Angular_Material-15.2.9-7C3AED?style=for-the-badge&logo=angular&logoColor=white"/></a> 
+<a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white"/></a> 
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge"/></a>
+<br/><br/>
+  <p><b>Full-stack enterprise platform</b> — Angular 15 · Spring Boot 3 · MongoDB · Gemini AI</p>
+  <p>Final Year Engineering Project @ <b>Centre National d'Informatique (CNI), Tunisia</b></p>
+  <br/>
+<a href="#">🚀 Live Demo</a>  · 
+<a href="https://github.com/hamayari/Pfe-Backend">📦 Backend Repo</a>  · 
+<a href="mailto:hamayari71@gmail.com">📬 Contact</a>
 </div>
 
-<div align="center">
 📌 Table of Contents
-Overview · Features · Tech Stack · Architecture · Installation · Roles · Performance · Security · Deployment
-</div>
+
+Overview
+Key Metrics
+Features
+Tech Stack
+Architecture
+Installation
+Roles & Permissions
+Performance
+Security
+Deployment
+
 
 🌐 Overview
-<table>
-<tr>
-<td width="60%">
-Gestion Pro is a production-grade, full-stack commercial management platform. It handles the full lifecycle of conventions and invoicing, provides role-based analytical dashboards, real-time team messaging, and an AI-powered decision-support chatbot — all in a single, unified interface.
-This project was built from scratch during a 6-month internship at a national public institution, applying real-world Agile Scrum methodology with full CI/CD pipelines.
-</td>
-<td width="40%" align="center">
-MetricValue📦 REST Endpoints70+🗄️ MongoDB Entities44⚙️ Backend Services95+🧩 Angular Components50+🔐 User Roles6🧪 Unit Tests95+
-</td>
-</tr>
-</table>
+Gestion Pro is a production-grade enterprise web application that manages the complete lifecycle of commercial conventions and billing, provides role-based analytical dashboards, enables real-time team messaging, and integrates an AI-powered decision-support chatbot — all in a single unified platform.
+Built from scratch over 6 months at a national public institution using Agile Scrum methodology with full CI/CD pipelines, automated testing, and containerized deployment.
+
+📊 Key Metrics
+<div align="center">
+🔗 70+ REST Endpoints🗄️ 44 MongoDB Entities⚙️ 95+ Backend Services🧩 50+ Angular Components🔐 6 User Roles🧪 95+ Unit Tests🐳 Docker + Jenkins CI/CD📊 Prometheus + Grafana
+</div>
 
 ✨ Features
 <details>
-<summary><b>🔐 Authentication & Security</b></summary>
+<summary>&nbsp;<b>🔐 Authentication & Security</b></summary>
 <br/>
-FeatureDescriptionJWT LoginSecure token-based authentication with auto-refresh2FA (TOTP)QR code scan + time-based one-time password validationAngular GuardsRole-based route protection for all pagesSession ManagementAutomatic token refresh and logout on expiryPassword RecoveryEmail-based secure reset flowHTTP InterceptorsAutomatic token injection on every requestAudit TrailComplete login and action history per user
+
+JWT Authentication — Secure token-based login with auto-refresh and expiry management
+Two-Factor Auth (TOTP) — QR code scan + time-based one-time password validation
+Angular Route Guards — Role-based protection on every route
+Session Management — Automatic token refresh and silent logout on expiry
+Password Recovery — Secure email-based reset flow
+HTTP Interceptors — Automatic token injection on all outgoing requests
+Audit Trail — Complete login and action history per user
+
 </details>
 <details>
-<summary><b>📊 Role-Based Dashboards (4 specialized views)</b></summary>
+<summary>&nbsp;<b>📊 Role-Based Dashboards</b></summary>
 <br/>
 👨‍💼 Admin Dashboard
 
-Real-time system monitoring (CPU, RAM, Disk)
+Real-time system monitoring (CPU, RAM, Disk via Prometheus)
 Full user CRUD with role assignment
-Global KPIs and statistics
-Nomenclature configuration
-Full audit logs and traceability
+Global KPIs, statistics, and nomenclature configuration
+Complete audit logs and traceability
 
 💼 Commercial Dashboard
 
-Interactive sales pipeline
-Revenue and target tracking
+Interactive sales pipeline and revenue tracking
 Performance charts and conversion indicators
-Payment deadline calendar
+Payment deadline calendar and leaderboard
 
 🎯 Decision Maker Dashboard
 
-Real-time strategic KPIs
-Interactive regional heatmaps
-Predictive analytics with trend detection
-AI Chatbot powered by Gemini AI
+Real-time strategic KPIs and heatmaps
+Advanced analytics and trend detection
+AI Chatbot (Gemini AI) for natural language data analysis
 
 📋 Project Manager Dashboard
 
-Active project and task tracking
-Team overview and shared calendar
-Productivity metrics and validation workflow
+Active project and task management
+Team overview, shared calendar, and validation workflow
 
 </details>
 <details>
-<summary><b>📝 Convention Management</b></summary>
+<summary>&nbsp;<b>📝 Convention Management</b></summary>
 <br/>
 
-Full CRUD with guided forms and validation
-Advanced search with multi-filter and dynamic sorting
+Full CRUD with guided forms, inline editing, and validation
+Paginated list with multi-filter, sorting, and advanced search
 Geographic zone/region selection with autocomplete
 Visual lifecycle workflow with colored status badges
-Modification timeline with full versioning history
+Full modification timeline with versioning history
 Data export to PDF, Excel, CSV
 
 </details>
 <details>
-<summary><b>💳 Smart Billing & OCR Validation</b></summary>
+<summary>&nbsp;<b>💳 Smart Billing & OCR Validation</b></summary>
 <br/>
 
 Automatic invoice generation directly from conventions
-Customizable auto-numbering sequences
 Partial payment tracking with balance management
-Tesseract OCR — automatic data extraction from payment proofs
-Smart auto-matching of uploaded proofs to invoices
-Color-coded delay indicators and payment alerts
+Tesseract OCR — automatic data extraction from uploaded payment proofs
+Smart auto-matching of proofs to invoices
+Color-coded delay indicators and multi-channel payment alerts
 
 </details>
 <details>
-<summary><b>💬 Real-Time Messaging (Slack-style)</b></summary>
+<summary>&nbsp;<b>💬 Real-Time Messaging (Slack-style)</b></summary>
 <br/>
 
-Live bidirectional WebSocket communication (STOMP protocol)
+Bidirectional WebSocket communication via STOMP protocol
 File attachments, emoji reactions, pinned messages
-Typing indicators ("X is typing...")
-Full-text message search
-User online/offline presence
-Threaded replies and @mentions
+Typing indicators, online/offline user presence
+Full-text message search, threaded replies, @mentions
 
 </details>
 <details>
-<summary><b>🤖 Integrated AI Chatbot (Gemini AI)</b></summary>
+<summary>&nbsp;<b>🤖 AI Chatbot — Powered by Gemini AI</b></summary>
 <br/>
 
-Natural language report generation
-Predictive analytics and business recommendations
+Natural language report generation and business queries
+Predictive analytics and strategic recommendations
 Dynamic on-the-fly chart generation
-Context-aware intelligent search
-Conversation history — save and resume sessions
+Context-aware intelligent search with conversation history
 FR/EN multilingual support
 
 </details>
 <details>
-<summary><b>🔔 Notification Center & KPI Alerts</b></summary>
+<summary>&nbsp;<b>🔔 Notification Center & KPI Alerts</b></summary>
 <br/>
 
 Unified inbox for all notification types
-Multi-channel delivery: Email · SMS (Twilio) · In-App · Web Push
-Configurable thresholds with automatic alert triggering
-Alert delegation and escalation workflows
-Real-time browser push notifications
+Multi-channel delivery: Email (Brevo) · SMS (Twilio) · In-App · Web Push
+Configurable thresholds with automatic alert triggering and escalation
+Real-time browser push notifications with unread badge counter
 
 </details>
 
 🛠️ Tech Stack
-<div align="center">
 Frontend
-LayerTechnologyVersionFrameworkAngular15.2.10LanguageTypeScript4.9.4UI LibraryAngular Material15.2.9Reactive ProgrammingRxJS7.8.0ChartingChart.js + ng2-charts4.4.0 / 4.1.1Maps & HeatmapsLeafletLatestCustom VizD3.jsLatestReal-TimeWebSocket (STOMP)—StylingSCSS / Material Design 3—PWAService Workers—
+CategoryTechnologyVersionFrameworkAngular15.2.10LanguageTypeScript4.9.4UI LibraryAngular Material15.2.9Reactive ProgrammingRxJS7.8.0ChartingChart.js + ng2-charts4.4.0 / 4.1.1Maps & HeatmapsLeafletLatestCustom VisualizationD3.jsLatestReal-TimeWebSocket / STOMP—StylingSCSS / Material Design 3—PWAService Workers—
 Backend (see Pfe-Backend)
-LayerTechnologyVersionFrameworkSpring Boot3.2.0LanguageJava17DatabaseMongoDB7.0AIGemini AI API—OCRTesseract5.4.0EmailBrevo (SMTP)—SMSTwilio SDK8.31.1PaymentsStripe Java24.6.0CI/CDJenkins + Docker—API DocsSwagger / OpenAPI 3.0—MonitoringPrometheus + Grafana—
-</div>
+CategoryTechnologyVersionFrameworkSpring Boot3.2.0LanguageJava17DatabaseMongoDB7.0AIGemini AI API—OCRTesseract5.4.0EmailBrevo / SMTP—SMSTwilio SDK8.31.1PaymentsStripe Java24.6.0CI/CDJenkins + Docker—API DocsSwagger / OpenAPI 3.0—MonitoringPrometheus + Grafana—TestingJUnit + Mockito + JaCoCo—
 
 📁 Architecture
 src/
 ├── app/
-│   ├── auth/                        # Authentication (login, 2FA, reset)
-│   ├── dashboard/                   # 4 role-based dashboards
+│   ├── auth/                        # Authentication (login, 2FA, password reset)
+│   ├── dashboard/
 │   │   ├── admin-dashboard/
 │   │   ├── commercial-dashboard/
 │   │   ├── decision-maker-dashboard/
 │   │   └── project-manager-dashboard/
-│   ├── features/                    # Feature modules
+│   ├── features/
 │   │   ├── convention-management/
 │   │   ├── invoice-management/
-│   │   ├── messaging-page/          # Real-time chat (WebSocket)
+│   │   ├── messaging-page/          # Real-time chat (WebSocket + STOMP)
 │   │   ├── chatbot-decideur/        # Gemini AI chatbot
 │   │   ├── monitoring-system/       # KPI monitoring
 │   │   ├── payment-proofs/          # OCR validation
@@ -157,8 +167,7 @@ src/
 │   ├── shared/                      # Reusable components & pipes
 │   └── core/                        # JWT interceptors, error handling
 ├── assets/
-│   ├── i18n/                        # Translation files (FR / EN)
-│   └── icons/
+│   └── i18n/                        # Translation files (FR / EN)
 └── environments/                    # Dev / Production config
 
 🚀 Installation
@@ -170,8 +179,8 @@ Git
 
 Quick Start
 bash# 1. Clone the repository
-git clone https://github.com/hamayari/Pfe-Frontend.git
-cd Pfe-Frontend
+git clone https://github.com/hamayari/gestion-pro-frontend.git
+cd gestion-pro-frontend
 
 # 2. Install dependencies
 npm install
@@ -179,8 +188,8 @@ npm install
 # 3. Start the development server
 npm start
 
-The app runs at http://localhost:4200
-Make sure the backend is running at http://localhost:8080
+App runs at http://localhost:4200
+Backend must be running at http://localhost:8080
 
 Environment Configuration
 typescript// src/environments/environment.ts
@@ -193,33 +202,29 @@ export const environment = {
   enableChatbot: true,
   enableNotifications: true,
   enableWebSocket: true,
-  geminiApiKey: 'YOUR_GEMINI_API_KEY',   // ← Replace with your key
+  geminiApiKey: 'YOUR_GEMINI_API_KEY',
   enableMonitoring: true,
   metricsInterval: 30000
 };
 Available Scripts
-bashnpm start              # Development server (port 4200)
+bashnpm start              # Dev server — http://localhost:4200
 npm run build          # Production build → dist/
-npm run build:stats    # Production build + bundle analysis
+npm run build:stats    # Build + bundle analyzer
 npm run lint           # ESLint check
 npm run lint:fix       # Auto-fix lint issues
 npm run format         # Prettier formatting
 
 👥 Roles & Permissions
-<div align="center">
-RoleRouteAccess Level🔴 SUPER_ADMIN/adminFull system access + monitoring🟠 ADMIN/adminUser management + nomenclatures🟢 COMMERCIAL/commercialConventions + invoices + clients🔵 DECISION_MAKER/decideurAnalytics + KPIs + AI chatbot🟣 PROJECT_MANAGER/project-managerProjects + tasks + teams⚪ USER/homeRead-only view
-</div>
+RoleRouteAccess🔴 SUPER_ADMIN/adminFull system access + monitoring🟠 ADMIN/adminUser management + nomenclatures🟢 COMMERCIAL/commercialConventions + invoices + clients🔵 DECISION_MAKER/decideurAnalytics + KPIs + AI chatbot🟣 PROJECT_MANAGER/project-managerProjects + tasks + teams⚪ USER/homeRead-only view
 
-📊 Performance
-<div align="center">
+📈 Performance
 MetricTargetFirst Contentful Paint< 1.5sTime to Interactive< 3.5sLighthouse Score90+
-</div>
-Optimizations implemented:
+Implemented optimizations:
 
 ✅ Lazy loading of all feature modules
 ✅ OnPush Change Detection strategy
 ✅ TrackBy in all *ngFor loops
-✅ Virtual Scrolling for large lists
+✅ Virtual Scrolling for large datasets
 ✅ Image lazy loading
 ✅ Service Workers (PWA-ready)
 ✅ Bundle optimization, Tree shaking, AOT Compilation
@@ -228,7 +233,7 @@ Optimizations implemented:
 🔒 Security
 
 ✅ JWT with auto-refresh and expiry management
-✅ Route guards on every protected page
+✅ Role-based route guards on every protected page
 ✅ Input sanitization via DomSanitizer
 ✅ CSRF token protection
 ✅ Content Security Policy headers
@@ -263,26 +268,22 @@ CMD ["nginx", "-g", "daemon off;"]
 ✅ ARIA labels on all interactive components
 ✅ Full keyboard navigation support
 ✅ WCAG AA color contrast compliance
-✅ Screen reader friendly
-✅ Semantic HTML throughout
+✅ Screen reader friendly · Semantic HTML throughout
 
 
 🤝 Contributing
-bash# 1. Fork the project
-# 2. Create your feature branch
+bash# Fork → branch → commit → pull request
 git checkout -b feature/YourFeature
-
-# 3. Commit your changes
 git commit -m "feat: add YourFeature"
-
-# 4. Push and open a Pull Request
 git push origin feature/YourFeature
 
 📄 License
-Distributed under the MIT License. See LICENSE for details.
+Distributed under the MIT License — see LICENSE for details.
 
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4F46E5,100:7C3AED&height=100&section=footer" width="100%"/>
-Made with ❤️ by Mohamed Amine Ayari
-⭐ If this project helped you, please give it a star — it means a lot!
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:8B5CF6,100:A855F7&height=100&section=footer" width="100%"/>
+  <br/>
+  <b>Made with ❤️ by <a href="https://www.linkedin.com/in/mohamed-amine-ayari-34917b222">Mohamed Amine Ayari</a></b>
+  <br/><br/>
+  ⭐ If this project helped you, please give it a star — it means a lot!
 </div>
