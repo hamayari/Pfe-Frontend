@@ -2,14 +2,16 @@
 
 # 🚀 Enterprise Management Platform - Frontend
 
-### Modern Full-Stack Business Management & Invoicing Application
+### Modern Angular SPA for Business Management & Invoicing
 
 [![Angular](https://img.shields.io/badge/Angular-15.2.10-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Material](https://img.shields.io/badge/Material_UI-15.2.9-0081CB?style=for-the-badge&logo=material-ui&logoColor=white)](https://material.angular.io/)
 [![RxJS](https://img.shields.io/badge/RxJS-7.8-B7178C?style=for-the-badge&logo=reactivex&logoColor=white)](https://rxjs.dev/)
 
-[Live Demo](#) • [Documentation](#) • [Report Bug](#) • [Request Feature](#)
+**🔗 [Backend Repository](https://github.com/YOUR_USERNAME/YOUR_BACKEND_REPO)** • [Live Demo](#) • [Report Bug](#) • [Request Feature](#)
+
+> **Note:** This is the frontend repository. For the backend API, please visit the [backend repository](https://github.com/YOUR_USERNAME/YOUR_BACKEND_REPO).
 
 </div>
 
@@ -17,7 +19,9 @@
 
 ## 🎯 Project Overview
 
-**Enterprise-grade Angular application** featuring a sophisticated business management system with real-time communication, AI-powered analytics, and role-based dashboards. Built with modern web technologies and best practices for scalability, performance, and user experience.
+**This is the frontend repository** of an enterprise-grade business management system. Built with Angular 15 and TypeScript, it provides a sophisticated single-page application with real-time communication, AI-powered analytics, and role-based dashboards.
+
+> 🔗 **Backend Repository:** [Link to your backend repo](https://github.com/YOUR_USERNAME/YOUR_BACKEND_REPO)
 
 ### 🌟 Key Highlights
 
@@ -461,7 +465,21 @@ export const environment = {
 
 ### Backend Configuration
 
-Ensure the backend API is running and accessible at `http://localhost:8080`
+**Important:** This frontend application requires the backend API to be running.
+
+1. Clone and setup the backend repository: [Backend Repo Link](https://github.com/YOUR_USERNAME/YOUR_BACKEND_REPO)
+2. Follow the backend setup instructions
+3. Ensure the backend API is running on `http://localhost:8080`
+4. Update the `environment.ts` file if your backend runs on a different port
+
+```typescript
+// src/environments/environment.ts
+export const environment = {
+  apiUrl: 'http://localhost:8080/api',  // Update if needed
+  wsUrl: 'ws://localhost:8080/ws',      // Update if needed
+  // ... other config
+};
+```
 
 ---
 
@@ -770,6 +788,10 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 - 💼 LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
 - 🐙 GitHub: [@hamayari](https://github.com/hamayari)
 
+**Project Links:**
+- 🎨 Frontend Repository: [This Repo](https://github.com/hamayari/Pfe-Frontend)
+- ⚙️ Backend Repository: [Backend Repo](https://github.com/YOUR_USERNAME/YOUR_BACKEND_REPO)
+
 ---
 
 ## 🙏 Acknowledgments
@@ -797,14 +819,16 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 | 🌐 **Integration** | WebSocket, REST API, OCR, AI chatbot (Gemini) |
 | 📱 **Responsive** | Mobile-first design, works on all devices |
 
-### **Technical Skills Demonstrated**
+### **Frontend Technical Skills Demonstrated**
 
 ```
-Angular 15 • TypeScript • RxJS • Material Design • WebSocket
-Chart.js • D3.js • JWT Authentication • Route Guards • Interceptors
-Reactive Forms • State Management • PWA • Docker • CI/CD
-SCSS/SASS • Responsive Design • Accessibility • i18n
+Angular 15 • TypeScript • RxJS • Material Design • WebSocket Client
+Chart.js • D3.js • JWT Authentication • Route Guards • HTTP Interceptors
+Reactive Forms • State Management • PWA • Responsive Design
+SCSS/SASS • Accessibility (WCAG) • i18n • Performance Optimization
 ```
+
+> 💡 **Full Stack Project:** This frontend works with a [Spring Boot backend](https://github.com/YOUR_USERNAME/YOUR_BACKEND_REPO) featuring REST APIs, WebSocket, JWT security, and PostgreSQL database.
 
 ---
 
